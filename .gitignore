@@ -1,0 +1,22 @@
+## .NET
+bin/
+obj/
+*.user
+.vs/
+*.suo
+TestResults/
+*.db
+*.db-shm
+*.db-wal
+
+## Generated ICO files (keep template PNG)
+*.ico
+!src/Folderly.Core/Resources/*.png
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Logs
+logs/
+*.log
