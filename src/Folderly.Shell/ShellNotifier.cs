@@ -17,9 +17,17 @@ public sealed class ShellNotifier : IShellNotifier
             nint.Zero);
 
         // 特定フォルダへの変更通知
+        var parentPath = Directory.GetParent(folderPath)?.FullName;
+
+        NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(Path.Combine(folderPath, "desktop.ini"), NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
+        if (!string.IsNullOrWhiteSpace(parentPath))
+        {
+            NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEITEM);
+            NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEDIR);
+        }
 
         NativeMethods.SHChangeNotify(
             NativeMethods.SHCNE_ASSOCCHANGED,
