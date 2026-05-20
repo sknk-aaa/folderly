@@ -9,11 +9,11 @@ public static class FolderAttributesService
     public static FileAttributes GetAttributes(string path)
         => File.GetAttributes(path);
 
-    /// <summary>対象フォルダに FILE_ATTRIBUTE_SYSTEM を付与する。</summary>
+    /// <summary>対象フォルダに desktop.ini カスタマイズ用の属性を付与する。</summary>
     public static void ApplyFolderAttributes(string folderPath)
     {
         var current = File.GetAttributes(folderPath);
-        File.SetAttributes(folderPath, current | FileAttributes.System);
+        File.SetAttributes(folderPath, current | FileAttributes.System | FileAttributes.ReadOnly);
     }
 
     /// <summary>desktop.ini に HIDDEN | SYSTEM を付与する。</summary>
