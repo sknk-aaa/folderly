@@ -28,7 +28,7 @@ public interface IShellItemArray
 }
 
 [ComVisible(true)]
-[Guid("A08CE4D0-FA25-44AB-B57C-C7240467C5B0")]
+[Guid("A08CE4D0-FA25-44AB-B57C-C7B1C323E0B9")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 public interface IExplorerCommand
 {
