@@ -14,6 +14,8 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <EntryPointProjectUniqueName>..\Folderly.App\Folderly.App.csproj</EntryPointProjectUniqueName>
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <SkipCopyBuildProduct>true</SkipCopyBuildProduct>
     <AssetTargetFallback>uap10.0.17763</AssetTargetFallback>
     <MinimumVisualStudioVersion>15</MinimumVisualStudioVersion>
   </PropertyGroup>
