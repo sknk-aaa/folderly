@@ -7,7 +7,7 @@ Windows フォルダの見た目を「表紙画像 + 色タグ」で変えられ
 ### 必要なもの
 
 - .NET 8 SDK (8.0.421+)
-- Visual Studio 2022 (17.10+)  
+- Visual Studio 2022 (17.10+) / Visual Studio 2026  
   必須ワークロード: **Windows アプリケーション開発**（MSIX パッケージングツール含む）
 - Windows 10 1809 (build 17763) 以上（実行・テスト環境）
 
@@ -27,16 +27,70 @@ dotnet test tests/Folderly.Tests/Folderly.Tests.csproj --logger "console;verbosi
 
 ### MSIX パッケージのビルド（サイドロードテスト用）
 
-1. `Folderly.sln` を Visual Studio 2022 で開く
-2. スタートアッププロジェクトを `Folderly.Package` に設定
-3. `Release | x64` を選択してビルド
-4. 出力先: `src/Folderly.Package/bin/x64/Release/` に `.msix` が生成される
+Visual Studio の WAP ビルドで `.msix` が生成されない環境があるため、現時点では
+`Folderly.Package` の Release 出力を `makeappx` で手動パックします。
+
+```powershell
+cd $env:USERPROFILE\dev\folderly
+
+$msbuild = "${env:ProgramFiles}\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
+
+& $msbuild .\src\Folderly.App\Folderly.App.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false
+& $msbuild .\src\Folderly.ContextMenu\Folderly.ContextMenu.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false
+& $msbuild .\src\Folderly.Package\Folderly.Package.wapproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false
+
+$stage = ".\src\Folderly.Package\obj\x64\Release\MsixStage"
+$out = ".\src\Folderly.Package\AppPackages\Folderly_1.0.0.1_x64.msix"
+
+Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force $stage | Out-Null
+New-Item -ItemType Directory -Force ".\src\Folderly.Package\AppPackages" | Out-Null
+
+Copy-Item ".\src\Folderly.Package\bin\x64\Release\*" $stage -Recurse -Force
+Copy-Item ".\src\Folderly.Package\Package.appxmanifest" "$stage\AppxManifest.xml" -Force
+Copy-Item ".\src\Folderly.Package\Images" "$stage\Images" -Recurse -Force
+
+$makeappx = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter makeappx.exe |
+  Where-Object { $_.FullName -like "*\x64\makeappx.exe" } |
+  Sort-Object FullName -Descending |
+  Select-Object -First 1 -ExpandProperty FullName
+
+& $makeappx pack /d $stage /p $out /overwrite
+```
 
 **ローカルサイドロード手順（開発者テスト）**:
+
+初回のみ、`CN=Folderly` のテスト証明書を作成して `LocalMachine\Root` に信頼登録します。
+証明書登録は管理者 PowerShell で実行してください。
+
 ```powershell
-# 開発者モードを有効化（設定 → 開発者向け → 開発者モード）
-# または PowerShell (管理者) で:
-Add-AppxPackage -Path "src\Folderly.Package\bin\x64\Release\Folderly.Package_1.0.0.0_x64_Debug.msix"
+$cert = New-SelfSignedCertificate `
+  -Type Custom `
+  -Subject "CN=Folderly" `
+  -KeyUsage DigitalSignature `
+  -FriendlyName "Folderly Temporary MSIX Certificate" `
+  -CertStoreLocation "Cert:\CurrentUser\My" `
+  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3")
+
+Export-Certificate -Cert $cert -FilePath "$env:TEMP\FolderlyTemporary.cer"
+Import-Certificate -FilePath "$env:TEMP\FolderlyTemporary.cer" -CertStoreLocation Cert:\LocalMachine\Root
+```
+
+署名とインストール:
+
+```powershell
+$signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+  Where-Object { $_.FullName -like "*\x64\signtool.exe" } |
+  Sort-Object FullName -Descending |
+  Select-Object -First 1 -ExpandProperty FullName
+
+& $signtool sign /fd SHA256 /sha1 <証明書のThumbprint> $out
+
+Get-AppxPackage *Folderly* | Remove-AppxPackage
+Stop-Process -Name dllhost -Force -ErrorAction SilentlyContinue
+Add-AppxPackage $out
+Stop-Process -Name explorer -Force
+Start-Process explorer.exe
 ```
 
 > **注意**: 右クリックメニューは MSIX インストール後にのみ機能します。  
@@ -48,6 +102,7 @@ Add-AppxPackage -Path "src\Folderly.Package\bin\x64\Release\Folderly.Package_1.0
 |---|---|---|
 | `Folderly.Core` | net8.0 | ビジネスロジック（OS 非依存） |
 | `Folderly.Shell` | net8.0-windows | Windows API ラッパー（P/Invoke） |
+| `Folderly.ContextMenu` | net8.0-windows | File Explorer 右クリックメニュー COM ハンドラ |
 | `Folderly.App` | net8.0-windows | WPF GUI（Windows 専用） |
 | `Folderly.Package` | — | MSIX パッケージング（WAP プロジェクト） |
 | `Folderly.Tests` | net8.0 | xUnit テスト（Core 層対象） |

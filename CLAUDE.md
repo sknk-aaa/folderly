@@ -78,22 +78,26 @@
 - **判断**: `Close_Click` と `OnClosing` 両方で `_vm.Save()` を呼ぶ（二重 Save は冪等）
 - **理由**: ×ボタンでウィンドウを閉じた場合も設定が保存されるべき（SPEC F-14「設定の永続化」）。`SetSetting` は `INSERT OR REPLACE` のため二重呼び出しは問題なし。
 
-### 19. COM ハンドラは IExplorerCommand + IClassFactory で実装
-- **判断**: `ContextMenuHandler.cs` に `FolderlyContextMenuHandler`（IExplorerCommand）と `FolderlyClassFactory`（IClassFactory）を実装。`CoRegisterClassObject` で登録し WPF Dispatcher ループを COM STA メッセージポンプとして利用
-- **理由**: MSIX の `desktop4:FileExplorerContextMenus` 拡張は COM ExeServer 方式が必須。`IExplorerCommand` が Explorer の右クリックメニューエントリポイント。
-- **COM インターフェースの使い分け**: Explorer から受け取る側（IShellItem, IShellItemArray）は `[ComImport]` を付与。Folderly が実装する側（IExplorerCommand, IClassFactory）は `[Guid]` + `[InterfaceType]` のみ（`[ComImport]` なし）。
-- **フォルダパスの受け渡し**: `Invoke` → `GetDisplayName(SIGDN_FILESYSPATH=0x80058000)` → NamedPipe で既存インスタンスへ送信（失敗時は新プロセス起動）→ `CoRevokeClassObject` + `Shutdown`
-- **タイムアウト**: `Start()` 後 30 秒以内に `Invoke` が来なければ自動終了（`System.Timers.Timer`）
+### 19. COM ハンドラは専用 DLL + Packaged COM SurrogateServer
+- **判断**: `Folderly.ContextMenu` プロジェクトを追加し、`Folderly.ContextMenu.comhost.dll` を MSIX に同梱する。`Package.appxmanifest` は `com:SurrogateServer` + `desktop4:FileExplorerContextMenus` で `IExplorerCommand` を登録する。
+- **理由**: Explorer の File Explorer context menu は Packaged COM の DLL surrogate 方式が安定する。`ExeServer` 方式ではメニュー登録・起動の互換性問題が出たため分離した。
+- **COM インターフェース**: `IExplorerCommand` の IID は `A08CE4D0-FA25-44AB-B57C-C7B1C323E0B9`。誤った IID だとメニューは表示されても `Invoke` が動かない。
+- **フォルダパスの受け渡し**: `Invoke` → `GetDisplayName(SIGDN_FILESYSPATH=0x80058000)` → package ルートの `Folderly.exe` を対象フォルダ引数付きで起動する。
+- **診断ログ**: 右クリック Invoke は `%LOCALAPPDATA%\Folderly\context-menu.log` に記録する。
 
-### 20. `--com-server` 検出は Mutex 取得より前に行う
-- **判断**: `App.OnStartup` の先頭で `e.Args.Contains("--com-server")` を確認し、マッチした場合は `ComServer.Start(this)` を呼んで即 `return`
-- **理由**: COM サーバーインスタンスは単一インスタンス制御（Mutex）とは独立して動作する。Mutex を取得すると通常インスタンスとの衝突が起きる。
+### 20. MSIX 版の実行依存関係
+- **判断**: `Folderly.App` は framework-dependent とし、`.NET Desktop Runtime 8` を前提にする。SQLite は `SQLitePCLRaw.bundle_e_sqlite3` を参照し、`e_sqlite3.dll` を package 出力にコピーする。
+- **理由**: MSIX 手動パックでは framework-dependent の runtimeconfig とネイティブ SQLite DLL の同梱が必要。`includedFrameworks` の runtimeconfig や `e_sqlite3.dll` 欠落は起動時クラッシュの原因になる。
+
+### 21. Shell 通知は folder / desktop.ini / directory update をまとめて送る
+- **判断**: 適用後に `SHCNE_UPDATEIMAGE`、フォルダ `SHCNE_UPDATEITEM`、`desktop.ini` `SHCNE_UPDATEITEM`、フォルダ `SHCNE_UPDATEDIR` を送る。
+- **理由**: `desktop.ini` と folder system 属性は正しく設定されても Explorer が即時再評価しない場合があるため、対象メタデータの変更を明示的に通知する。
 
 ## 次セッション申し送り事項（Store 申請前）
 
-- Steps 17〜18 完了済み
-- Windows 実機で MSIX インストール → 右クリックメニュー動作確認が必要（COM ハンドラは MSIX 環境のみ）
+- Step 17 は MSIX サイドロード、スタートメニュー起動、右クリックメニュー表示、右クリックから ApplyWindow 起動まで確認済み
+- Step 18 は手動テスト継続中。即時反映と元に戻すの確認が残り
 - FolderTemplate.png は現在シンプルな2色の矩形。WPF プレビューの視覚品質に合わせて最終調整すること
-- Shell 層（Folderly.Shell）は WSL2 で書いたコードのみ。Windows 実機での SHChangeNotify 動作確認が必要
+- Shell 層（Folderly.Shell）は即時反映改善を追加済み。Windows 実機で再確認が必要
 - `StoreLicenseService` の StoreContext 実装は MSIX 環境でのみ動作確認可能
 - Store 申請前に Publisher を Partner Center の CN=... に変更すること（Package.appxmanifest コメント参照）

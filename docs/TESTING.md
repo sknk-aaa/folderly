@@ -2,6 +2,38 @@
 
 Folderly v1.0 の手動テスト手順です。Windows 環境で実施してください。
 
+## 実施記録
+
+### 2026-05-20 / Windows x64 / MSIX 1.0.0.1
+
+確認済み:
+
+- [x] MSIX を手動 `makeappx` で作成できる
+- [x] テスト証明書で MSIX に署名できる
+- [x] MSIX をサイドロードできる
+- [x] `Get-AppxPackage *Folderly*` で `Architecture : X64` / `Status : Ok` を確認
+- [x] スタートメニューから Folderly が起動する
+- [x] フォルダ右クリックに「Folderly でカスタマイズ」が表示される
+- [x] 右クリックメニューから画像選択画面が起動する
+- [x] 適用完了メッセージが表示される
+- [x] `.folderly\cover.ico` が生成される
+- [x] `desktop.ini` が生成され、`IconResource=.folderly\cover.ico,0` が設定される
+- [x] Explorer 再起動後にフォルダアイコンが反映される
+
+要再確認:
+
+- [ ] 適用後に Explorer 再起動なしで即時反映されること
+- [ ] `元に戻す` が MSIX 版で完全復元すること
+- [ ] 日本語フォルダ名で文字化けなく適用できること
+- [ ] `docs/TESTING.md` の全チェック項目を上から実施すること
+
+既知の調整:
+
+- 右クリックメニューは `Folderly.ContextMenu.comhost.dll` を使う Packaged COM SurrogateServer 方式。
+- MSIX 起動には `Microsoft.WindowsDesktop.App 8.0.x` が必要。
+- SQLite 用に `SQLitePCLRaw.bundle_e_sqlite3` と `e_sqlite3.dll` の同梱が必要。
+- Explorer の即時反映を安定させるため、`SHChangeNotify` はフォルダ、`desktop.ini`、ディレクトリ更新へ通知する。
+
 ## 前提
 - Folderly がインストール済みであること（MSIX パッケージ）
 - テスト用フォルダを任意の場所に作成しておくこと
