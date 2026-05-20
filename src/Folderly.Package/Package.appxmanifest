@@ -82,7 +82,7 @@
             <desktop4:ItemType Type="Directory">
               <desktop4:Verb
                 Id="Folderly"
-                Clsid="{2A7A05DA-70D8-4302-8B23-AE8D79D801B6}" />
+                Clsid="2A7A05DA-70D8-4302-8B23-AE8D79D801B6" />
             </desktop4:ItemType>
           </desktop4:FileExplorerContextMenus>
         </desktop4:Extension>
