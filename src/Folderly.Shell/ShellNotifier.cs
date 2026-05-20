@@ -20,6 +20,12 @@ public sealed class ShellNotifier : IShellNotifier
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(Path.Combine(folderPath, "desktop.ini"), NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
+
+        NativeMethods.SHChangeNotify(
+            NativeMethods.SHCNE_ASSOCCHANGED,
+            NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+            nint.Zero,
+            nint.Zero);
     }
 
     private static unsafe void NotifyPath(string path, uint eventId)
@@ -31,7 +37,7 @@ public sealed class ShellNotifier : IShellNotifier
         {
             NativeMethods.SHChangeNotify(
                 eventId,
-                NativeMethods.SHCNF_PATH | NativeMethods.SHCNF_FLUSH,
+                NativeMethods.SHCNF_PATHW | NativeMethods.SHCNF_FLUSH,
                 (nint)pathPtr,
                 nint.Zero);
         }
