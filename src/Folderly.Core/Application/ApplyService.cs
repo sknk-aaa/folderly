@@ -90,16 +90,17 @@ public sealed class ApplyService
         var icoBytes = IcoConverter.Convert(composed);
         var iconHash = ComputeHash(request);
 
-        // 6. ICO ファイル保存
+        // 6. ICO ファイル保存（パスをハッシュ由来でユニークにし、Explorer アイコンキャッシュ無効化）
+        var iconFileName = $"cover_{iconHash[..8]}.ico";
         var (centralIcoPath, _) = await SaveIcoFilesAsync(
-            folderPath, iconHash, icoBytes, ct);
+            folderPath, iconHash, iconFileName, icoBytes, ct);
 
-        // 7. .folderly ディレクトリ作成
+        // 7. .folderly ディレクトリ作成（SaveIcoFilesAsync 内で作成済だが念のため）
         var folderlyDir = Path.Combine(folderPath, ".folderly");
         Directory.CreateDirectory(folderlyDir);
 
-        // 8. desktop.ini 書き込み
-        DesktopIniManager.Write(folderPath, @".folderly\cover.ico", existingIniContent);
+        // 8. desktop.ini 書き込み（IconResource はユニーク名を指す）
+        DesktopIniManager.Write(folderPath, $@".folderly\{iconFileName}", existingIniContent);
 
         // 9. ファイル属性設定
         FolderAttributesService.ApplyFolderAttributes(folderPath);
@@ -144,7 +145,7 @@ public sealed class ApplyService
     }
 
     private static async Task<(string central, string local)> SaveIcoFilesAsync(
-        string folderPath, string iconHash, byte[] icoBytes, CancellationToken ct)
+        string folderPath, string iconHash, string localFileName, byte[] icoBytes, CancellationToken ct)
     {
         var localAppData = Environment.GetFolderPath(
             Environment.SpecialFolder.LocalApplicationData);
@@ -157,7 +158,19 @@ public sealed class ApplyService
 
         var folderlyDir = Path.Combine(folderPath, ".folderly");
         Directory.CreateDirectory(folderlyDir);
-        var localPath = Path.Combine(folderlyDir, "cover.ico");
+
+        // 前世代の cover ファイル群を掃除（同名再上書きでは Explorer キャッシュが剥がれないため）
+        foreach (var stale in Directory.EnumerateFiles(folderlyDir, "cover*.ico"))
+        {
+            try
+            {
+                File.SetAttributes(stale, FileAttributes.Normal);
+                File.Delete(stale);
+            }
+            catch { /* 残ってしまっても致命ではない */ }
+        }
+
+        var localPath = Path.Combine(folderlyDir, localFileName);
         await File.WriteAllBytesAsync(localPath, icoBytes, ct);
 
         return (centralPath, localPath);

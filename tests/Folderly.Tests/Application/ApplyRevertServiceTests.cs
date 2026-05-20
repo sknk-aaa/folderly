@@ -38,11 +38,12 @@ public class ApplyRevertServiceTests : IDisposable
         _repo.Dispose();
         if (Directory.Exists(_tempDir))
         {
-            // 属性を正規化してから削除
+            // 属性を正規化してから削除（_tempDir 自体の System|ReadOnly も外す必要あり）
             foreach (var f in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
                 File.SetAttributes(f, FileAttributes.Normal);
             foreach (var d in Directory.EnumerateDirectories(_tempDir, "*", SearchOption.AllDirectories))
                 File.SetAttributes(d, FileAttributes.Normal);
+            File.SetAttributes(_tempDir, FileAttributes.Normal);
             Directory.Delete(_tempDir, recursive: true);
         }
     }
@@ -88,8 +89,24 @@ public class ApplyRevertServiceTests : IDisposable
 
         var folderlyDir = Path.Combine(_tempDir, ".folderly");
         Assert.True(Directory.Exists(folderlyDir));
-        var icoPath = Path.Combine(folderlyDir, "cover.ico");
-        Assert.True(File.Exists(icoPath));
+        // cover_<hash8>.ico というユニーク名で生成される（Explorer キャッシュ無効化のため）
+        var icoFiles = Directory.GetFiles(folderlyDir, "cover_*.ico");
+        Assert.Single(icoFiles);
+    }
+
+    [Fact]
+    public async Task ApplyAsync_Reapply_RegeneratesIcoWithNewName()
+    {
+        var folderlyDir = Path.Combine(_tempDir, ".folderly");
+
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
+        var firstIco = Directory.GetFiles(folderlyDir, "cover_*.ico").Single();
+
+        // タグ色を変えて再適用 → 別のファイル名になり、前のファイルは消える
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
+        var icoFiles = Directory.GetFiles(folderlyDir, "cover_*.ico");
+        Assert.Single(icoFiles);
+        Assert.NotEqual(firstIco, icoFiles[0]);
     }
 
     [Fact]

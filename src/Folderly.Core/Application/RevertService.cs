@@ -38,41 +38,120 @@ public sealed class RevertService
 
         _logger.LogInformation("Reverting {FolderPath}", normalized);
 
-        var iniPath = Path.Combine(normalized, "desktop.ini");
-
-        // 2. desktop.ini を元に戻す
-        if (entry.HadDesktopIni && entry.OriginalDesktopIniContent is not null)
+        try
         {
-            var originalContent = Encoding.Unicode.GetString(entry.OriginalDesktopIniContent);
-            DesktopIniManager.WriteRaw(normalized, originalContent);
+            var iniPath = Path.Combine(normalized, "desktop.ini");
+
+            // フォルダ自体の System | ReadOnly を一旦外す（desktop.ini の書換/削除を阻まないため）
+            TryClearAttributes(normalized);
+
+            // 2. desktop.ini を元に戻す
+            if (entry.HadDesktopIni && entry.OriginalDesktopIniContent is not null)
+            {
+                if (File.Exists(iniPath))
+                    TryClearAttributes(iniPath);
+
+                var originalContent = Encoding.Unicode.GetString(entry.OriginalDesktopIniContent);
+                DesktopIniManager.WriteRaw(normalized, originalContent);
+
+                if (entry.OriginalDesktopIniAttrs is int attrs)
+                {
+                    try { File.SetAttributes(iniPath, (FileAttributes)attrs); }
+                    catch (Exception ex) { _logger.LogWarning(ex, "Failed to restore desktop.ini attributes"); }
+                }
+            }
+            else if (!entry.HadDesktopIni)
+            {
+                if (File.Exists(iniPath))
+                {
+                    TryClearAttributes(iniPath);
+                    DeleteFileWithRetry(iniPath, ct);
+                }
+            }
+
+            // 3. フォルダ属性を元に戻す
+            FolderAttributesService.RestoreAttributes(
+                normalized, (FileAttributes)entry.OriginalAttributes);
+
+            // 4. .folderly ディレクトリを削除
+            var folderlyDir = Path.Combine(normalized, ".folderly");
+            if (Directory.Exists(folderlyDir))
+            {
+                DeleteFolderlyWithRetry(folderlyDir, ct);
+            }
+
+            // 5. Shell 通知
+            _shellNotifier.NotifyFolderChanged(normalized);
+
+            // 6. 履歴削除
+            _history.Delete(normalized);
+
+            _logger.LogInformation("Reverted {FolderPath} successfully", normalized);
         }
-        else if (!entry.HadDesktopIni)
+        catch (Exception ex)
         {
-            if (File.Exists(iniPath))
-                File.Delete(iniPath);
+            _logger.LogError(ex, "Revert failed for {FolderPath}", normalized);
+            throw;
         }
 
-        // 3. フォルダ属性を元に戻す
-        FolderAttributesService.RestoreAttributes(
-            normalized, (FileAttributes)entry.OriginalAttributes);
-
-        // 4. .folderly ディレクトリを削除
-        var folderlyDir = Path.Combine(normalized, ".folderly");
-        if (Directory.Exists(folderlyDir))
-        {
-            // 隠し属性のファイルも削除できるよう属性を正規化してから削除
-            foreach (var f in Directory.EnumerateFiles(folderlyDir))
-                File.SetAttributes(f, FileAttributes.Normal);
-            Directory.Delete(folderlyDir, recursive: true);
-        }
-
-        // 5. Shell 通知
-        _shellNotifier.NotifyFolderChanged(normalized);
-
-        // 6. 履歴削除
-        _history.Delete(normalized);
-
-        _logger.LogInformation("Reverted {FolderPath} successfully", normalized);
         return Task.CompletedTask;
+    }
+
+    private void TryClearAttributes(string path)
+    {
+        try { File.SetAttributes(path, FileAttributes.Normal); }
+        catch (Exception ex) { _logger.LogWarning(ex, "Failed to clear attributes on {Path}", path); }
+    }
+
+    private void DeleteFileWithRetry(string path, CancellationToken ct)
+    {
+        const int maxAttempts = 5;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+            try
+            {
+                File.Delete(path);
+                return;
+            }
+            catch (IOException) when (i < maxAttempts - 1)
+            {
+                Thread.Sleep(100 * (i + 1));
+            }
+            catch (UnauthorizedAccessException) when (i < maxAttempts - 1)
+            {
+                TryClearAttributes(path);
+                Thread.Sleep(100 * (i + 1));
+            }
+        }
+    }
+
+    private void DeleteFolderlyWithRetry(string folderlyDir, CancellationToken ct)
+    {
+        // 隠し / 読み取り専用属性のファイル・サブディレクトリも削除できるよう属性を正規化
+        foreach (var f in Directory.EnumerateFiles(folderlyDir, "*", SearchOption.AllDirectories))
+            TryClearAttributes(f);
+        foreach (var d in Directory.EnumerateDirectories(folderlyDir, "*", SearchOption.AllDirectories))
+            TryClearAttributes(d);
+        TryClearAttributes(folderlyDir);
+
+        const int maxAttempts = 5;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+            try
+            {
+                Directory.Delete(folderlyDir, recursive: true);
+                return;
+            }
+            catch (IOException) when (i < maxAttempts - 1)
+            {
+                Thread.Sleep(100 * (i + 1));
+            }
+            catch (UnauthorizedAccessException) when (i < maxAttempts - 1)
+            {
+                Thread.Sleep(100 * (i + 1));
+            }
+        }
     }
 }
