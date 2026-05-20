@@ -44,9 +44,44 @@
 - **判断**: `CheckPath()` の冒頭で `path.StartsWith(@"\\")` を確認し、その後 `Path.GetFullPath` を呼ぶ
 - **理由**: Linux/WSL2 では `Path.GetFullPath(@"\\server\share")` が UNC パスを正しく処理しない（バックスラッシュが通常文字として扱われる）。事前チェックにより WSL2 でも UNC 判定テストが通過する。
 
-## 次セッション申し送り事項（Step 11以降）
+## 仕様判断ログ（Step 11〜16）
 
-- Step 11〜: WPF GUI の実装（net8.0-windows、Windows 環境が必要）
-- Folderly.App の WPF コントロール実装は VS2022 または Windows の dotnet CLI で行う
-- Shell 層（Folderly.Shell）のビルド・テストは Windows 環境で実施する
-- FolderTemplate.png は現在シンプルな2色の矩形。Step 11 で WPF プレビューに合わせて視覚的に最適化すること
+### 11. TargetFramework を net8.0-windows10.0.17763.0 に変更
+- **判断**: `Folderly.App.csproj` の TFM を `net8.0-windows` から `net8.0-windows10.0.17763.0` に変更
+- **理由**: `Windows.Services.Store.StoreContext`（WinRT API）を使用するため、最低 Windows 10 1809 (17763) のバージョン修飾が必要。`net8.0-windows` では WinRT 型が解決されない。
+
+### 12. AppServices は DI フレームワークなしの静的コンテナ
+- **判断**: `AppServices` static class でサービスを保持。`Initialize()` を `App.OnStartup` から呼ぶ
+- **理由**: YAGNI 原則。v1.0 のサービス数（5つ）では DI コンテナ導入のメリットがコストを下回る。テストは Core 層（DI 不要）のみ対象。
+
+### 13. LocalizationService はインデクサーバインディングで即時反映
+- **判断**: `this[string key]` インデクサー + `PropertyChanged(Binding.IndexerName)` で言語切替を即時反映
+- **理由**: SPEC F-15「再起動不要で即時切替」。ViewModel が `public LocalizationService L => LocalizationService.Instance` を公開し、XAML が `{Binding L[Key]}` でバインド。`PropertyChanged` に `Binding.IndexerName`（= "Item[]"）を発火することで WPF がすべてのインデクサーバインディングを再評価する。
+
+### 14. FileLogger はカスタム実装（Serilog 非使用）
+- **判断**: `FileLoggerProvider` + `FileLogger` を自前実装。ローテーション: 5MB で rotate、最大 5 世代保持
+- **理由**: SPEC.md Section 2 の固定 NuGet リストに Serilog は含まれない。`Microsoft.Extensions.Logging.Abstractions` は許可済みのため、ILogger インターフェースを満たすシンプルな実装を選択。
+
+### 15. StoreLicenseService は StoreContext 失敗時に試用版フォールバック
+- **判断**: `StoreContext.GetDefault()` の呼び出しを `try-catch` で囲み、例外時は `IsTrial=true, DaysRemaining=7` を返す
+- **理由**: MSIX 未パッケージ環境（開発中・テスト中）では `StoreContext.GetDefault()` が例外を投げる。フォールバックにより開発環境でもアプリが動作する。本番（MSIX パッケージ）では正常に動作する。
+
+### 16. タグボタンはコードビハインドで動的生成
+- **判断**: `ApplyWindow.xaml.cs` の `BuildTagButtons()` でタグボタンを ControlTemplate + Ellipse で生成
+- **理由**: XAML DataTemplate で `HexToColorConverter` + 選択状態管理を宣言的に記述すると、`MultiBinding` + `IMultiValueConverter` が必要になり複雑化する。コードビハインドで生成する方がシンプルで見通しがよい。
+
+### 17. 単一インスタンス制御は Mutex + NamedPipe
+- **判断**: `App.OnStartup` で `Mutex("Folderly_SingleInstance_v1")` を取得。既存インスタンスがあれば `NamedPipeClientStream` でフォルダパスを送信して終了
+- **理由**: SPEC 3.3「単一インスタンス制約」。WPF 標準の単一インスタンス機構（`WindowsFormsApplicationBase`）は WinForms 依存のため不採用。Mutex + NamedPipe は WPF での一般的なパターンで依存追加なし。パイプスレッドはバックグラウンドスレッドで常時待機し、受信時に `Dispatcher.Invoke` で UI スレッドに切り替えて `MainWindow.OpenApplyWindow()` を呼ぶ。
+
+### 18. SettingsWindow は OnClosing でも Save() を呼ぶ
+- **判断**: `Close_Click` と `OnClosing` 両方で `_vm.Save()` を呼ぶ（二重 Save は冪等）
+- **理由**: ×ボタンでウィンドウを閉じた場合も設定が保存されるべき（SPEC F-14「設定の永続化」）。`SetSetting` は `INSERT OR REPLACE` のため二重呼び出しは問題なし。
+
+## 次セッション申し送り事項（Step 17以降）
+
+- Steps 11〜16 完了済み。Windows でビルド・手動テストを実施すること
+- FolderTemplate.png は現在シンプルな2色の矩形。WPF プレビューの視覚品質に合わせて最終調整すること
+- MSIX パッケージング（Folderly.Package）は未着手。Store 申請前に実施
+- Shell 層（Folderly.Shell）は WSL2 で書いたコードのみ。Windows 実機での SHChangeNotify 動作確認が必要
+- `StoreLicenseService` の StoreContext 実装は MSIX 環境でのみ動作確認可能
