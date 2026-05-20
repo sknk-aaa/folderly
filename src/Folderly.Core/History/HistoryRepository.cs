@@ -15,6 +15,8 @@ public sealed class HistoryRepository : IDisposable
 
     public HistoryRepository(string dbPath, ILogger<HistoryRepository>? logger = null)
     {
+        SQLitePCL.Batteries_V2.Init();
+
         _logger = logger ?? NullLogger<HistoryRepository>.Instance;
         _conn = new SqliteConnection($"Data Source={dbPath}");
         _conn.Open();
