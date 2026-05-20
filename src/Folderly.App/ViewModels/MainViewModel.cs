@@ -71,15 +71,43 @@ public sealed class HistoryItemViewModel : ViewModelBase
     {
         get
         {
-            if (_thumbnail == null && File.Exists(Entry.IconStoragePath))
-                _thumbnail = LoadThumbnail(Entry.IconStoragePath);
+            if (_thumbnail == null)
+                _thumbnail = LoadThumbnail(Entry);
             return _thumbnail;
         }
     }
 
     public HistoryItemViewModel(HistoryEntry entry) => Entry = entry;
 
-    private static BitmapSource? LoadThumbnail(string icoPath)
+    private static BitmapSource? LoadThumbnail(HistoryEntry entry)
+    {
+        foreach (var path in GetIconCandidates(entry))
+        {
+            if (!File.Exists(path)) continue;
+
+            var thumbnail = LoadThumbnailFromIco(path);
+            if (thumbnail is not null)
+                return thumbnail;
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<string> GetIconCandidates(HistoryEntry entry)
+    {
+        if (!string.IsNullOrWhiteSpace(entry.IconStoragePath))
+            yield return entry.IconStoragePath;
+
+        yield return Path.Combine(entry.FolderPath, ".folderly", "cover.ico");
+    }
+
+    private static BitmapSource? LoadThumbnailFromIco(string icoPath)
+    {
+        var thumbnail = LoadWithBitmapDecoder(icoPath);
+        return thumbnail ?? LoadEmbeddedPngFrame(icoPath);
+    }
+
+    private static BitmapSource? LoadWithBitmapDecoder(string icoPath)
     {
         try
         {
@@ -93,5 +121,63 @@ public sealed class HistoryItemViewModel : ViewModelBase
             return frame;
         }
         catch { return null; }
+    }
+
+    private static BitmapSource? LoadEmbeddedPngFrame(string icoPath)
+    {
+        try
+        {
+            using var stream = File.OpenRead(icoPath);
+            using var reader = new BinaryReader(stream);
+
+            if (reader.ReadUInt16() != 0) return null;
+            if (reader.ReadUInt16() != 1) return null;
+
+            var count = reader.ReadUInt16();
+            if (count == 0) return null;
+
+            var entries = new List<(int Size, int Bytes, int Offset)>(count);
+            for (var i = 0; i < count; i++)
+            {
+                var width = reader.ReadByte();
+                var height = reader.ReadByte();
+                reader.ReadBytes(4); // color count, reserved, planes
+                reader.ReadUInt16(); // bit count
+                var bytes = reader.ReadInt32();
+                var offset = reader.ReadInt32();
+
+                var size = width == 0 ? 256 : width;
+                if (height != 0)
+                    size = Math.Min(size, height);
+                entries.Add((size, bytes, offset));
+            }
+
+            foreach (var entry in entries.OrderBy(e => Math.Abs(e.Size - 48)))
+            {
+                if (entry.Bytes <= 0 || entry.Offset < 0) continue;
+                if (entry.Offset + entry.Bytes > stream.Length) continue;
+
+                stream.Position = entry.Offset;
+                var data = reader.ReadBytes(entry.Bytes);
+                if (!IsPng(data)) continue;
+
+                using var pngStream = new MemoryStream(data);
+                var decoder = new PngBitmapDecoder(
+                    pngStream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                var frame = decoder.Frames[0];
+                frame.Freeze();
+                return frame;
+            }
+        }
+        catch { return null; }
+
+        return null;
+    }
+
+    private static bool IsPng(byte[] data)
+    {
+        byte[] signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+        return data.Length >= signature.Length &&
+               data.Take(signature.Length).SequenceEqual(signature);
     }
 }
