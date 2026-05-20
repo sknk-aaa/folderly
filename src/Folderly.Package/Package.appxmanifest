@@ -4,8 +4,9 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
   xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
-  IgnorableNamespaces="rescap desktop4 com">
+  IgnorableNamespaces="rescap desktop4 desktop5 com">
 
   <!--
     Publisher: Store 申請時に Partner Center のパブリッシャー ID（CN=...）に変更すること。
@@ -79,11 +80,11 @@
         -->
         <desktop4:Extension Category="windows.fileExplorerContextMenus">
           <desktop4:FileExplorerContextMenus>
-            <desktop4:ItemType Type="Directory">
-              <desktop4:Verb
+            <desktop5:ItemType Type="Directory">
+              <desktop5:Verb
                 Id="Folderly"
                 Clsid="2A7A05DA-70D8-4302-8B23-AE8D79D801B6" />
-            </desktop4:ItemType>
+            </desktop5:ItemType>
           </desktop4:FileExplorerContextMenus>
         </desktop4:Extension>
 
