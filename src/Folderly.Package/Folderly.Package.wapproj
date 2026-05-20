@@ -5,7 +5,6 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{539EC4CB-7A99-442F-81F9-AE4AE2238780}</ProjectGuid>
-    <OutputType>Package</OutputType>
     <AppxBundle>Never</AppxBundle>
     <AppxBundlePlatforms>x64|ARM64</AppxBundlePlatforms>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
