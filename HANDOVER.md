@@ -25,7 +25,7 @@
 | 4  | Core - TemplateRenderer | 完了 |
 | 5  | Core - IcoConverter | 完了 |
 | 6  | Core - DesktopIniManager + FolderAttributesService | 完了 |
-| 7  | Shell - ShellNotifier + IShellNotifier | 完了（即時反映調整は継続中） |
+| 7  | Shell - ShellNotifier + IShellNotifier | 完了（`b5fd369` の `ForceIconIndexUpdate` で即時反映確認済 2026-05-20） |
 | 8  | Core - HistoryRepository | 完了 |
 | 9  | Core - FolderProtection | 完了 |
 | 10 | Core - ApplyService + RevertService | 完了 |
@@ -128,29 +128,15 @@ Core テスト 88 件は WSL2 で全 pass 確認済み。
 
 ## 未完了・継続中の項目
 
-### 【最優先】Explorer 即時反映の問題
+### Explorer 即時反映の問題（解決済み 2026-05-20）
 
-**症状**: アイコン適用後、**親ディレクトリの一覧に表示されるフォルダアイコン**が更新されない。
+**状態**: 解決済み。コミット `b5fd369` の [src/Folderly.Shell/ShellNotifier.cs](src/Folderly.Shell/ShellNotifier.cs#L61-L77) の `ForceIconIndexUpdate`（`SHGetFileInfo` でシステムイメージリストを強制更新 → 取得した icon index に対して `SHCNE_UPDATEIMAGE | SHCNF_DWORD` を発火）を含む MSIX で、`C:\Users\625so\Desktop\FolderlyTest_A` と `C:\Users\625so\Documents\FolderlyTest_B` の両方で親ディレクトリのフォルダアイコンが Explorer 再起動なし & F5 なしで即時更新されることを確認。
 
-**確認済み事実**:
-- `desktop.ini` と `cover.ico` は正しく生成されている（フォルダを開くと Explorer のタイトルバー・タスクバーには custom icon が表示される）
-- 以下を実施しても親ディレクトリ表示は更新されない:
-  - 全 SHChangeNotify 系の呼び出し（PATH / PIDL / UPDATEIMAGE / UPDATEITEM / UPDATEDIR / ATTRIBUTES / ASSOCCHANGED / RENAMEFOLDER 自己リネーム）
-  - `iconcache_*.db` の削除 + Explorer 再起動
-
-**最新の試み**（コミット `b5fd369`、まだユーザは MSIX 未ビルド）:
-- [src/Folderly.Shell/ShellNotifier.cs](src/Folderly.Shell/ShellNotifier.cs#L61-L77) の `ForceIconIndexUpdate`: `SHGetFileInfo` でシステムイメージリストを強制更新し、特定の icon index に対して `SHCNE_UPDATEIMAGE | SHCNF_DWORD` を発火
-
-**未試行のアプローチ**:
-1. **C:\ ルート直下以外のフォルダ**（例: `C:\Users\<user>\Desktop\TestFolder`）でテスト → C:\ ルート固有問題か切り分け
-2. `SHCNE_RMDIR` + `SHCNE_MKDIR` トリック（フォルダ削除→再作成を装う）
-3. Explorer のタブ/ウィンドウを一旦閉じて開き直したらどうか
-4. `IShellItem` / `IShellFolder::ParseDisplayName` 経由で明示的にメタデータ再取得
+残課題: 多少のラグがある（数百ミリ秒程度）。実用上は許容範囲だがさらに詰める余地はある。優先度は低い。
 
 ### 手動テスト未完了項目（[docs/TESTING.md](docs/TESTING.md)）
 
 「要再確認」セクション:
-- [ ] 適用後に Explorer 再起動なしで即時反映されること ← 上記の最優先課題
 - [ ] 元に戻すが MSIX 版で完全復元すること
 - [ ] 日本語フォルダ名で文字化けなく適用できること
 - [ ] docs/TESTING.md 全項目を上から実施
@@ -218,44 +204,19 @@ WSL2 側の最新コミットは `b5fd369 fix: force icon index update via SHGet
 
 ## 次にやるべきこと
 
-### Step 17.5（暫定）: Explorer 即時反映の決着
+### Step 17.5: 完了（2026-05-20）
 
-**前提**: 最新コミット `b5fd369` を含む MSIX をビルド・インストール。
-
-#### 手順A: SHGetFileInfo アプローチの効果検証
-
-1. 既存のテストフォルダで一度「元に戻す」
-2. 新しい MSIX をインストール
-3. アイコン適用 → Explorer 再起動なしで親ディレクトリ表示が更新されるか確認
-
-→ 更新されれば **完了**、コミットしてユーザに報告。
-
-#### 手順B: 切り分けテスト（手順 A が失敗した場合）
-
-異なる場所のフォルダで挙動を比較:
-- `C:\` ルート直下のフォルダ
-- `C:\Users\<user>\Desktop\Test1`
-- `C:\Users\<user>\Documents\Test2`
-
-C:\ ルート固有問題なのか、Windows 全体の挙動なのかを切り分ける。
-
-#### 手順C: 次の実装案（手順 B でも改善しない場合）
-
-[src/Folderly.Shell/ShellNotifier.cs](src/Folderly.Shell/ShellNotifier.cs) に以下を追加:
-
-1. **RMDIR + MKDIR トリック**: フォルダ削除→再作成を装う通知
-   ```csharp
-   NotifyPath(folderPath, SHCNE_RMDIR);
-   NotifyPath(folderPath, SHCNE_MKDIR);
-   ```
-
-2. **親フォルダの中身列挙を強制**: `SHCNE_UPDATEDIR` を親に対して PIDL で複数回
-
-3. それでもダメなら、**`IShellFolder::ParseDisplayName`** で明示的に再パースを試す（複雑なので最終手段）
+最優先課題だった Explorer 即時反映は `b5fd369` の `ForceIconIndexUpdate` で解決。Desktop / Documents 配下で再起動なしの即時反映を確認済み（多少のラグあり、実用上問題なし）。
 
 ### Step 18 残作業: docs/TESTING.md 完走
 
-即時反映問題が解決したら、[docs/TESTING.md](docs/TESTING.md) を上から順に実施し、全てのチェックを埋める。
+[docs/TESTING.md](docs/TESTING.md) を上から順に実施し、全てのチェックを埋める。優先項目:
+- 「元に戻す」が MSIX 版で完全復元すること
+- 日本語フォルダ名で文字化けなく適用できること
+- 一度適用済みのフォルダに再適用（キャッシュ越しの更新）
+- タグ機能（各色での適用）
+- 保護機能（C:\Windows, C:\Program Files, ドライブルート等）
+- OneDrive 配下の警告ダイアログ
 
 ### Step 19 以降（Store 申請）
 
