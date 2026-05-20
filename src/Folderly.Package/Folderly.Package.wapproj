@@ -56,4 +56,14 @@
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" Condition=" '$(WapProjPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets" Condition=" '$(WapProjPath)' == '' " />
+
+  <!-- Folderly is a managed WPF app and does not require Microsoft.VCLibs.
+       Some VS/MSIX installs miss the GetFrameworkSdkPackages task used by
+       DesktopBridge's VCLibs resolver, so keep the package self-contained. -->
+  <Target Name="_ResolveVCLibDependencies">
+    <ItemGroup>
+      <FrameworkSdkReference Remove="@(FrameworkSdkReference)" />
+      <FrameworkSdkPackage Remove="@(FrameworkSdkPackage)" />
+    </ItemGroup>
+  </Target>
 </Project>
