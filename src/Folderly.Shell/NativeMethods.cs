@@ -19,4 +19,10 @@ internal static partial class NativeMethods
         uint uFlags,
         nint dwItem1,
         nint dwItem2);
+
+    [LibraryImport("shell32.dll", EntryPoint = "ILCreateFromPathW", StringMarshalling = StringMarshalling.Utf16)]
+    internal static partial nint ILCreateFromPath(string path);
+
+    [LibraryImport("shell32.dll")]
+    internal static partial void ILFree(nint pidl);
 }
