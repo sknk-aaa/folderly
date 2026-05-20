@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <!-- ApplyWindow -->
+  <data name="ApplyWindowTitle" xml:space="preserve"><value>Folderly</value></data>
+  <data name="TargetFolder" xml:space="preserve"><value>対象フォルダ</value></data>
+  <data name="SelectImage" xml:space="preserve"><value>画像を選択...</value></data>
+  <data name="DropImageHere" xml:space="preserve"><value>またはここにドロップ</value></data>
+  <data name="PreviewPlaceholder" xml:space="preserve"><value>画像を選択してください</value></data>
+  <data name="ScaleLabel" xml:space="preserve"><value>拡大率</value></data>
+  <data name="ResetPosition" xml:space="preserve"><value>中央に戻す</value></data>
+  <data name="CropCenter" xml:space="preserve"><value>中央でクロップ</value></data>
+  <data name="CropPad" xml:space="preserve"><value>余白で全体表示</value></data>
+  <data name="TagLabel" xml:space="preserve"><value>タグ</value></data>
+  <data name="TagNone" xml:space="preserve"><value>なし</value></data>
+  <data name="TagBlue" xml:space="preserve"><value>青&#x0a;開発</value></data>
+  <data name="TagGreen" xml:space="preserve"><value>緑&#x0a;大学</value></data>
+  <data name="TagOrange" xml:space="preserve"><value>橙&#x0a;動画</value></data>
+  <data name="TagPurple" xml:space="preserve"><value>紫&#x0a;デザイン</value></data>
+  <data name="TagRed" xml:space="preserve"><value>赤&#x0a;重要</value></data>
+  <data name="TagGray" xml:space="preserve"><value>グレー&#x0a;保管</value></data>
+  <data name="Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Apply" xml:space="preserve"><value>適用</value></data>
+  <data name="Applying" xml:space="preserve"><value>適用中...</value></data>
+  <data name="ApplySuccess" xml:space="preserve"><value>フォルダ表紙を適用しました！</value></data>
+  <data name="ApplyFailed" xml:space="preserve"><value>適用に失敗しました: {0}</value></data>
+  <data name="ImageLoadError" xml:space="preserve"><value>画像の読み込みに失敗しました。別のファイルを選択してください。</value></data>
+  <data name="ProtectionDeniedTitle" xml:space="preserve"><value>このフォルダは変更できません</value></data>
+  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}&#x0a;&#x0a;別のフォルダを選択してください。</value></data>
+  <data name="OneDriveWarningTitle" xml:space="preserve"><value>OneDrive のフォルダです</value></data>
+  <data name="OneDriveWarningMessage" xml:space="preserve"><value>このフォルダは OneDrive で同期されています。Folderly の変更は他のデバイスにも同期される可能性があります。&#x0a;&#x0a;続行しますか？</value></data>
+  <data name="WarningGenericTitle" xml:space="preserve"><value>確認</value></data>
+  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;続行しますか？</value></data>
+  <data name="Continue" xml:space="preserve"><value>続行</value></data>
+  <data name="OK" xml:space="preserve"><value>OK</value></data>
+
+  <!-- MainWindow -->
+  <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>
+  <data name="HistoryTab" xml:space="preserve"><value>履歴</value></data>
+  <data name="SettingsTab" xml:space="preserve"><value>設定</value></data>
+  <data name="HelpTab" xml:space="preserve"><value>ヘルプ</value></data>
+  <data name="RecentFolders" xml:space="preserve"><value>最近変更したフォルダ</value></data>
+  <data name="OpenFolder" xml:space="preserve"><value>開く</value></data>
+  <data name="RevertFolder" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="ClearAllHistory" xml:space="preserve"><value>履歴をすべてクリア</value></data>
+  <data name="NoHistory" xml:space="preserve"><value>まだ履歴がありません。フォルダを右クリックして始めましょう。</value></data>
+  <data name="RevertConfirmTitle" xml:space="preserve"><value>元の状態に戻しますか？</value></data>
+  <data name="RevertConfirmMessage" xml:space="preserve"><value>{0} の表紙画像とタグを解除し、元のフォルダの見た目に戻します。</value></data>
+  <data name="RevertButton" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="RevertFailed" xml:space="preserve"><value>復元に失敗しました: {0}</value></data>
+  <data name="TrialBanner" xml:space="preserve"><value>無料試用：あと {0} 日</value></data>
+  <data name="BuyNow" xml:space="preserve"><value>Microsoft Store で購入する</value></data>
+  <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>履歴をすべて削除しますか？</value></data>
+  <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>すべての履歴レコードを削除します。適用済みのフォルダ表紙は影響を受けません。</value></data>
+  <data name="Clear" xml:space="preserve"><value>削除</value></data>
+  <data name="AppliedAt" xml:space="preserve"><value>適用日時: {0}</value></data>
+
+  <!-- SettingsWindow -->
+  <data name="SettingsTitle" xml:space="preserve"><value>設定</value></data>
+  <data name="LanguageSection" xml:space="preserve"><value>言語</value></data>
+  <data name="LanguageSystem" xml:space="preserve"><value>システム言語に従う</value></data>
+  <data name="LanguageJapanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="HistorySection" xml:space="preserve"><value>履歴</value></data>
+  <data name="HistoryMaxCount" xml:space="preserve"><value>最大保持件数</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>履歴をすべて削除</value></data>
+  <data name="AboutSection" xml:space="preserve"><value>Folderly について</value></data>
+  <data name="VersionLabel" xml:space="preserve"><value>バージョン</value></data>
+  <data name="LicenseLabel" xml:space="preserve"><value>ライセンス</value></data>
+  <data name="LicenseFull" xml:space="preserve"><value>購入済み</value></data>
+  <data name="LicenseTrial" xml:space="preserve"><value>無料試用（あと {0} 日）</value></data>
+  <data name="SupportLink" xml:space="preserve"><value>サポートに連絡</value></data>
+  <data name="LicenseInfo" xml:space="preserve"><value>ライセンス情報</value></data>
+  <data name="Close" xml:space="preserve"><value>閉じる</value></data>
+</root>

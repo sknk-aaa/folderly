@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <!-- ApplyWindow -->
+  <data name="ApplyWindowTitle" xml:space="preserve"><value>Folderly</value></data>
+  <data name="TargetFolder" xml:space="preserve"><value>Target folder</value></data>
+  <data name="SelectImage" xml:space="preserve"><value>Select Image...</value></data>
+  <data name="DropImageHere" xml:space="preserve"><value>or drop image here</value></data>
+  <data name="PreviewPlaceholder" xml:space="preserve"><value>Select an image to preview</value></data>
+  <data name="ScaleLabel" xml:space="preserve"><value>Scale</value></data>
+  <data name="ResetPosition" xml:space="preserve"><value>Reset Position</value></data>
+  <data name="CropCenter" xml:space="preserve"><value>Crop to Center</value></data>
+  <data name="CropPad" xml:space="preserve"><value>Fit with Padding</value></data>
+  <data name="TagLabel" xml:space="preserve"><value>Tag</value></data>
+  <data name="TagNone" xml:space="preserve"><value>None</value></data>
+  <data name="TagBlue" xml:space="preserve"><value>Blue&#x0a;Development</value></data>
+  <data name="TagGreen" xml:space="preserve"><value>Green&#x0a;University</value></data>
+  <data name="TagOrange" xml:space="preserve"><value>Orange&#x0a;Video</value></data>
+  <data name="TagPurple" xml:space="preserve"><value>Purple&#x0a;Design</value></data>
+  <data name="TagRed" xml:space="preserve"><value>Red&#x0a;Important</value></data>
+  <data name="TagGray" xml:space="preserve"><value>Gray&#x0a;Archive</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Applying" xml:space="preserve"><value>Applying...</value></data>
+  <data name="ApplySuccess" xml:space="preserve"><value>Folder cover applied!</value></data>
+  <data name="ApplyFailed" xml:space="preserve"><value>Failed to apply: {0}</value></data>
+  <data name="ImageLoadError" xml:space="preserve"><value>Failed to load image. Please select a different file.</value></data>
+  <data name="ProtectionDeniedTitle" xml:space="preserve"><value>Cannot modify this folder</value></data>
+  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}&#x0a;&#x0a;Please select a different folder.</value></data>
+  <data name="OneDriveWarningTitle" xml:space="preserve"><value>OneDrive Folder</value></data>
+  <data name="OneDriveWarningMessage" xml:space="preserve"><value>This folder is synchronized by OneDrive. Changes may sync to other devices.&#x0a;&#x0a;Continue?</value></data>
+  <data name="WarningGenericTitle" xml:space="preserve"><value>Warning</value></data>
+  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;Continue?</value></data>
+  <data name="Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="OK" xml:space="preserve"><value>OK</value></data>
+
+  <!-- MainWindow -->
+  <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>
+  <data name="HistoryTab" xml:space="preserve"><value>History</value></data>
+  <data name="SettingsTab" xml:space="preserve"><value>Settings</value></data>
+  <data name="HelpTab" xml:space="preserve"><value>Help</value></data>
+  <data name="RecentFolders" xml:space="preserve"><value>Recently modified folders</value></data>
+  <data name="OpenFolder" xml:space="preserve"><value>Open</value></data>
+  <data name="RevertFolder" xml:space="preserve"><value>Revert</value></data>
+  <data name="ClearAllHistory" xml:space="preserve"><value>Clear All History</value></data>
+  <data name="NoHistory" xml:space="preserve"><value>No history yet. Right-click a folder to get started.</value></data>
+  <data name="RevertConfirmTitle" xml:space="preserve"><value>Revert folder?</value></data>
+  <data name="RevertConfirmMessage" xml:space="preserve"><value>This will remove the cover image and tag from:&#x0a;{0}&#x0a;&#x0a;The folder will be restored to its original state.</value></data>
+  <data name="RevertButton" xml:space="preserve"><value>Revert</value></data>
+  <data name="RevertFailed" xml:space="preserve"><value>Failed to revert: {0}</value></data>
+  <data name="TrialBanner" xml:space="preserve"><value>Free trial: {0} days remaining</value></data>
+  <data name="BuyNow" xml:space="preserve"><value>Buy on Microsoft Store</value></data>
+  <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>Clear all history?</value></data>
+  <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>All history records will be removed. Applied folder covers will not be affected.</value></data>
+  <data name="Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="AppliedAt" xml:space="preserve"><value>Applied: {0}</value></data>
+
+  <!-- SettingsWindow -->
+  <data name="SettingsTitle" xml:space="preserve"><value>Settings</value></data>
+  <data name="LanguageSection" xml:space="preserve"><value>Language</value></data>
+  <data name="LanguageSystem" xml:space="preserve"><value>Use system language</value></data>
+  <data name="LanguageJapanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="HistorySection" xml:space="preserve"><value>History</value></data>
+  <data name="HistoryMaxCount" xml:space="preserve"><value>Maximum history count</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>Delete all history</value></data>
+  <data name="AboutSection" xml:space="preserve"><value>About Folderly</value></data>
+  <data name="VersionLabel" xml:space="preserve"><value>Version</value></data>
+  <data name="LicenseLabel" xml:space="preserve"><value>License</value></data>
+  <data name="LicenseFull" xml:space="preserve"><value>Licensed</value></data>
+  <data name="LicenseTrial" xml:space="preserve"><value>Free trial ({0} days left)</value></data>
+  <data name="SupportLink" xml:space="preserve"><value>Contact Support</value></data>
+  <data name="LicenseInfo" xml:space="preserve"><value>License Information</value></data>
+  <data name="Close" xml:space="preserve"><value>Close</value></data>
+</root>
