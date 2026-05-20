@@ -43,6 +43,9 @@ public sealed class ShellNotifier : IShellNotifier
             NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
         }
 
+        // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
+        NotifyRenameFolderToSelf(folderPath);
+
         NativeMethods.SHChangeNotify(
             NativeMethods.SHCNE_ASSOCCHANGED,
             NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
@@ -62,6 +65,22 @@ public sealed class ShellNotifier : IShellNotifier
                 NativeMethods.SHCNF_PATHW | NativeMethods.SHCNF_FLUSH,
                 (nint)pathPtr,
                 nint.Zero);
+        }
+    }
+
+    private static unsafe void NotifyRenameFolderToSelf(string path)
+    {
+        if (!Directory.Exists(path)) return;
+        // 異なるオブジェクト（別アドレス）で同一内容の文字列を生成し、
+        // p1 != p2 を保証したうえで "自分自身へのリネーム" を通知する
+        var pathCopy = new string(path.AsSpan());
+        fixed (char* p1 = path)
+        fixed (char* p2 = pathCopy)
+        {
+            NativeMethods.SHChangeNotify(
+                NativeMethods.SHCNE_RENAMEFOLDER,
+                NativeMethods.SHCNF_PATHW | NativeMethods.SHCNF_FLUSH,
+                (nint)p1, (nint)p2);
         }
     }
 
