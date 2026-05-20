@@ -55,21 +55,19 @@
       <Extensions>
 
         <!--
-          COM LocalServer 登録。
-          Folderly.exe が IExplorerCommand を実装したローカルサーバーとして動作する。
-          Explorer から起動される際は COM サーバーモードで実行される想定。
+          COM SurrogateServer 登録。
+          Folderly.comhost.dll が IExplorerCommand を公開し、Explorer から
+          DLL surrogate 経由で読み込まれる。
           Clsid: {2A7A05DA-70D8-4302-8B23-AE8D79D801B6}
         -->
         <com:Extension Category="windows.comServer">
           <com:ComServer>
-            <com:ExeServer
-              Executable="Folderly.exe"
-              DisplayName="Folderly Context Menu Handler"
-              Arguments="--com-server">
+            <com:SurrogateServer DisplayName="Folderly Context Menu Handler">
               <com:Class
                 Id="2A7A05DA-70D8-4302-8B23-AE8D79D801B6"
-                DisplayName="Folderly.ContextMenuHandler" />
-            </com:ExeServer>
+                Path="Folderly.comhost.dll"
+                ThreadingModel="STA" />
+            </com:SurrogateServer>
           </com:ComServer>
         </com:Extension>
 

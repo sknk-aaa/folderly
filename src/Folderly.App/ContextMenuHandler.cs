@@ -11,7 +11,7 @@ namespace Folderly.App;
 
 [ComImport, Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe"),
  InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-internal interface IShellItem
+public interface IShellItem
 {
     [PreserveSig] int BindToHandler(IntPtr pbc, ref Guid bhid, ref Guid riid, out IntPtr ppv);
     [PreserveSig] int GetParent(out IShellItem ppsi);
@@ -22,7 +22,7 @@ internal interface IShellItem
 
 [ComImport, Guid("b63ea76d-1f85-456f-a19c-48159efa858b"),
  InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-internal interface IShellItemArray
+public interface IShellItemArray
 {
     [PreserveSig] int BindToHandler(IntPtr pbc, ref Guid rbhid, ref Guid riid, out IntPtr ppvOut);
     [PreserveSig] int GetPropertyStore(int flags, ref Guid riid, out IntPtr ppv);
@@ -37,9 +37,10 @@ internal interface IShellItemArray
 // COM インターフェース定義（Folderly 実装側）
 // ——————————————————————————————————————————————————————
 
+[ComVisible(true)]
 [Guid("a08ce4d0-fa25-44ab-b57c-c7240467c5b0"),
  InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-internal interface IExplorerCommand
+public interface IExplorerCommand
 {
     [PreserveSig] int GetTitle(IShellItemArray? psiItemArray, [MarshalAs(UnmanagedType.LPWStr)] out string ppszName);
     [PreserveSig] int GetIcon(IShellItemArray? psiItemArray, [MarshalAs(UnmanagedType.LPWStr)] out string ppszIcon);
@@ -51,9 +52,10 @@ internal interface IExplorerCommand
     [PreserveSig] int EnumSubCommands(out IntPtr ppEnum);
 }
 
+[ComVisible(true)]
 [Guid("00000001-0000-0000-c000-000000000046"),
  InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-internal interface IClassFactory
+public interface IClassFactory
 {
     [PreserveSig] int CreateInstance(IntPtr pUnkOuter, ref Guid riid, out IntPtr ppvObject);
     [PreserveSig] int LockServer(bool fLock);
@@ -66,7 +68,7 @@ internal interface IClassFactory
 [ComVisible(true)]
 [Guid("2A7A05DA-70D8-4302-8B23-AE8D79D801B6")]
 [ClassInterface(ClassInterfaceType.None)]
-internal sealed class FolderlyContextMenuHandler : IExplorerCommand
+public sealed class FolderlyContextMenuHandler : IExplorerCommand
 {
     private static readonly Guid CommandGuid = new("2A7A05DA-70D8-4302-8B23-AE8D79D801B6");
     private const int E_NOTIMPL = unchecked((int)0x80004001);
@@ -186,9 +188,15 @@ internal static class ComServer
     {
         _timeoutTimer?.Stop();
         if (!TrySendViaPipe(folderPath))
-            Process.Start(new ProcessStartInfo(Environment.ProcessPath!, $"\"{folderPath}\"")
+            Process.Start(new ProcessStartInfo(GetFolderlyExePath(), $"\"{folderPath}\"")
                 { UseShellExecute = false });
         Stop();
+    }
+
+    private static string GetFolderlyExePath()
+    {
+        var packagedExe = Path.Combine(AppContext.BaseDirectory, "Folderly.exe");
+        return File.Exists(packagedExe) ? packagedExe : Environment.ProcessPath!;
     }
 
     public static void Stop() =>
