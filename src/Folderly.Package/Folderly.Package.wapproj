@@ -11,7 +11,7 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <PackageCertificateKeyFile>Folderly.Package_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <GenerateTestArtifacts>True</GenerateTestArtifacts>
+    <ParentPlatformTarget>x64</ParentPlatformTarget>
     <TargetPlatformVersion>10.0.26100.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <AssetTargetFallback>uap10.0.17763</AssetTargetFallback>
@@ -44,9 +44,7 @@
     <Content Include="Images\Wide310x150Logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Folderly.App\Folderly.App.csproj">
-      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
-    </ProjectReference>
+    <ProjectReference Include="..\Folderly.App\Folderly.App.csproj" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" Condition=" '$(WapProjPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets" Condition=" '$(WapProjPath)' == '' " />
