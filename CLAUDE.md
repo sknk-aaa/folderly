@@ -78,10 +78,22 @@
 - **判断**: `Close_Click` と `OnClosing` 両方で `_vm.Save()` を呼ぶ（二重 Save は冪等）
 - **理由**: ×ボタンでウィンドウを閉じた場合も設定が保存されるべき（SPEC F-14「設定の永続化」）。`SetSetting` は `INSERT OR REPLACE` のため二重呼び出しは問題なし。
 
-## 次セッション申し送り事項（Step 17以降）
+### 19. COM ハンドラは IExplorerCommand + IClassFactory で実装
+- **判断**: `ContextMenuHandler.cs` に `FolderlyContextMenuHandler`（IExplorerCommand）と `FolderlyClassFactory`（IClassFactory）を実装。`CoRegisterClassObject` で登録し WPF Dispatcher ループを COM STA メッセージポンプとして利用
+- **理由**: MSIX の `desktop4:FileExplorerContextMenus` 拡張は COM ExeServer 方式が必須。`IExplorerCommand` が Explorer の右クリックメニューエントリポイント。
+- **COM インターフェースの使い分け**: Explorer から受け取る側（IShellItem, IShellItemArray）は `[ComImport]` を付与。Folderly が実装する側（IExplorerCommand, IClassFactory）は `[Guid]` + `[InterfaceType]` のみ（`[ComImport]` なし）。
+- **フォルダパスの受け渡し**: `Invoke` → `GetDisplayName(SIGDN_FILESYSPATH=0x80058000)` → NamedPipe で既存インスタンスへ送信（失敗時は新プロセス起動）→ `CoRevokeClassObject` + `Shutdown`
+- **タイムアウト**: `Start()` 後 30 秒以内に `Invoke` が来なければ自動終了（`System.Timers.Timer`）
 
-- Steps 11〜16 完了済み。Windows でビルド・手動テストを実施すること
+### 20. `--com-server` 検出は Mutex 取得より前に行う
+- **判断**: `App.OnStartup` の先頭で `e.Args.Contains("--com-server")` を確認し、マッチした場合は `ComServer.Start(this)` を呼んで即 `return`
+- **理由**: COM サーバーインスタンスは単一インスタンス制御（Mutex）とは独立して動作する。Mutex を取得すると通常インスタンスとの衝突が起きる。
+
+## 次セッション申し送り事項（Store 申請前）
+
+- Steps 17〜18 完了済み
+- Windows 実機で MSIX インストール → 右クリックメニュー動作確認が必要（COM ハンドラは MSIX 環境のみ）
 - FolderTemplate.png は現在シンプルな2色の矩形。WPF プレビューの視覚品質に合わせて最終調整すること
-- MSIX パッケージング（Folderly.Package）は未着手。Store 申請前に実施
 - Shell 層（Folderly.Shell）は WSL2 で書いたコードのみ。Windows 実機での SHChangeNotify 動作確認が必要
 - `StoreLicenseService` の StoreContext 実装は MSIX 環境でのみ動作確認可能
+- Store 申請前に Publisher を Partner Center の CN=... に変更すること（Package.appxmanifest コメント参照）

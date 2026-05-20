@@ -19,6 +19,13 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Explorer から COM サーバーモードで起動された場合は UI を表示せず COM ループに入る
+        if (e.Args.Contains("--com-server", StringComparer.OrdinalIgnoreCase))
+        {
+            ComServer.Start(this);
+            return;
+        }
+
         _mutex = new Mutex(initiallyOwned: true, MutexName, out bool createdNew);
 
         if (!createdNew)
