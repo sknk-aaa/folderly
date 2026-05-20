@@ -95,12 +95,15 @@ public sealed class ApplyService
         var (centralIcoPath, _) = await SaveIcoFilesAsync(
             folderPath, iconHash, iconFileName, icoBytes, ct);
 
-        // 7. .folderly ディレクトリ作成（SaveIcoFilesAsync 内で作成済だが念のため）
-        var folderlyDir = Path.Combine(folderPath, ".folderly");
+        // 7. _folderly ディレクトリ作成（SaveIcoFilesAsync 内で作成済だが念のため）
+        var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
         Directory.CreateDirectory(folderlyDir);
 
         // 8. desktop.ini 書き込み（IconResource はユニーク名を指す）
-        DesktopIniManager.Write(folderPath, $@".folderly\{iconFileName}", existingIniContent);
+        DesktopIniManager.Write(
+            folderPath,
+            $@"{FolderlyConstants.FolderlyDirectoryName}\{iconFileName}",
+            existingIniContent);
 
         // 9. ファイル属性設定
         FolderAttributesService.ApplyFolderAttributes(folderPath);
@@ -156,7 +159,7 @@ public sealed class ApplyService
         if (!File.Exists(centralPath))
             await File.WriteAllBytesAsync(centralPath, icoBytes, ct);
 
-        var folderlyDir = Path.Combine(folderPath, ".folderly");
+        var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
         Directory.CreateDirectory(folderlyDir);
 
         // 前世代の cover ファイル群を掃除（同名再上書きでは Explorer キャッシュが剥がれないため）
@@ -168,6 +171,20 @@ public sealed class ApplyService
                 File.Delete(stale);
             }
             catch { /* 残ってしまっても致命ではない */ }
+        }
+
+        // 旧バージョンが残した .folderly ディレクトリも片付ける（OneDrive で消える前提だが
+        // 非 OneDrive パスで残っているケースもあるため）
+        var legacyDir = Path.Combine(folderPath, FolderlyConstants.LegacyFolderlyDirectoryName);
+        if (Directory.Exists(legacyDir))
+        {
+            try
+            {
+                foreach (var f in Directory.EnumerateFiles(legacyDir, "*", SearchOption.AllDirectories))
+                    File.SetAttributes(f, FileAttributes.Normal);
+                Directory.Delete(legacyDir, recursive: true);
+            }
+            catch { /* 掃除失敗は致命ではない */ }
         }
 
         var localPath = Path.Combine(folderlyDir, localFileName);

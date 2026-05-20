@@ -9,7 +9,7 @@ namespace Folderly.Core.Application;
 
 /// <summary>
 /// フォルダアイコン復元のユースケース。
-/// desktop.ini 復元→属性復元→.folderly 削除→Shell 通知→履歴削除 を一括実行する。
+/// desktop.ini 復元→属性復元→_folderly 削除→Shell 通知→履歴削除 を一括実行する。
 /// </summary>
 public sealed class RevertService
 {
@@ -73,11 +73,16 @@ public sealed class RevertService
             FolderAttributesService.RestoreAttributes(
                 normalized, (FileAttributes)entry.OriginalAttributes);
 
-            // 4. .folderly ディレクトリを削除
-            var folderlyDir = Path.Combine(normalized, ".folderly");
-            if (Directory.Exists(folderlyDir))
+            // 4. _folderly ディレクトリを削除（旧 .folderly が残っていれば合わせて掃除）
+            foreach (var dirName in new[] {
+                FolderlyConstants.FolderlyDirectoryName,
+                FolderlyConstants.LegacyFolderlyDirectoryName })
             {
-                DeleteFolderlyWithRetry(folderlyDir, ct);
+                var folderlyDir = Path.Combine(normalized, dirName);
+                if (Directory.Exists(folderlyDir))
+                {
+                    DeleteFolderlyWithRetry(folderlyDir, ct);
+                }
             }
 
             // 5. Shell 通知

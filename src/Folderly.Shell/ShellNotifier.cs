@@ -20,7 +20,12 @@ public sealed class ShellNotifier : IShellNotifier
         // 特定フォルダへの変更通知
         var parentPath = Directory.GetParent(folderPath)?.FullName;
         var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
-        var iconPath = Path.Combine(folderPath, ".folderly", "cover.ico");
+        // ICO 本体のパスは実行時のハッシュで決まる。存在するファイルだけ通知する
+        var folderlyDir = Path.Combine(folderPath, "_folderly");
+        var iconPath = Directory.Exists(folderlyDir)
+            ? Directory.EnumerateFiles(folderlyDir, "cover_*.ico").FirstOrDefault()
+              ?? Path.Combine(folderlyDir, "cover.ico")
+            : Path.Combine(folderlyDir, "cover.ico");
 
         NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);

@@ -23,7 +23,7 @@ public static class FolderAttributesService
         File.SetAttributes(iniPath, current | FileAttributes.Hidden | FileAttributes.System);
     }
 
-    /// <summary>.folderly\ サブフォルダに HIDDEN を付与する。</summary>
+    /// <summary>_folderly\ サブフォルダに HIDDEN を付与する。</summary>
     public static void ApplyHiddenFolderlyAttributes(string folderlyPath)
     {
         var current = File.GetAttributes(folderlyPath);

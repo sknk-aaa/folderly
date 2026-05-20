@@ -98,7 +98,16 @@ public sealed class HistoryItemViewModel : ViewModelBase
         if (!string.IsNullOrWhiteSpace(entry.IconStoragePath))
             yield return entry.IconStoragePath;
 
-        yield return Path.Combine(entry.FolderPath, ".folderly", "cover.ico");
+        // フォルダ内 _folderly\cover_*.ico を動的に列挙（旧 .folderly\cover.ico フォールバックも残す）
+        foreach (var dirName in new[] { "_folderly", ".folderly" })
+        {
+            var dir = Path.Combine(entry.FolderPath, dirName);
+            if (Directory.Exists(dir))
+            {
+                foreach (var ico in Directory.EnumerateFiles(dir, "cover*.ico"))
+                    yield return ico;
+            }
+        }
     }
 
     private static BitmapSource? LoadThumbnailFromIco(string icoPath)

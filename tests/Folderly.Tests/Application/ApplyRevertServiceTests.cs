@@ -1,3 +1,4 @@
+using Folderly.Core;
 using Folderly.Core.Application;
 using Folderly.Core.Composition;
 using Folderly.Core.History;
@@ -87,7 +88,7 @@ public class ApplyRevertServiceTests : IDisposable
     {
         await _applyService.ApplyAsync(MakeRequest());
 
-        var folderlyDir = Path.Combine(_tempDir, ".folderly");
+        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
         Assert.True(Directory.Exists(folderlyDir));
         // cover_<hash8>.ico というユニーク名で生成される（Explorer キャッシュ無効化のため）
         var icoFiles = Directory.GetFiles(folderlyDir, "cover_*.ico");
@@ -97,7 +98,7 @@ public class ApplyRevertServiceTests : IDisposable
     [Fact]
     public async Task ApplyAsync_Reapply_RegeneratesIcoWithNewName()
     {
-        var folderlyDir = Path.Combine(_tempDir, ".folderly");
+        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
 
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
         var firstIco = Directory.GetFiles(folderlyDir, "cover_*.ico").Single();
@@ -217,7 +218,7 @@ public class ApplyRevertServiceTests : IDisposable
         await _applyService.ApplyAsync(MakeRequest());
         await _revertService.RevertAsync(_tempDir);
 
-        var folderlyDir = Path.Combine(_tempDir, ".folderly");
+        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
         Assert.False(Directory.Exists(folderlyDir));
     }
 
