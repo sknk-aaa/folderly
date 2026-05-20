@@ -1,0 +1,123 @@
+<Window x:Class="Folderly.App.Views.ApplyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctrl="clr-namespace:Folderly.App.Views.Controls"
+        xmlns:conv="clr-namespace:Folderly.App.Infrastructure"
+        Title="{Binding L[ApplyWindowTitle]}"
+        Width="560" Height="720"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource SurfaceBrush}"
+        FontFamily="Segoe UI Variable"
+        Drop="Window_Drop"
+        AllowDrop="True">
+
+    <Window.Resources>
+        <conv:HexToColorConverter   x:Key="HexToColor"/>
+        <conv:ScaleToPercentConverter x:Key="ScaleToPercent"/>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid Margin="20,16,20,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- フォルダパス -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="📁" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <TextBlock Text="{Binding FolderPath}" FontSize="12"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+
+        <!-- フォルダプレビュー -->
+        <Border Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,16"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+            <ctrl:FolderPreview x:Name="Preview"
+                                SourceImage="{Binding SourceImage}"
+                                Scale="{Binding Scale, Mode=TwoWay}"
+                                OffsetX="{Binding OffsetX, Mode=TwoWay}"
+                                OffsetY="{Binding OffsetY, Mode=TwoWay}"
+                                SelectedTagColor="{Binding SelectedTagColor}"
+                                CropMode="{Binding CropMode}"
+                                PositionChanged="Preview_PositionChanged"/>
+        </Border>
+
+        <!-- 画像選択 -->
+        <Grid Grid.Row="2" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="{Binding L[SelectImage]}"
+                    Style="{StaticResource SecondaryButton}"
+                    Click="SelectImage_Click" Margin="0,0,10,0"/>
+            <TextBlock Grid.Column="1" Text="{Binding L[DropImageHere]}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       FontSize="12" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- 拡大率 -->
+        <Grid Grid.Row="3" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding L[ScaleLabel]}" VerticalAlignment="Center"/>
+            <Slider Grid.Column="1" Minimum="0.5" Maximum="3.0" SmallChange="0.05"
+                    Value="{Binding Scale, Mode=TwoWay}"
+                    VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBlock Grid.Column="2"
+                       Text="{Binding Scale, Converter={StaticResource ScaleToPercent}}"
+                       VerticalAlignment="Center" FontSize="12"
+                       Foreground="{StaticResource TextSecondaryBrush}"/>
+            <Button Grid.Column="3" Content="{Binding L[ResetPosition]}"
+                    Style="{StaticResource SecondaryButton}"
+                    Click="ResetPosition_Click" Margin="8,0,0,0" Padding="10,4"/>
+        </Grid>
+
+        <!-- クロップモード -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,16">
+            <RadioButton Content="{Binding L[CropCenter]}"
+                         IsChecked="{Binding IsCropCenter, Mode=TwoWay}"
+                         GroupName="CropMode" Margin="0,0,20,0"/>
+            <RadioButton Content="{Binding L[CropPad]}"
+                         IsChecked="{Binding IsCropPad, Mode=TwoWay}"
+                         GroupName="CropMode"/>
+        </StackPanel>
+
+        <!-- タグ選択（コードビハインドで動的生成） -->
+        <StackPanel Grid.Row="5" Margin="0,0,0,0">
+            <TextBlock Text="{Binding L[TagLabel]}" Margin="0,0,0,8"/>
+            <StackPanel x:Name="TagPanel" Orientation="Horizontal"/>
+        </StackPanel>
+
+        <!-- ボタン行 -->
+        <Grid Grid.Row="7" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Content="{Binding L[Cancel]}"
+                    Style="{StaticResource SecondaryButton}"
+                    Click="Cancel_Click" Margin="0,0,10,0" MinWidth="90"/>
+            <Button x:Name="ApplyBtn" Grid.Column="2"
+                    Content="{Binding L[Apply]}"
+                    Style="{StaticResource PrimaryButton}"
+                    IsEnabled="{Binding CanApply}"
+                    Click="Apply_Click" MinWidth="90"/>
+        </Grid>
+    </Grid>
+    </ScrollViewer>
+</Window>
