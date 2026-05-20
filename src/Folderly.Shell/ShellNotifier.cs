@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Folderly.Core.Shell;
 
 namespace Folderly.Shell;
@@ -43,6 +44,10 @@ public sealed class ShellNotifier : IShellNotifier
             NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
         }
 
+        // SHGetFileInfo でシステムイメージリストを強制更新 → 特定インデックスへ UPDATEIMAGE
+        // UPDATEDIR だけでは古いキャッシュが残るケースに対応するための直接的なアプローチ
+        ForceIconIndexUpdate(folderPath);
+
         // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
         NotifyRenameFolderToSelf(folderPath);
 
@@ -51,6 +56,24 @@ public sealed class ShellNotifier : IShellNotifier
             NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
             nint.Zero,
             nint.Zero);
+    }
+
+    private static void ForceIconIndexUpdate(string path)
+    {
+        if (!Directory.Exists(path)) return;
+        var shfi = new NativeMethods.SHFILEINFOW();
+        var result = NativeMethods.SHGetFileInfo(
+            path, 0, ref shfi,
+            (uint)Marshal.SizeOf<NativeMethods.SHFILEINFOW>(),
+            NativeMethods.SHGFI_ICON | NativeMethods.SHGFI_SYSICONINDEX);
+        if (result == nint.Zero) return;
+        if (shfi.hIcon != nint.Zero)
+            NativeMethods.DestroyIcon(shfi.hIcon);
+        NativeMethods.SHChangeNotify(
+            NativeMethods.SHCNE_UPDATEIMAGE,
+            NativeMethods.SHCNF_DWORD | NativeMethods.SHCNF_FLUSH,
+            nint.Zero,
+            (nint)shfi.iIcon);
     }
 
     private static unsafe void NotifyPath(string path, uint eventId)
