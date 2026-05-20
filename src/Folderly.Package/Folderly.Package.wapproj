@@ -92,10 +92,10 @@
     <PropertyGroup>
       <NativeRuntimeIdentifier Condition=" '$(Platform)' == 'x64' ">win-x64</NativeRuntimeIdentifier>
       <NativeRuntimeIdentifier Condition=" '$(Platform)' == 'ARM64' ">win-arm64</NativeRuntimeIdentifier>
-      <AppOutputDir>..\Folderly.App\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.17763.0\$(NativeRuntimeIdentifier)\</AppOutputDir>
+      <AppOutputRoot>..\Folderly.App\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.17763.0\</AppOutputRoot>
     </PropertyGroup>
     <ItemGroup>
-      <NativeSqliteFiles Include="$(AppOutputDir)runtimes\$(NativeRuntimeIdentifier)\native\e_sqlite3.dll" />
+      <NativeSqliteFiles Include="$(AppOutputRoot)**\e_sqlite3.dll" />
     </ItemGroup>
     <Copy
       SourceFiles="@(NativeSqliteFiles)"
