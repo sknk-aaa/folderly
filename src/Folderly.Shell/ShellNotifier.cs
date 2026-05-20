@@ -17,16 +17,23 @@ public sealed class ShellNotifier : IShellNotifier
             nint.Zero);
 
         // 特定フォルダへの変更通知
-        unsafe
+        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPath(Path.Combine(folderPath, "desktop.ini"), NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
+    }
+
+    private static unsafe void NotifyPath(string path, uint eventId)
+    {
+        if (!Directory.Exists(path) && !File.Exists(path))
+            return;
+
+        fixed (char* pathPtr = path)
         {
-            fixed (char* pathPtr = folderPath)
-            {
-                NativeMethods.SHChangeNotify(
-                    NativeMethods.SHCNE_UPDATEDIR,
-                    NativeMethods.SHCNF_PATH | NativeMethods.SHCNF_FLUSH,
-                    (nint)pathPtr,
-                    nint.Zero);
-            }
+            NativeMethods.SHChangeNotify(
+                eventId,
+                NativeMethods.SHCNF_PATH | NativeMethods.SHCNF_FLUSH,
+                (nint)pathPtr,
+                nint.Zero);
         }
     }
 }
