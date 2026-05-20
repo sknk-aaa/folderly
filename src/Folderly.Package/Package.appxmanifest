@@ -56,7 +56,7 @@
 
         <!--
           COM SurrogateServer 登録。
-          Folderly.comhost.dll が IExplorerCommand を公開し、Explorer から
+          Folderly.ContextMenu.comhost.dll が IExplorerCommand を公開し、Explorer から
           DLL surrogate 経由で読み込まれる。
           Clsid: {2A7A05DA-70D8-4302-8B23-AE8D79D801B6}
         -->
@@ -65,7 +65,7 @@
             <com:SurrogateServer DisplayName="Folderly Context Menu Handler">
               <com:Class
                 Id="2A7A05DA-70D8-4302-8B23-AE8D79D801B6"
-                Path="Folderly.comhost.dll"
+                Path="Folderly.ContextMenu.comhost.dll"
                 ThreadingModel="STA" />
             </com:SurrogateServer>
           </com:ComServer>

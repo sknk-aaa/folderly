@@ -54,6 +54,10 @@
       <Project>{C31D4F39-1FFB-49FA-9BFB-10ADB7A7EA78}</Project>
       <Name>Folderly.App</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Folderly.ContextMenu\Folderly.ContextMenu.csproj">
+      <Project>{ECF74F8F-67DC-4BB7-B622-A7DE3970266F}</Project>
+      <Name>Folderly.ContextMenu</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" Condition=" '$(WapProjPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets" Condition=" '$(WapProjPath)' == '' " />
@@ -66,5 +70,21 @@
       <FrameworkSdkReference Remove="@(FrameworkSdkReference)" />
       <FrameworkSdkPackage Remove="@(FrameworkSdkPackage)" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="CopyContextMenuComHost" AfterTargets="Build">
+    <PropertyGroup>
+      <ContextMenuRuntimeIdentifier Condition=" '$(Platform)' == 'x64' ">win-x64</ContextMenuRuntimeIdentifier>
+      <ContextMenuRuntimeIdentifier Condition=" '$(Platform)' == 'ARM64' ">win-arm64</ContextMenuRuntimeIdentifier>
+      <ContextMenuOutputDir>..\Folderly.ContextMenu\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.17763.0\$(ContextMenuRuntimeIdentifier)\</ContextMenuOutputDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <ContextMenuOutputFiles Include="$(ContextMenuOutputDir)Folderly.ContextMenu.*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(ContextMenuOutputFiles)"
+      DestinationFolder="$(OutputPath)"
+      SkipUnchangedFiles="true"
+      Condition=" '@(ContextMenuOutputFiles)' != '' " />
   </Target>
 </Project>
