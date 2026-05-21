@@ -13,11 +13,6 @@ public sealed class ShellNotifier : IShellNotifier
     {
         TryTouchFolder(folderPath);
 
-        // SHChangeNotify を送る前に新しいアイコンをサムネイルキャッシュへ先書きする。
-        // Explorer が通知を受け取ってキャッシュを参照したとき、すでに新しいアイコンが
-        // 書き込まれているため黄色フォルダフラッシュなしで即時反映できる。
-        ForceThumbnailExtraction(folderPath);
-
         // グローバルアイコンキャッシュを更新
         NativeMethods.SHChangeNotify(
             NativeMethods.SHCNE_UPDATEIMAGE,
@@ -136,7 +131,6 @@ public sealed class ShellNotifier : IShellNotifier
         if (!Directory.Exists(folderPath)) return;
 
         TryTouchFolder(folderPath);
-        ForceThumbnailExtraction(folderPath);
         ToggleSystemReadOnly(folderPath);
 
         ForceIconIndexUpdate(folderPath);
@@ -172,23 +166,6 @@ public sealed class ShellNotifier : IShellNotifier
             // Explorer が受け取ったとき「属性メタデータが変化した」と判断して desktop.ini を再評価する。
             File.SetAttributes(folderPath, attrs & ~(FileAttributes.System | FileAttributes.ReadOnly));
             File.SetAttributes(folderPath, attrs);
-        }
-        catch { }
-    }
-
-    private static void ForceThumbnailExtraction(string folderPath)
-    {
-        if (!Directory.Exists(folderPath)) return;
-        try
-        {
-            var riid = typeof(NativeMethods.IShellItem).GUID;
-            NativeMethods.SHCreateItemFromParsingName(folderPath, nint.Zero, riid, out var shellItem);
-            if (shellItem == null) return;
-
-            var cache = (NativeMethods.IThumbnailCache)new NativeMethods.LocalThumbnailCache();
-            // WTS_FORCEEXTRACTION: キャッシュを無視して新しいアイコンを強制再生成し共有キャッシュへ書き込む
-            cache.GetThumbnail(shellItem, 256, NativeMethods.WTS_FORCEEXTRACTION,
-                out _, out _, out _);
         }
         catch { }
     }
