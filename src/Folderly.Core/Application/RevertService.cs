@@ -123,10 +123,48 @@ public sealed class RevertService
         return Task.CompletedTask;
     }
 
+    public async Task<RevertAllResult> RevertAllAsync(
+        IEnumerable<string>? cleanupRoots = null,
+        CancellationToken ct = default)
+    {
+        var entries = _history.GetAll().ToList();
+        var failCount = 0;
+
+        foreach (var entry in entries)
+        {
+            try
+            {
+                await RevertAsync(entry.FolderPath, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to revert history entry {FolderPath}", entry.FolderPath);
+                try { _history.Delete(entry.FolderPath); } catch { }
+                failCount++;
+            }
+        }
+
+        var cleanedOrphans = CleanupOrphanedFolderlyArtifacts(
+            cleanupRoots ?? GetDefaultCleanupRoots(), ct);
+        return new RevertAllResult(entries.Count, cleanedOrphans, failCount);
+    }
+
     private void TryClearAttributes(string path)
     {
         try { File.SetAttributes(path, FileAttributes.Normal); }
         catch (Exception ex) { _logger.LogWarning(ex, "Failed to clear attributes on {Path}", path); }
+    }
+
+    private void TryClearFolderCustomizationAttributes(string path)
+    {
+        try
+        {
+            var attrs = File.GetAttributes(path);
+            attrs &= ~FileAttributes.System;
+            attrs &= ~FileAttributes.ReadOnly;
+            File.SetAttributes(path, attrs);
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Failed to clear folder customization attributes on {Path}", path); }
     }
 
     private void DeleteFileWithRetry(string path, CancellationToken ct)
@@ -275,4 +313,150 @@ public sealed class RevertService
 
         return string.Join("\r\n", result).Trim();
     }
+
+    private int CleanupOrphanedFolderlyArtifacts(IEnumerable<string> roots, CancellationToken ct)
+    {
+        var cleanedCount = 0;
+        foreach (var folder in EnumerateCleanupCandidates(roots, ct))
+        {
+            ct.ThrowIfCancellationRequested();
+            try
+            {
+                if (TryCleanupOrphanedFolderlyArtifacts(folder, ct))
+                    cleanedCount++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to cleanup orphaned Folderly artifacts in {FolderPath}", folder);
+            }
+        }
+
+        return cleanedCount;
+    }
+
+    private bool TryCleanupOrphanedFolderlyArtifacts(string folderPath, CancellationToken ct)
+    {
+        var iniPath = Path.Combine(folderPath, "desktop.ini");
+        var hasFolderlyIni = false;
+        string? cleanedIni = null;
+
+        if (File.Exists(iniPath))
+        {
+            var content = DesktopIniManager.Read(folderPath);
+            if (content is not null)
+            {
+                cleanedIni = RemoveFolderlyIconKeys(content);
+                hasFolderlyIni = !string.Equals(cleanedIni, content, StringComparison.Ordinal);
+            }
+        }
+
+        var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
+        var legacyDir = Path.Combine(folderPath, FolderlyConstants.LegacyFolderlyDirectoryName);
+        var hasFolderlyDir = Directory.Exists(folderlyDir) || Directory.Exists(legacyDir);
+
+        if (!hasFolderlyIni && !hasFolderlyDir)
+            return false;
+
+        if (hasFolderlyIni)
+        {
+            if (File.Exists(iniPath))
+                TryClearAttributes(iniPath);
+
+            if (string.IsNullOrWhiteSpace(cleanedIni))
+            {
+                if (File.Exists(iniPath))
+                    DeleteFileWithRetry(iniPath, ct);
+            }
+            else
+            {
+                DesktopIniManager.WriteRaw(folderPath, cleanedIni);
+            }
+        }
+
+        foreach (var dir in new[] { folderlyDir, legacyDir })
+        {
+            if (Directory.Exists(dir))
+                DeleteFolderlyWithRetry(dir, ct);
+        }
+
+        TryClearFolderCustomizationAttributes(folderPath);
+        _history.Delete(folderPath);
+        _shellNotifier.NotifyFolderChanged(folderPath);
+        _logger.LogInformation("Cleaned orphaned Folderly artifacts in {FolderPath}", folderPath);
+        return true;
+    }
+
+    private static IEnumerable<string> EnumerateCleanupCandidates(IEnumerable<string> roots, CancellationToken ct)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var root in roots)
+        {
+            if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
+                continue;
+
+            var stack = new Stack<string>();
+            stack.Push(Path.GetFullPath(root));
+
+            while (stack.Count > 0)
+            {
+                ct.ThrowIfCancellationRequested();
+                var current = stack.Pop();
+                if (!seen.Add(current))
+                    continue;
+
+                yield return current;
+
+                IEnumerable<string> children;
+                try { children = Directory.EnumerateDirectories(current); }
+                catch { continue; }
+
+                foreach (var child in children)
+                {
+                    if (ShouldSkipCleanupDirectory(child))
+                        continue;
+                    stack.Push(child);
+                }
+            }
+        }
+    }
+
+    private static bool ShouldSkipCleanupDirectory(string path)
+    {
+        var name = Path.GetFileName(path);
+        if (string.IsNullOrWhiteSpace(name))
+            return false;
+
+        return name.Equals("AppData", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals(".git", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals("node_modules", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals("obj", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals("packages", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IReadOnlyList<string> GetDefaultCleanupRoots()
+    {
+        var roots = new List<string>();
+        AddRoot(roots, Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+        AddRoot(roots, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+        AddRoot(roots, Environment.GetEnvironmentVariable("OneDrive"));
+        AddRoot(roots, Environment.GetEnvironmentVariable("OneDriveConsumer"));
+        AddRoot(roots, Environment.GetEnvironmentVariable("OneDriveCommercial"));
+        return roots;
+    }
+
+    private static void AddRoot(List<string> roots, string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            return;
+
+        var fullPath = Path.GetFullPath(path);
+        if (!roots.Contains(fullPath, StringComparer.OrdinalIgnoreCase))
+            roots.Add(fullPath);
+    }
 }
+
+public sealed record RevertAllResult(
+    int HistoryEntryCount,
+    int CleanedOrphanCount,
+    int FailCount);

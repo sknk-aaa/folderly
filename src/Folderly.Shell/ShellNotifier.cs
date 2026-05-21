@@ -67,6 +67,8 @@ public sealed class ShellNotifier : IShellNotifier
         // 遅延通知: ウィンドウが開いていない場合や Refresh 後もキャッシュが残る場合の保険。
         // 複数ラウンドで属性・desktop.ini・最新ICOを通知し、Explorer の再評価タイミングを拾う。
         ScheduleDelayedNotify(folderPath);
+        NotifyAssociationsChanged();
+        ScheduleDelayedAssociationChanged();
 
     }
 
@@ -160,6 +162,22 @@ public sealed class ShellNotifier : IShellNotifier
         NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
 
         RefreshExplorerWindows(folderPath);
+    }
+
+    private static void ScheduleDelayedAssociationChanged()
+    {
+        foreach (var delayMs in new[] { 500, 1500 })
+        {
+            var d = delayMs;
+            var t = new Thread(() =>
+            {
+                Thread.Sleep(d);
+                NotifyAssociationsChanged();
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.IsBackground = true;
+            t.Start();
+        }
     }
 
     private static void TryTouchFolder(string folderPath)
@@ -271,6 +289,15 @@ public sealed class ShellNotifier : IShellNotifier
             NativeMethods.SHCNF_DWORD | NativeMethods.SHCNF_FLUSH,
             nint.Zero,
             (nint)shfi.iIcon);
+    }
+
+    private static void NotifyAssociationsChanged()
+    {
+        NativeMethods.SHChangeNotify(
+            NativeMethods.SHCNE_ASSOCCHANGED,
+            NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+            nint.Zero,
+            nint.Zero);
     }
 
     private static unsafe void NotifyPath(string path, uint eventId)

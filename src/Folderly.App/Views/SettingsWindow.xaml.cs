@@ -23,24 +23,10 @@ public partial class SettingsWindow : Window
             MessageBoxButton.OKCancel, MessageBoxImage.Warning);
         if (res != MessageBoxResult.OK) return;
 
-        var entries = AppServices.History.GetAll().ToList();
-        var failCount = 0;
+        var result = await AppServices.Revert.RevertAllAsync();
 
-        foreach (var entry in entries)
-        {
-            try
-            {
-                await AppServices.Revert.RevertAsync(entry.FolderPath);
-            }
-            catch
-            {
-                try { AppServices.History.Delete(entry.FolderPath); } catch { }
-                failCount++;
-            }
-        }
-
-        if (failCount > 0)
-            MessageBox.Show(string.Format(L["RevertAllPartialFailed"], failCount),
+        if (result.FailCount > 0)
+            MessageBox.Show(string.Format(L["RevertAllPartialFailed"], result.FailCount),
                 "Folderly", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 

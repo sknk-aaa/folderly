@@ -311,6 +311,27 @@ public class ApplyRevertServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task RevertAllAsync_CleansOrphanedFolderlyDesktopIni()
+    {
+        var iniPath = Path.Combine(_tempDir, "desktop.ini");
+        var folderlyContent =
+            "[.ShellClassInfo]\r\n" +
+            @"IconResource=C:\Users\tester\AppData\Local\Folderly\icons\abc.ico,0" + "\r\n";
+
+        File.WriteAllText(iniPath, folderlyContent, new System.Text.UnicodeEncoding(false, true));
+        File.SetAttributes(_tempDir, File.GetAttributes(_tempDir) | FileAttributes.System | FileAttributes.ReadOnly);
+        File.SetAttributes(iniPath, FileAttributes.Hidden | FileAttributes.System);
+
+        var result = await _revertService.RevertAllAsync(new[] { _tempDir });
+
+        Assert.Equal(1, result.CleanedOrphanCount);
+        Assert.False(File.Exists(iniPath));
+        var attrs = File.GetAttributes(_tempDir);
+        Assert.False(attrs.HasFlag(FileAttributes.System));
+        Assert.False(attrs.HasFlag(FileAttributes.ReadOnly));
+    }
+
+    [Fact]
     public async Task RevertAsync_DeletesFolderlyDirectory()
     {
         await _applyService.ApplyAsync(MakeRequest());
