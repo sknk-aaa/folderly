@@ -11,10 +11,12 @@ public sealed class ShellNotifier : IShellNotifier
 {
     public void NotifyFolderChanged(string folderPath)
     {
-        // フォルダの LastWriteTime を現在時刻に更新してサムネイルキャッシュを無効化する。
-        // 中身があるフォルダは content-preview サムネイルがキャッシュされているため、
-        // タイムスタンプを変えることでキャッシュミスを起こし desktop.ini アイコンを再読みさせる。
         TryTouchFolder(folderPath);
+
+        // SHChangeNotify を送る前に新しいアイコンをサムネイルキャッシュへ先書きする。
+        // Explorer が通知を受け取ってキャッシュを参照したとき、すでに新しいアイコンが
+        // 書き込まれているため黄色フォルダフラッシュなしで即時反映できる。
+        ForceThumbnailExtraction(folderPath);
 
         // グローバルアイコンキャッシュを更新
         NativeMethods.SHChangeNotify(
@@ -134,10 +136,7 @@ public sealed class ShellNotifier : IShellNotifier
         if (!Directory.Exists(folderPath)) return;
 
         TryTouchFolder(folderPath);
-
-        // System+ReadOnly を一瞬解除→即再設定することで Explorer に desktop.ini の再読みを強制する。
-        // Explorer は属性の「変化」を検知したときに desktop.ini を再評価するため、
-        // 再適用（同フォルダに別画像）でも新しいアイコンが即時反映される。
+        ForceThumbnailExtraction(folderPath);
         ToggleSystemReadOnly(folderPath);
 
         ForceIconIndexUpdate(folderPath);
@@ -173,6 +172,23 @@ public sealed class ShellNotifier : IShellNotifier
             // Explorer が受け取ったとき「属性メタデータが変化した」と判断して desktop.ini を再評価する。
             File.SetAttributes(folderPath, attrs & ~(FileAttributes.System | FileAttributes.ReadOnly));
             File.SetAttributes(folderPath, attrs);
+        }
+        catch { }
+    }
+
+    private static void ForceThumbnailExtraction(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
+        try
+        {
+            var riid = typeof(NativeMethods.IShellItem).GUID;
+            NativeMethods.SHCreateItemFromParsingName(folderPath, nint.Zero, riid, out var shellItem);
+            if (shellItem == null) return;
+
+            var cache = (NativeMethods.IThumbnailCache)new NativeMethods.LocalThumbnailCache();
+            // WTS_FORCEEXTRACTION: キャッシュを無視して新しいアイコンを強制再生成し共有キャッシュへ書き込む
+            cache.GetThumbnail(shellItem, 256, NativeMethods.WTS_FORCEEXTRACTION,
+                out _, out _, out _);
         }
         catch { }
     }

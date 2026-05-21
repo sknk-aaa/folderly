@@ -53,4 +53,60 @@ internal static partial class NativeMethods
 
     [LibraryImport("shell32.dll")]
     internal static partial void ILFree(nint pidl);
+
+    // ── IThumbnailCache: サムネイルキャッシュの強制再生成に使用 ─────────────────
+
+    internal const uint WTS_FORCEEXTRACTION = 0x00000004;
+
+    [ComImport]
+    [Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal interface IShellItem
+    {
+        [PreserveSig] int BindToHandler(nint pbc, ref Guid bhid, ref Guid riid, out nint ppv);
+        [PreserveSig] int GetParent(out IShellItem ppsi);
+        [PreserveSig] int GetDisplayName(uint sigdnName, [MarshalAs(UnmanagedType.LPWStr)] out string ppszName);
+        [PreserveSig] int GetAttributes(uint sfgaoMask, out uint psfgaoAttribs);
+        [PreserveSig] int Compare([MarshalAs(UnmanagedType.Interface)] IShellItem psi, uint hint, out int piOrder);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct WTS_THUMBNAILID
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public byte[] rgbKey;
+    }
+
+    [ComImport]
+    [Guid("F676C15D-596A-4ce2-8234-33996F445DB1")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal interface IThumbnailCache
+    {
+        [PreserveSig]
+        int GetThumbnail(
+            [MarshalAs(UnmanagedType.Interface)] IShellItem pShellItem,
+            uint cxyRequestedThumbSize,
+            uint flags,
+            out nint ppvThumb,
+            out uint pOutFlags,
+            out WTS_THUMBNAILID pThumbnailID);
+        [PreserveSig]
+        int GetThumbnailByID(
+            WTS_THUMBNAILID thumbnailID,
+            uint cxyRequestedThumbSize,
+            out nint ppvThumb,
+            out uint pOutFlags);
+    }
+
+    // CLSID = {50EF4544-AC9F-4A8E-B21B-8A26180DB13F} (Local Thumbnail Cache)
+    [ComImport]
+    [Guid("50EF4544-AC9F-4A8E-B21B-8A26180DB13F")]
+    internal class LocalThumbnailCache { }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+    internal static extern void SHCreateItemFromParsingName(
+        [MarshalAs(UnmanagedType.LPWStr)] string pszPath,
+        nint pbc,
+        [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+        [MarshalAs(UnmanagedType.Interface)] out IShellItem ppv);
 }
