@@ -166,14 +166,13 @@ public sealed class ShellNotifier : IShellNotifier
         try
         {
             var attrs = File.GetAttributes(folderPath);
-            // System か ReadOnly のどちらかが設定されているときだけ toggle する（revert 後は両方クリア済みのためスキップ）
             if ((attrs & (FileAttributes.System | FileAttributes.ReadOnly)) == 0) return;
 
+            // Explorer に通知せず（黄色フォルダを出さないため）サイレントに 2 回 SetAttributes する。
+            // これにより NTFS の ChangeTime が 2 回更新され、直後の SHCNE_ATTRIBUTES 通知を
+            // Explorer が受け取ったとき「属性メタデータが変化した」と判断して desktop.ini を再評価する。
             File.SetAttributes(folderPath, attrs & ~(FileAttributes.System | FileAttributes.ReadOnly));
-            NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
-
             File.SetAttributes(folderPath, attrs);
-            NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         }
         catch { }
     }
