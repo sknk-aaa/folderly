@@ -4,10 +4,11 @@
              Width="320" Height="320">
     <!--
         RootCanvas: 320x320 の固定キャンバス。
-        - TemplateImage: フォルダ型テンプレート PNG（背景）
+        - TemplateImage: フォルダ型テンプレート PNG（背景レイヤー）
         - ImageCanvas:   ユーザー画像（ImageRegion に ClipToBounds で切り抜き）
         - TagPath:       タグ色の塗りつぶしパス（フォルダタブ形状に重ねる）
-        - Placeholder:   画像未選択時の案内テキスト
+        - FrontTemplateImage: 前面レイヤー（ボトムエッジのみ）
+        - Placeholder:   画像未選択時の案内
         座標は FolderPreview.xaml.cs で ImageRegion / TagRegion を 320px にスケールして設定する。
     -->
     <Canvas x:Name="RootCanvas"
@@ -19,7 +20,15 @@
             MouseWheel="OnMouseWheel"
             MouseLeave="OnMouseLeave">
 
-        <!-- フォルダ型テンプレート（背景） -->
+        <Canvas.Effect>
+            <DropShadowEffect Color="#000000"
+                              BlurRadius="28"
+                              ShadowDepth="6"
+                              Direction="275"
+                              Opacity="0.38"/>
+        </Canvas.Effect>
+
+        <!-- フォルダ型テンプレート（背景レイヤー） -->
         <Image x:Name="TemplateImage"
                Width="320" Height="320"
                Stretch="Fill"
@@ -49,6 +58,7 @@
               IsHitTestVisible="False"
               Visibility="Collapsed"/>
 
+        <!-- 前面レイヤー（ボトムエッジのみ、ポケット廃止） -->
         <Image x:Name="FrontTemplateImage"
                Width="320" Height="320"
                Stretch="Fill"
@@ -61,11 +71,22 @@
                 Width="320" Height="320"
                 Canvas.Left="0" Canvas.Top="0"
                 IsHitTestVisible="False">
-            <TextBlock Text="画像を選択してください"
-                       Foreground="#888888"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       FontSize="13"/>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="0,28,0,0"
+                        Opacity="0.45">
+                <TextBlock Text="+"
+                           Foreground="#FFFFFF"
+                           FontSize="36"
+                           FontWeight="Light"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,6"/>
+                <TextBlock Text="画像を選択してください"
+                           Foreground="#CCDDFF"
+                           FontSize="11.5"
+                           FontFamily="Yu Gothic UI"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
         </Border>
 
     </Canvas>

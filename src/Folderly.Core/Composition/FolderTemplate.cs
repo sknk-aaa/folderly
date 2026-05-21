@@ -77,25 +77,25 @@ public static class FolderTemplate
     {
         using var image = new Image<Rgba32>(size, size);
         float scale = (float)size / BaseSize;
+        float bodyTop = FolderBodyRegion.Y * scale;
+        float bodyH   = FolderBodyRegion.Height * scale;
 
         image.Mutate(ctx =>
         {
             ctx.Fill(Color.Transparent);
-            ctx.Fill(Color.ParseHex("#F8C53A"), CreateTabPath(size));
 
-            var rearBody = new RectangularPolygon(
-                0f,
-                FolderBodyRegion.Y * scale,
-                size,
-                FolderBodyRegion.Height * scale);
-            ctx.Fill(Color.ParseHex("#FFE18A"), rearBody);
+            // Tab (slightly darker than body)
+            ctx.Fill(Color.ParseHex("#1A2240"), CreateTabPath(size));
 
-            var topHighlight = new RectangularPolygon(
-                4f * scale,
-                FolderBodyRegion.Y * scale,
-                size - 8f * scale,
-                4f * scale);
-            ctx.Fill(Color.ParseHex("#FFF3BE"), topHighlight);
+            // Folder body — subtle two-tone (top lighter, bottom darker)
+            ctx.Fill(Color.ParseHex("#273062"),
+                new RectangularPolygon(0f, bodyTop, size, bodyH * 0.5f));
+            ctx.Fill(Color.ParseHex("#222B58"),
+                new RectangularPolygon(0f, bodyTop + bodyH * 0.5f, size, bodyH * 0.5f));
+
+            // Accent line at top of body (separates tab from body visually)
+            ctx.Fill(Color.ParseHex("#4A6DC8"),
+                new RectangularPolygon(0f, bodyTop, size, 2.5f * scale));
         });
 
         using var ms = new MemoryStream();
@@ -107,31 +107,15 @@ public static class FolderTemplate
     {
         using var image = new Image<Rgba32>(size, size);
         float scale = (float)size / BaseSize;
+        float bodyBottom = (FolderBodyRegion.Y + FolderBodyRegion.Height) * scale;
 
         image.Mutate(ctx =>
         {
             ctx.Fill(Color.Transparent);
 
-            var pocket = new RectangularPolygon(
-                FrontPocketRegion.X * scale,
-                FrontPocketRegion.Y * scale,
-                FrontPocketRegion.Width * scale,
-                FrontPocketRegion.Height * scale);
-            ctx.Fill(Color.ParseHex("#FFD45A"), pocket);
-
-            var topLip = new RectangularPolygon(
-                0f,
-                FrontPocketRegion.Y * scale,
-                size,
-                4f * scale);
-            ctx.Fill(Color.ParseHex("#FFF0A8"), topLip);
-
-            var bottomShadow = new RectangularPolygon(
-                0f,
-                (BaseSize * 0.94f) * scale,
-                size,
-                4f * scale);
-            ctx.Fill(Color.ParseHex("#D9A11E"), bottomShadow);
+            // Thin bottom edge only — no pocket overlay
+            ctx.Fill(Color.ParseHex("#0D1525"),
+                new RectangularPolygon(0f, bodyBottom - 4f * scale, size, 4f * scale));
         });
 
         using var ms = new MemoryStream();
