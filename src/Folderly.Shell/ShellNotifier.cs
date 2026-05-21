@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Folderly.Core.Shell;
 
@@ -61,10 +62,51 @@ public sealed class ShellNotifier : IShellNotifier
         // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
         NotifyRenameFolderToSelf(folderPath);
 
-        // 1秒後に2回目の通知を送る。
-        // Explorer はコンテンツサムネイルモード→カスタムアイコンモードの切り替えを非同期で行うため、
-        // 1回目の通知でモード切替を開始させ、切替完了後に再通知することで初回適用も即時反映させる。
+        // Shell.Application 経由で開いている Explorer ウィンドウを直接 Refresh する。
+        // SHChangeNotify は非同期処理キューに積むだけだが、Document.Refresh() は
+        // 対象ウィンドウの再描画を即座に強制するため、開いているウィンドウがあれば即時反映できる。
+        RefreshExplorerWindows(folderPath);
+
+        // 遅延通知: ウィンドウが開いていない場合や Refresh 後もキャッシュが残る場合の保険
         ScheduleDelayedNotify(folderPath);
+    }
+
+    private static void RefreshExplorerWindows(string folderPath)
+    {
+        var parentPath = Directory.GetParent(folderPath)?.FullName;
+        try
+        {
+            var shellType = Type.GetTypeFromProgID("Shell.Application");
+            if (shellType == null) return;
+            var shell = Activator.CreateInstance(shellType);
+            var windows = shellType.InvokeMember("Windows", BindingFlags.InvokeMethod, null, shell, null);
+            if (windows == null) return;
+
+            var countObj = windows.GetType().InvokeMember("Count", BindingFlags.GetProperty, null, windows, null);
+            var count = countObj is int c ? c : 0;
+            for (var i = 0; i < count; i++)
+            {
+                try
+                {
+                    var win = windows.GetType().InvokeMember("Item", BindingFlags.InvokeMethod, null, windows, new object[] { i });
+                    if (win == null) continue;
+                    var locationUrl = win.GetType().InvokeMember("LocationURL", BindingFlags.GetProperty, null, win, null) as string;
+                    if (string.IsNullOrWhiteSpace(locationUrl)) continue;
+                    var locationPath = Uri.TryCreate(locationUrl, UriKind.Absolute, out var uri) ? uri.LocalPath : null;
+                    if (locationPath == null) continue;
+
+                    // 親フォルダまたはフォルダ自身を表示しているウィンドウを対象にする
+                    if (!string.Equals(locationPath, parentPath, StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(locationPath, folderPath, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var doc = win.GetType().InvokeMember("Document", BindingFlags.GetProperty, null, win, null);
+                    doc?.GetType().InvokeMember("Refresh", BindingFlags.InvokeMethod, null, doc, null);
+                }
+                catch { }
+            }
+        }
+        catch { }
     }
 
     private static void ScheduleDelayedNotify(string folderPath)
@@ -107,6 +149,8 @@ public sealed class ShellNotifier : IShellNotifier
         NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEDIR);
         NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
+
+        RefreshExplorerWindows(folderPath);
     }
 
     private static void TryTouchFolder(string folderPath)
