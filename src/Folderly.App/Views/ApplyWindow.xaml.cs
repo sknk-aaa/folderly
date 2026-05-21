@@ -157,6 +157,11 @@ public partial class ApplyWindow : Window
         _vm.OffsetY = e.OffsetY;
     }
 
+    private void Preview_ScaleChanged(object sender, double scale)
+    {
+        _vm.Scale = scale;
+    }
+
     // ─── タグ選択 ────────────────────────────────────────────────────────────
 
     private void TagButton_Click(object sender, RoutedEventArgs e)
@@ -218,9 +223,9 @@ public partial class ApplyWindow : Window
             if (result.IsSuccess)
             {
                 ShowSuccessToast();
+                Hide();
                 if (ShouldReopenExplorerWindowsAfterApply())
                     await ReopenExplorerWindowsAsync(_vm.FolderPath);
-                await Task.Delay(1200);
                 Close();
             }
         }

@@ -43,14 +43,12 @@ public partial class App : Application
         if (e.Args.Length > 0)
         {
             // 右クリックから起動: ApplyWindow を直接開く
-            _mainWindow = new MainWindow();
-            _mainWindow.Show();
-            _mainWindow.OpenApplyWindow(e.Args[0]);
+            OpenApplyWindow(e.Args[0]);
         }
         else
         {
             // スタートメニューから起動: MainWindow を表示
-            _mainWindow = new MainWindow();
+            _mainWindow = EnsureMainWindow();
             _mainWindow.Show();
         }
 
@@ -82,13 +80,15 @@ public partial class App : Application
 
                     Dispatcher.Invoke(() =>
                     {
-                        _mainWindow?.Activate();
                         if (!string.IsNullOrWhiteSpace(path))
-                            _mainWindow?.OpenApplyWindow(path);
+                        {
+                            OpenApplyWindow(path);
+                        }
                         else
                         {
-                            _mainWindow?.Show();
-                            _mainWindow?.Activate();
+                            var mainWindow = EnsureMainWindow();
+                            mainWindow.Show();
+                            mainWindow.Activate();
                         }
                     });
                 }
@@ -113,5 +113,25 @@ public partial class App : Application
             writer.WriteLine(folderPath);
         }
         catch { /* 既存インスタンスが応答しない場合は無視 */ }
+    }
+
+    private MainWindow EnsureMainWindow()
+    {
+        if (_mainWindow != null) return _mainWindow;
+        _mainWindow = new MainWindow();
+        return _mainWindow;
+    }
+
+    private void OpenApplyWindow(string folderPath)
+    {
+        var win = new ApplyWindow(folderPath);
+        if (_mainWindow?.IsVisible == true)
+        {
+            win.Owner = _mainWindow;
+            win.Closed += (_, _) => _mainWindow?.RefreshHistory();
+        }
+
+        win.Show();
+        win.Activate();
     }
 }

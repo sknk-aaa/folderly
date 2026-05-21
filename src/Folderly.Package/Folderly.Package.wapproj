@@ -46,6 +46,7 @@
     <Content Include="Images\SplashScreen.png" />
     <Content Include="Images\Square150x150Logo.png" />
     <Content Include="Images\Square44x44Logo.png" />
+    <Content Include="Images\FolderlyContext.ico" />
     <Content Include="Images\StoreLogo.png" />
     <Content Include="Images\Wide310x150Logo.png" />
   </ItemGroup>

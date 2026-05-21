@@ -13,11 +13,11 @@ public static class FolderTemplate
 {
     public const int BaseSize = 256;
 
-    // タグ領域: フォルダ左上のタブ部分（全幅 35%、高さ 18%）
+    // タグ領域: フォルダ左上のタブ部分（全幅 45%、高さ 18%）
     public static readonly RectangleF TagRegion = new(
         x: 0f,
         y: 0f,
-        width: BaseSize * 0.35f,
+        width: BaseSize * 0.45f,
         height: BaseSize * 0.18f);
 
     // フォルダ本体: タグタブより下の全体
@@ -29,10 +29,10 @@ public static class FolderTemplate
 
     // 画像表示領域: フォルダ本体内の内側マージン付きエリア
     public static readonly RectangleF ImageRegion = new(
-        x: BaseSize * 0.06f,
-        y: BaseSize * 0.24f,
-        width: BaseSize * 0.88f,
-        height: BaseSize * 0.62f);
+        x: BaseSize * 0.03f,
+        y: BaseSize * 0.22f,
+        width: BaseSize * 0.94f,
+        height: BaseSize * 0.66f);
 
     private static byte[]? _templateCache;
     private static readonly object _lock = new();
@@ -86,9 +86,9 @@ public static class FolderTemplate
         {
             ctx.Fill(Color.Transparent);
 
-            float tagW = BaseSize * 0.35f * scale;
-            float tagH = BaseSize * 0.18f * scale;
-            float bodyY = BaseSize * 0.18f * scale;
+            float tagW = TagRegion.Width * scale;
+            float tagH = TagRegion.Height * scale;
+            float bodyY = FolderBodyRegion.Y * scale;
             float bodyH = BaseSize * 0.75f * scale;
             float bodyW = size;
 

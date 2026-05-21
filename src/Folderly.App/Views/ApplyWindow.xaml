@@ -48,7 +48,8 @@
                                 OffsetY="{Binding OffsetY, Mode=TwoWay}"
                                 SelectedTagColor="{Binding SelectedTagColor}"
                                 CropMode="{Binding CropMode}"
-                                PositionChanged="Preview_PositionChanged"/>
+                                PositionChanged="Preview_PositionChanged"
+                                ScaleChanged="Preview_ScaleChanged"/>
         </Border>
 
         <!-- 画像選択 -->

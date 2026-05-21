@@ -26,17 +26,10 @@ public partial class FolderPreview : UserControl
 
     static FolderPreview()
     {
-        // FolderTemplate の領域定義（256px 基準）をプレビュー座標に変換
-        // ImageRegion = (BaseSize*0.06, BaseSize*0.24, BaseSize*0.88, BaseSize*0.62)
-        // TagRegion   = (0,            0,            BaseSize*0.35, BaseSize*0.18)
-        double b = FolderTemplate.BaseSize;
-        ImageRegionPx = new Rect(
-            b * 0.06 * PreviewScale, b * 0.24 * PreviewScale,
-            b * 0.88 * PreviewScale, b * 0.62 * PreviewScale);
-
-        TagRegionPx = new Rect(
-            0, 0,
-            b * 0.35 * PreviewScale, b * 0.18 * PreviewScale);
+        var imageRegion = FolderTemplate.ScaleRegion(FolderTemplate.ImageRegion, (float)PreviewSize);
+        var tagRegion = FolderTemplate.ScaleRegion(FolderTemplate.TagRegion, (float)PreviewSize);
+        ImageRegionPx = new Rect(imageRegion.X, imageRegion.Y, imageRegion.Width, imageRegion.Height);
+        TagRegionPx = new Rect(tagRegion.X, tagRegion.Y, tagRegion.Width, tagRegion.Height);
     }
 
     // ─── Dependency Properties ───────────────────────────────────────────────
@@ -113,6 +106,7 @@ public partial class FolderPreview : UserControl
 
     /// <summary>ドラッグで画像位置が変化したときに発生する。値は ICO 座標系。</summary>
     public event EventHandler<(double OffsetX, double OffsetY)>? PositionChanged;
+    public event EventHandler<double>? ScaleChanged;
 
     // ─── Drag state ──────────────────────────────────────────────────────────
 
@@ -258,6 +252,20 @@ public partial class FolderPreview : UserControl
         SetCurrentValue(OffsetXProperty, newOffsetX);
         SetCurrentValue(OffsetYProperty, newOffsetY);
         PositionChanged?.Invoke(this, (newOffsetX, newOffsetY));
+    }
+
+    private void OnMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (SourceImage is null) return;
+
+        var pos = e.GetPosition(RootCanvas);
+        if (!ImageRegionPx.Contains(pos)) return;
+
+        var step = e.Delta > 0 ? 0.05 : -0.05;
+        var newScale = Math.Clamp(Scale + step, 0.5, 3.0);
+        SetCurrentValue(ScaleProperty, newScale);
+        ScaleChanged?.Invoke(this, newScale);
+        e.Handled = true;
     }
 
     private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

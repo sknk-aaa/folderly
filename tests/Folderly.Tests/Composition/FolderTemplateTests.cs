@@ -5,9 +5,9 @@ namespace Folderly.Tests.Composition;
 public class FolderTemplateTests
 {
     [Fact]
-    public void TagRegion_WidthIs35Percent()
+    public void TagRegion_WidthIs45Percent()
     {
-        Assert.Equal(FolderTemplate.BaseSize * 0.35f, FolderTemplate.TagRegion.Width, precision: 3);
+        Assert.Equal(FolderTemplate.BaseSize * 0.45f, FolderTemplate.TagRegion.Width, precision: 3);
     }
 
     [Fact]

@@ -16,6 +16,7 @@
             MouseLeftButtonDown="OnMouseLeftButtonDown"
             MouseMove="OnMouseMove"
             MouseLeftButtonUp="OnMouseLeftButtonUp"
+            MouseWheel="OnMouseWheel"
             MouseLeave="OnMouseLeave">
 
         <!-- フォルダ型テンプレート（背景） -->

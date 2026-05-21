@@ -60,8 +60,9 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
 
     public int GetIcon(IShellItemArray? _, out string ppszIcon)
     {
-        ppszIcon = string.Empty;
-        return E_NOTIMPL;
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Images", "FolderlyContext.ico");
+        ppszIcon = File.Exists(iconPath) ? iconPath : $"{GetFolderlyExePath()},0";
+        return S_OK;
     }
 
     public int GetToolTip(IShellItemArray? _, out string ppszInfotip)

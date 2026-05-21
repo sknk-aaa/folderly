@@ -35,6 +35,8 @@ public partial class MainWindow : Window
 
     private void HistoryTab_Click(object sender, RoutedEventArgs e) => _vm.Refresh();
 
+    public void RefreshHistory() => _vm.Refresh();
+
     private void SettingsTab_Click(object sender, RoutedEventArgs e)
     {
         var win = new SettingsWindow { Owner = this };
