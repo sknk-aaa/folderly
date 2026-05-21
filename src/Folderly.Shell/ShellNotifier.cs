@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using Folderly.Core.Shell;
 
 namespace Folderly.Shell;
@@ -23,17 +24,14 @@ public sealed class ShellNotifier : IShellNotifier
         // 特定フォルダへの変更通知
         var parentPath = Directory.GetParent(folderPath)?.FullName;
         var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
-        // ICO 本体のパスは実行時のハッシュで決まる。存在するファイルだけ通知する
-        var folderlyDir = Path.Combine(folderPath, "_folderly");
-        var iconPath = Directory.Exists(folderlyDir)
-            ? Directory.EnumerateFiles(folderlyDir, "cover_*.ico").FirstOrDefault()
-              ?? Path.Combine(folderlyDir, "cover.ico")
-            : Path.Combine(folderlyDir, "cover.ico");
+        var iconPath = ResolveCurrentIconPath(folderPath);
 
+        NotifyCurrentIcon(iconPath);
         NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPath(iconPath, NativeMethods.SHCNE_UPDATEITEM);
+        if (iconPath is not null)
+            NotifyPath(iconPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
         if (!string.IsNullOrWhiteSpace(parentPath))
         {
@@ -44,7 +42,8 @@ public sealed class ShellNotifier : IShellNotifier
         NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPidl(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPidl(iconPath, NativeMethods.SHCNE_UPDATEITEM);
+        if (iconPath is not null)
+            NotifyPidl(iconPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEDIR);
         if (!string.IsNullOrWhiteSpace(parentPath))
         {
@@ -131,14 +130,21 @@ public sealed class ShellNotifier : IShellNotifier
         if (!Directory.Exists(folderPath)) return;
 
         TryTouchFolder(folderPath);
-        ToggleSystemReadOnly(folderPath);
-
+        var iconPath = ResolveCurrentIconPath(folderPath);
+        NotifyCurrentIcon(iconPath);
         ForceIconIndexUpdate(folderPath);
 
         // PATH と PIDL 両方で通知（Explorer の受け取り方が実装依存のため）
+        var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
+        NotifyPath(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
+        if (iconPath is not null)
+            NotifyPath(iconPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
+        NotifyPidl(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
+        if (iconPath is not null)
+            NotifyPidl(iconPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
         NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEDIR);
@@ -177,9 +183,72 @@ public sealed class ShellNotifier : IShellNotifier
         catch { }
     }
 
+    private static void NotifyCurrentIcon(string? iconPath)
+    {
+        if (string.IsNullOrWhiteSpace(iconPath) || !File.Exists(iconPath)) return;
+
+        NotifyPath(iconPath, NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPidl(iconPath, NativeMethods.SHCNE_UPDATEITEM);
+        ForceIconIndexUpdate(iconPath);
+    }
+
+    private static string? ResolveCurrentIconPath(string folderPath)
+    {
+        var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
+        var relativeIconPath = ReadIconResourcePath(desktopIniPath);
+        if (!string.IsNullOrWhiteSpace(relativeIconPath))
+        {
+            var candidate = Path.IsPathRooted(relativeIconPath)
+                ? relativeIconPath
+                : Path.GetFullPath(Path.Combine(folderPath, relativeIconPath));
+            if (File.Exists(candidate))
+                return candidate;
+        }
+
+        var folderlyDir = Path.Combine(folderPath, "_folderly");
+        if (!Directory.Exists(folderlyDir))
+            return Path.Combine(folderlyDir, "cover.ico");
+
+        return Directory.EnumerateFiles(folderlyDir, "cover_*.ico")
+                   .OrderByDescending(File.GetLastWriteTimeUtc)
+                   .FirstOrDefault()
+               ?? Path.Combine(folderlyDir, "cover.ico");
+    }
+
+    private static string? ReadIconResourcePath(string desktopIniPath)
+    {
+        if (!File.Exists(desktopIniPath)) return null;
+
+        try
+        {
+            var bytes = File.ReadAllBytes(desktopIniPath);
+            var content = bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE
+                ? Encoding.Unicode.GetString(bytes, 2, bytes.Length - 2)
+                : File.ReadAllText(desktopIniPath, Encoding.UTF8);
+
+            foreach (var rawLine in content.Split('\n'))
+            {
+                var line = rawLine.Trim();
+                var eq = line.IndexOf('=');
+                if (eq <= 0) continue;
+
+                var key = line[..eq].Trim();
+                if (!string.Equals(key, "IconResource", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var value = line[(eq + 1)..].Trim();
+                var comma = value.LastIndexOf(',');
+                return comma >= 0 ? value[..comma].Trim() : value;
+            }
+        }
+        catch { }
+
+        return null;
+    }
+
     private static void ForceIconIndexUpdate(string path)
     {
-        if (!Directory.Exists(path)) return;
+        if (!Directory.Exists(path) && !File.Exists(path)) return;
         var shfi = new NativeMethods.SHFILEINFOW();
         var result = NativeMethods.SHGetFileInfo(
             path, 0, ref shfi,
