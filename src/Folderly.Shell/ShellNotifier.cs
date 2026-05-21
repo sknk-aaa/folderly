@@ -105,7 +105,6 @@ public sealed class ShellNotifier : IShellNotifier
         ForceIconIndexUpdate(folderPath);
         NotifyRenameFolderToSelf(folderPath);
         RefreshExplorerWindows(folderPath);
-        ScheduleDelayedRevertNotify(folderPath);
     }
 
     private static void RefreshExplorerWindows(string folderPath)
@@ -196,53 +195,6 @@ public sealed class ShellNotifier : IShellNotifier
         NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEDIR);
         NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEITEM);
         NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
-
-        RefreshExplorerWindows(folderPath);
-    }
-
-    private static void ScheduleDelayedRevertNotify(string folderPath)
-    {
-        foreach (var delayMs in new[] { 350, 900, 1800 })
-        {
-            var d = delayMs;
-            var t = new Thread(() =>
-            {
-                Thread.Sleep(d);
-                RunDelayedRevertNotify(folderPath);
-            });
-            t.SetApartmentState(ApartmentState.STA);
-            t.IsBackground = true;
-            t.Start();
-        }
-    }
-
-    private static void RunDelayedRevertNotify(string folderPath)
-    {
-        if (!Directory.Exists(folderPath)) return;
-
-        TryTouchFolder(folderPath);
-        TouchFolderAttributesWithoutClearingCustomization(folderPath);
-
-        var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
-        NotifyPathRaw(desktopIniPath, NativeMethods.SHCNE_DELETE);
-        NotifyPathRaw(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
-        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEDIR);
-        ForceThumbnailExtraction(folderPath);
-        ForceIconIndexUpdate(folderPath);
-
-        var parentPath = Directory.GetParent(folderPath)?.FullName;
-        if (!string.IsNullOrWhiteSpace(parentPath))
-        {
-            NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEITEM);
-            NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEDIR);
-            NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEITEM);
-            NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
-        }
 
         RefreshExplorerWindows(folderPath);
     }
