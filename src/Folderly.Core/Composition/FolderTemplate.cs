@@ -17,8 +17,8 @@ public static class FolderTemplate
     public const float TabYRatio = 0.094f;
     public const float TabTopWidthRatio = 0.335f;
     public const float TabSlopeEndRatio = 0.49f;
-    public const float TagHeightRatio = 0.24f;
-    public const float ImageCornerRadiusRatio = 0.043f;
+    public const float TagHeightRatio = 0.226f;
+    public const float ImageCornerRadiusRatio = 0.031f;
 
     public static readonly RectangleF TagRegion = new(
         x: BaseSize * TabXRatio,
@@ -135,7 +135,21 @@ public static class FolderTemplate
         builder.QuadraticBezierTo(
             new Vector2(points[0].X, points[0].Y),
             new Vector2(points[0].X + radius, points[0].Y));
-        builder.LineTo(points[1]);
+        var slope = points[2] - points[1];
+        var slopeLength = MathF.Sqrt(slope.X * slope.X + slope.Y * slope.Y);
+        var slopeUnit = slopeLength > 0f
+            ? new PointF(slope.X / slopeLength, slope.Y / slopeLength)
+            : new PointF(0f, 1f);
+        var rightRadius = targetSize * 0.09f;
+        var topCurveStart = new PointF(points[1].X - rightRadius, points[1].Y);
+        var slopeCurveEnd = new PointF(
+            points[1].X + slopeUnit.X * rightRadius,
+            points[1].Y + slopeUnit.Y * rightRadius);
+
+        builder.LineTo(topCurveStart);
+        builder.QuadraticBezierTo(
+            new Vector2(points[1].X, points[1].Y),
+            new Vector2(slopeCurveEnd.X, slopeCurveEnd.Y));
         builder.LineTo(points[2]);
         builder.CloseFigure();
         return builder.Build();

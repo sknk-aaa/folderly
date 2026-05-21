@@ -189,7 +189,7 @@ public partial class FolderPreview : UserControl
         // CropMode に応じたベーススケール（ImageRegion をちょうど埋める or 収める）
         double baseScale = CropMode == CoreCropMode.Center
             ? Math.Max(regionW / imgW, regionH / imgH)
-            : Math.Min(regionW / imgW, regionH / imgH);
+            : regionW / imgW;
 
         double totalScale = baseScale * Scale;
 
@@ -223,6 +223,14 @@ public partial class FolderPreview : UserControl
         var geometry = new StreamGeometry();
         using (var ctx = geometry.Open())
         {
+            var slope = new Vector(points[2].X - points[1].X, points[2].Y - points[1].Y);
+            slope.Normalize();
+            var rightRadius = PreviewSize * 0.09;
+            var topCurveStart = new Point(points[1].X - rightRadius, points[1].Y);
+            var slopeCurveEnd = new Point(
+                points[1].X + slope.X * rightRadius,
+                points[1].Y + slope.Y * rightRadius);
+
             ctx.BeginFigure(new Point(points[3].X, points[3].Y), isFilled: true, isClosed: true);
             ctx.LineTo(new Point(points[0].X, points[0].Y + radius), isStroked: true, isSmoothJoin: true);
             ctx.QuadraticBezierTo(
@@ -230,7 +238,12 @@ public partial class FolderPreview : UserControl
                 new Point(points[0].X + radius, points[0].Y),
                 isStroked: true,
                 isSmoothJoin: true);
-            ctx.LineTo(new Point(points[1].X, points[1].Y), isStroked: true, isSmoothJoin: true);
+            ctx.LineTo(topCurveStart, isStroked: true, isSmoothJoin: true);
+            ctx.QuadraticBezierTo(
+                new Point(points[1].X, points[1].Y),
+                slopeCurveEnd,
+                isStroked: true,
+                isSmoothJoin: true);
             ctx.LineTo(new Point(points[2].X, points[2].Y), isStroked: true, isSmoothJoin: true);
         }
 

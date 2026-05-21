@@ -116,7 +116,7 @@ public sealed class ApplyService
         _shellNotifier.NotifyFolderChanged(folderPath);
 
         // 11. 履歴保存
-        var mode = request.AdjustParams.Mode == CropMode.Center ? "center" : "pad";
+        var mode = request.AdjustParams.Mode == CropMode.Center ? "center" : "fit_width";
         var entry = new HistoryEntry(
             Id:                         null,
             FolderPath:                 folderPath,

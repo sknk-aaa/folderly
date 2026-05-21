@@ -47,19 +47,12 @@ public class ImageAdjusterTests
     }
 
     [Fact]
-    public void Adjust_OffsetX_ShiftsImage()
+    public void Adjust_OffsetX_DoesNotThrow()
     {
         using var src = CreateSolidImage(200, 200, r: 255, g: 0, b: 0);
-        // オフセットなし
-        using var result0 = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(OffsetX: 0));
-        // オフセットあり（右にシフト → 左端が透明に近づく可能性）
-        using var result1 = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(OffsetX: 50));
+        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(OffsetX: 50));
 
-        // 両者の出力が同一でないことを確認（オフセットが反映されている）
-        var px0 = result0[0, 0];
-        var px1 = result1[0, 0];
-        // 少なくとも片方は非同一 or 同一でも例外なし
-        Assert.Equal(Target.Width, result1.Width);
+        Assert.Equal(Target.Width, result.Width);
     }
 
     [Fact]
@@ -74,7 +67,7 @@ public class ImageAdjusterTests
     [Fact]
     public void Adjust_CenterCrop_WideImage_OutputIsTargetSize()
     {
-        using var src = CreateSolidImage(400, 100); // 横長
+        using var src = CreateSolidImage(400, 100);
         using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.Center));
 
         Assert.Equal(Target.Width, result.Width);
@@ -84,7 +77,7 @@ public class ImageAdjusterTests
     [Fact]
     public void Adjust_CenterCrop_TallImage_OutputIsTargetSize()
     {
-        using var src = CreateSolidImage(100, 400); // 縦長
+        using var src = CreateSolidImage(100, 400);
         using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.Center));
 
         Assert.Equal(Target.Width, result.Width);
@@ -92,34 +85,38 @@ public class ImageAdjusterTests
     }
 
     [Fact]
-    public void Adjust_PadMode_TallImage_HasTransparentPixels()
+    public void Adjust_FitWidthMode_TallImage_FillsWidth()
     {
-        // 細長い縦長画像 → 左右に透明パディングが入るはず
         using var src = CreateSolidImage(30, 200, r: 255, g: 0, b: 0);
-        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.Pad));
+        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.FitWidth));
 
         Assert.Equal(Target.Width, result.Width);
         Assert.Equal(Target.Height, result.Height);
 
-        // 左端のピクセルは透明（パディング領域）
         var leftPx = result[0, Target.Height / 2];
-        Assert.Equal(0, leftPx.A); // 透明
+        var rightPx = result[Target.Width - 1, Target.Height / 2];
+        Assert.Equal(255, leftPx.A);
+        Assert.Equal(255, rightPx.A);
     }
 
     [Fact]
-    public void Adjust_PadMode_OutputSizeUnchanged()
+    public void Adjust_FitWidthMode_WideImage_HasVerticalTransparentPixels()
     {
-        using var src = CreateSolidImage(50, 200);
-        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.Pad));
+        using var src = CreateSolidImage(400, 100);
+        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.FitWidth));
 
         Assert.Equal(Target.Width, result.Width);
         Assert.Equal(Target.Height, result.Height);
+
+        var topPx = result[Target.Width / 2, 0];
+        var centerPx = result[Target.Width / 2, Target.Height / 2];
+        Assert.Equal(0, topPx.A);
+        Assert.Equal(255, centerPx.A);
     }
 
     [Fact]
     public void Adjust_ExtremelyLargeImage_DoesNotThrow()
     {
-        // 8192x8192 を小さな target に縮小
         using var src = new Image<Rgba32>(8192, 8192);
         using var result = ImageAdjuster.Adjust(src, new Size(64, 64));
 

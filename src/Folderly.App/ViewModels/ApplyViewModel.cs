@@ -53,7 +53,14 @@ public sealed class ApplyViewModel : ViewModelBase
     public CoreCropMode CropMode
     {
         get => _cropMode;
-        set => SetField(ref _cropMode, value);
+        set
+        {
+            if (_cropMode == value) return;
+            _cropMode = value;
+            Notify();
+            Notify(nameof(IsCropCenter));
+            Notify(nameof(IsCropFitWidth));
+        }
     }
 
     public bool IsCropCenter
@@ -62,10 +69,16 @@ public sealed class ApplyViewModel : ViewModelBase
         set { if (value) CropMode = CoreCropMode.Center; }
     }
 
-    public bool IsCropPad
+    public bool IsCropFitWidth
     {
-        get => CropMode == CoreCropMode.Pad;
-        set { if (value) CropMode = CoreCropMode.Pad; }
+        get => CropMode == CoreCropMode.FitWidth;
+        set
+        {
+            if (!value) return;
+            CropMode = CoreCropMode.FitWidth;
+            Scale = 1.0;
+            OffsetX = 0.0;
+        }
     }
 
     // ─── タグ色 ───────────────────────────────────────────────────────────────

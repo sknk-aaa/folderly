@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace Folderly.Core.Composition;
 
-public enum CropMode { Center, Pad }
+public enum CropMode { Center, FitWidth }
 
 public record ImageAdjustParams(
     float Scale = 1.0f,
@@ -29,7 +29,7 @@ public static class ImageAdjuster
         var p = parameters ?? new ImageAdjustParams();
         return p.Mode == CropMode.Center
             ? ApplyCenterCrop(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY)
-            : ApplyPadMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY);
+            : ApplyFitWidthMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY);
     }
 
     private static Image<Rgba32> ApplyCenterCrop(
@@ -83,13 +83,10 @@ public static class ImageAdjuster
         return result;
     }
 
-    private static Image<Rgba32> ApplyPadMode(
+    private static Image<Rgba32> ApplyFitWidthMode(
         Image source, Size target, float scale, float offsetX, float offsetY)
     {
-        // アスペクト比を保持して target に収まる最大サイズを計算
-        float fitScale = Math.Min(
-            (float)target.Width / source.Width,
-            (float)target.Height / source.Height);
+        float fitScale = (float)target.Width / source.Width;
         float effectiveScale = fitScale * scale;
         effectiveScale = Math.Max(effectiveScale, 0.001f);
 

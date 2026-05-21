@@ -37,7 +37,7 @@
   <data name="ScaleLabel" xml:space="preserve"><value>拡大率</value></data>
   <data name="ResetPosition" xml:space="preserve"><value>中央に戻す</value></data>
   <data name="CropCenter" xml:space="preserve"><value>中央でクロップ</value></data>
-  <data name="CropPad" xml:space="preserve"><value>余白で全体表示</value></data>
+  <data name="CropFitWidth" xml:space="preserve"><value>横幅を最大表示</value></data>
   <data name="TagLabel" xml:space="preserve"><value>タグ</value></data>
   <data name="TagNone" xml:space="preserve"><value>なし</value></data>
   <data name="TagBlue" xml:space="preserve"><value>青&#x0a;開発</value></data>
