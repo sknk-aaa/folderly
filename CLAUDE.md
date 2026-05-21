@@ -93,11 +93,18 @@
 - **判断**: 適用後に `SHCNE_UPDATEIMAGE`、フォルダ `SHCNE_UPDATEITEM`、`desktop.ini` `SHCNE_UPDATEITEM`、フォルダ `SHCNE_UPDATEDIR` を送る。
 - **理由**: `desktop.ini` と folder system 属性は正しく設定されても Explorer が即時再評価しない場合があるため、対象メタデータの変更を明示的に通知する。
 
+### 22. ICO ファイル名にコンテンツハッシュ 8 文字を付加（`cover_<hash8>.ico`）
+- **判断**: `ApplyService` が ICO を生成する際、ICO バイト列の SHA256 先頭 8 文字をファイル名に含める（例: `cover_897add9f.ico`）。再適用時は新しい名前で保存し、旧 `cover_*.ico` を削除する。
+- **理由**: Explorer はフォルダ + ICO パスの組み合わせをアイコンキャッシュのキーにするため、同名ファイルを上書きしても古いアイコンが残り続ける。パス自体を変えることでキャッシュを強制無効化する（コミット `d5aa336`）。
+
+### 23. アイコン保存ディレクトリは `_folderly`（ドット無し）
+- **判断**: 元の `.folderly`（ドット始まり）から `_folderly`（アンダースコア始まり）に変更。旧パスとの後方互換は Revert / ShellNotifier / MainViewModel の各所でフォールバック列挙を実装。
+- **理由**: OneDrive Files-On-Demand はドット始まりの隠しディレクトリを「除外リスト」として dehydrate/削除する挙動がある。`_folderly` に変更すると OneDrive が通常フォルダとして扱い、`ReparsePoint` 属性付きで同期対象になることを実機（`C:\Users\625so\OneDrive\...`）で確認（コミット `70ee0d0`）。
+
 ## 次セッション申し送り事項（Store 申請前）
 
-- Step 17 は MSIX サイドロード、スタートメニュー起動、右クリックメニュー表示、右クリックから ApplyWindow 起動まで確認済み
-- Step 18 は手動テスト継続中。即時反映と元に戻すの確認が残り
+- Step 17/17.5 は完了（即時反映・Revert・再適用・OneDrive 互換が全て確認済み）
+- Step 18 は手動テスト継続中。残り項目は [docs/TESTING.md](docs/TESTING.md) と [HANDOVER.md](HANDOVER.md) 参照
 - FolderTemplate.png は現在シンプルな2色の矩形。WPF プレビューの視覚品質に合わせて最終調整すること
-- Shell 層（Folderly.Shell）は即時反映改善を追加済み。Windows 実機で再確認が必要
 - `StoreLicenseService` の StoreContext 実装は MSIX 環境でのみ動作確認可能
 - Store 申請前に Publisher を Partner Center の CN=... に変更すること（Package.appxmanifest コメント参照）
