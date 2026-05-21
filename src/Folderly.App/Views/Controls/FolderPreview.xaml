@@ -56,7 +56,7 @@
         </Canvas>
 
         <Rectangle x:Name="ImageBoundsOutline"
-                   Stroke="#99000000"
+                   Stroke="#55FFFFFF"
                    StrokeThickness="1.4"
                    StrokeDashArray="4 3"
                    RadiusX="6"
