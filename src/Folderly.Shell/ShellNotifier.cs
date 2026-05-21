@@ -60,6 +60,66 @@ public sealed class ShellNotifier : IShellNotifier
 
         // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
         NotifyRenameFolderToSelf(folderPath);
+
+        // 1秒後に2回目の通知を送る。
+        // Explorer はコンテンツサムネイルモード→カスタムアイコンモードの切り替えを非同期で行うため、
+        // 1回目の通知でモード切替を開始させ、切替完了後に再通知することで初回適用も即時反映させる。
+        ScheduleDelayedNotify(folderPath);
+    }
+
+    private static void ScheduleDelayedNotify(string folderPath)
+    {
+        var t = new Thread(() =>
+        {
+            Thread.Sleep(1200);
+            TryTouchFolder(folderPath);
+            ForceIconIndexUpdate(folderPath);
+
+            var pidl = NativeMethods.ILCreateFromPath(folderPath);
+            if (pidl == nint.Zero) return;
+            try
+            {
+                NativeMethods.SHChangeNotify(
+                    NativeMethods.SHCNE_ATTRIBUTES,
+                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                    pidl, nint.Zero);
+                NativeMethods.SHChangeNotify(
+                    NativeMethods.SHCNE_UPDATEITEM,
+                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                    pidl, nint.Zero);
+                NativeMethods.SHChangeNotify(
+                    NativeMethods.SHCNE_UPDATEDIR,
+                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                    pidl, nint.Zero);
+            }
+            finally
+            {
+                NativeMethods.ILFree(pidl);
+            }
+
+            var parentPath = Directory.GetParent(folderPath)?.FullName;
+            if (string.IsNullOrWhiteSpace(parentPath)) return;
+            var parentPidl = NativeMethods.ILCreateFromPath(parentPath);
+            if (parentPidl == nint.Zero) return;
+            try
+            {
+                NativeMethods.SHChangeNotify(
+                    NativeMethods.SHCNE_UPDATEITEM,
+                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                    parentPidl, nint.Zero);
+                NativeMethods.SHChangeNotify(
+                    NativeMethods.SHCNE_UPDATEDIR,
+                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                    parentPidl, nint.Zero);
+            }
+            finally
+            {
+                NativeMethods.ILFree(parentPidl);
+            }
+        });
+        t.SetApartmentState(ApartmentState.STA);
+        t.IsBackground = true;
+        t.Start();
     }
 
     private static void TryTouchFolder(string folderPath)
