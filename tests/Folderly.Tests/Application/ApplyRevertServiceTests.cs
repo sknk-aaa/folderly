@@ -148,9 +148,12 @@ public class ApplyRevertServiceTests : IDisposable
         var latestIco = latestEntry!.IconStoragePath;
 
         var content = DesktopIniManager.Read(_tempDir);
-        var expected = $@"IconResource={latestIco},0";
+        var expectedResource = $@"IconResource={latestIco},0";
+        var expectedFile = $@"IconFile={latestIco}";
         Assert.NotEqual(firstIco, latestIco);
-        Assert.Contains(expected, content);
+        Assert.Contains(expectedResource, content);
+        Assert.Contains(expectedFile, content);
+        Assert.Contains("IconIndex=0", content);
     }
 
     [Fact]

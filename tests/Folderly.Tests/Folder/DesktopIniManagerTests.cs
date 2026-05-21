@@ -42,6 +42,8 @@ public class DesktopIniManagerTests : IDisposable
         var content = DesktopIniManager.Read(_tempDir);
         Assert.NotNull(content);
         Assert.Contains("IconResource", content);
+        Assert.Contains("IconFile", content);
+        Assert.Contains("IconIndex=0", content);
         Assert.Contains(".folderly", content);
     }
 
@@ -94,6 +96,23 @@ public class DesktopIniManagerTests : IDisposable
         Assert.NotNull(content);
         Assert.Contains(".folderly", content);
         Assert.DoesNotContain("old_path.ico", content);
+    }
+
+    [Fact]
+    public void Write_ExistingWithIconFile_UpdatesAllIconKeys()
+    {
+        var existing = "[.ShellClassInfo]\r\nIconResource=old_resource.ico,0\r\nIconFile=old_file.ico\r\nIconIndex=1\r\n";
+        DesktopIniManager.Write(_tempDir, @".folderly\cover.ico",
+            existingContent: existing);
+
+        var content = DesktopIniManager.Read(_tempDir);
+        Assert.NotNull(content);
+        Assert.Contains(@"IconResource=.folderly\cover.ico,0", content);
+        Assert.Contains(@"IconFile=.folderly\cover.ico", content);
+        Assert.Contains("IconIndex=0", content);
+        Assert.DoesNotContain("old_resource.ico", content);
+        Assert.DoesNotContain("old_file.ico", content);
+        Assert.DoesNotContain("IconIndex=1", content);
     }
 
     [Fact]

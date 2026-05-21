@@ -10,6 +10,8 @@ public static class DesktopIniManager
 {
     private const string ShellClassInfoSection = ".ShellClassInfo";
     private const string IconResourceKey = "IconResource";
+    private const string IconFileKey = "IconFile";
+    private const string IconIndexKey = "IconIndex";
 
     private static readonly Encoding Utf16LeBom =
         new UnicodeEncoding(bigEndian: false, byteOrderMark: true);
@@ -40,8 +42,7 @@ public static class DesktopIniManager
         string? existingContent = null)
     {
         string newContent = existingContent is not null
-            ? UpdateOrAddKey(existingContent, ShellClassInfoSection, IconResourceKey,
-                $"{iconRelativePath},0")
+            ? UpdateIconKeys(existingContent, iconRelativePath)
             : BuildMinimalIni(iconRelativePath);
 
         WriteRaw(folderPath, newContent);
@@ -134,6 +135,20 @@ public static class DesktopIniManager
         return string.Join("\r\n", result);
     }
 
+    private static string UpdateIconKeys(string content, string iconPath)
+    {
+        var updated = UpdateOrAddKey(
+            content, ShellClassInfoSection, IconResourceKey, $"{iconPath},0");
+        updated = UpdateOrAddKey(
+            updated, ShellClassInfoSection, IconFileKey, iconPath);
+        updated = UpdateOrAddKey(
+            updated, ShellClassInfoSection, IconIndexKey, "0");
+        return updated;
+    }
+
     private static string BuildMinimalIni(string iconRelativePath)
-        => $"[{ShellClassInfoSection}]\r\n{IconResourceKey}={iconRelativePath},0\r\n";
+        => $"[{ShellClassInfoSection}]\r\n"
+           + $"{IconResourceKey}={iconRelativePath},0\r\n"
+           + $"{IconFileKey}={iconRelativePath}\r\n"
+           + $"{IconIndexKey}=0\r\n";
 }

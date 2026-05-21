@@ -68,10 +68,6 @@ public sealed class ShellNotifier : IShellNotifier
         // 複数ラウンドで属性・desktop.ini・最新ICOを通知し、Explorer の再評価タイミングを拾う。
         ScheduleDelayedNotify(folderPath);
 
-        // 再適用時だけ、Explorer が保持しているフォルダ項目キャッシュを強制的に作り直させる。
-        // 初回適用では cover_*.ico が1つだけなので、この強めの通知は使わない。
-        if (HasMultipleFolderlyIcons(folderPath))
-            ScheduleFolderRediscovery(folderPath);
     }
 
     private static void RefreshExplorerWindows(string folderPath)
@@ -166,73 +162,6 @@ public sealed class ShellNotifier : IShellNotifier
         RefreshExplorerWindows(folderPath);
     }
 
-    private static bool HasMultipleFolderlyIcons(string folderPath)
-    {
-        try
-        {
-            var folderlyDir = Path.Combine(folderPath, "_folderly");
-            if (!Directory.Exists(folderlyDir)) return false;
-
-            return Directory.EnumerateFiles(folderlyDir, "cover_*.ico")
-                .Take(2)
-                .Count() > 1;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private static void ScheduleFolderRediscovery(string folderPath)
-    {
-        var t = new Thread(() =>
-        {
-            Thread.Sleep(120);
-            ForceFolderRediscovery(folderPath);
-        });
-        t.SetApartmentState(ApartmentState.STA);
-        t.IsBackground = true;
-        t.Start();
-    }
-
-    private static void ForceFolderRediscovery(string folderPath)
-    {
-        if (!Directory.Exists(folderPath)) return;
-
-        var parentPath = Directory.GetParent(folderPath)?.FullName;
-        var iconPath = ResolveCurrentIconPath(folderPath);
-        var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
-
-        NotifyPath(folderPath, NativeMethods.SHCNE_RMDIR);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_RMDIR);
-
-        Thread.Sleep(80);
-
-        NotifyPath(folderPath, NativeMethods.SHCNE_MKDIR);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_MKDIR);
-
-        NotifyCurrentIcon(iconPath);
-        NotifyPath(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPidl(desktopIniPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
-        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEITEM);
-        NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEDIR);
-
-        if (!string.IsNullOrWhiteSpace(parentPath))
-        {
-            NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEITEM);
-            NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEDIR);
-            NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEITEM);
-            NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
-        }
-
-        ForceIconIndexUpdate(folderPath);
-        RefreshExplorerWindows(folderPath);
-    }
-
     private static void TryTouchFolder(string folderPath)
     {
         if (!Directory.Exists(folderPath)) return;
@@ -300,6 +229,7 @@ public sealed class ShellNotifier : IShellNotifier
                 ? Encoding.Unicode.GetString(bytes, 2, bytes.Length - 2)
                 : File.ReadAllText(desktopIniPath, Encoding.UTF8);
 
+            string? iconFileFallback = null;
             foreach (var rawLine in content.Split('\n'))
             {
                 var line = rawLine.Trim();
@@ -307,13 +237,18 @@ public sealed class ShellNotifier : IShellNotifier
                 if (eq <= 0) continue;
 
                 var key = line[..eq].Trim();
-                if (!string.Equals(key, "IconResource", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
                 var value = line[(eq + 1)..].Trim();
-                var comma = value.LastIndexOf(',');
-                return comma >= 0 ? value[..comma].Trim() : value;
+                if (string.Equals(key, "IconResource", StringComparison.OrdinalIgnoreCase))
+                {
+                    var comma = value.LastIndexOf(',');
+                    return comma >= 0 ? value[..comma].Trim() : value;
+                }
+
+                if (string.Equals(key, "IconFile", StringComparison.OrdinalIgnoreCase))
+                    iconFileFallback = value;
             }
+
+            return iconFileFallback;
         }
         catch { }
 
