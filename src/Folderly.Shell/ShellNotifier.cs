@@ -60,11 +60,6 @@ public sealed class ShellNotifier : IShellNotifier
 
         // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
         NotifyRenameFolderToSelf(folderPath);
-
-        // 中身があるフォルダ: MKDIR 通知で「フォルダが新たに存在する」と Explorer に伝え、
-        // desktop.ini を含めてメタデータを再読みさせる。RMDIR を先行させると黄色フォルダへの
-        // フラッシュが生じるため MKDIR のみ使う。
-        NotifyPidl(folderPath, NativeMethods.SHCNE_MKDIR);
     }
 
     private static void TryTouchFolder(string folderPath)
