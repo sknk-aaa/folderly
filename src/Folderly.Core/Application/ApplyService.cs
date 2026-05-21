@@ -20,7 +20,9 @@ public record ApplyRequest(
     string SourceImagePath,
     ImageAdjustParams AdjustParams,
     TagColor TagColor,
-    bool ForceApply = false);
+    bool ForceApply = false,
+    string? TagName = null,
+    bool ShowTagNameOnIcon = false);
 
 public record ApplyResult(bool IsSuccess, bool IsWarning, string? Message, string? IconPath)
 {
@@ -83,8 +85,9 @@ public sealed class ApplyService
             sourceImage, imageRegionSize, request.AdjustParams);
 
         // 4. テンプレート合成
+        var tagNameForIcon = request.ShowTagNameOnIcon ? request.TagName : null;
         using var composed = TemplateRenderer.Render(
-            adjustedImage, request.TagColor, FolderTemplate.BaseSize);
+            adjustedImage, request.TagColor, FolderTemplate.BaseSize, tagNameForIcon);
 
         // 5. ICO 変換
         var icoBytes = IcoConverter.Convert(composed);
@@ -133,7 +136,10 @@ public sealed class ApplyService
             ImageOffsetX:               request.AdjustParams.OffsetX,
             ImageOffsetY:               request.AdjustParams.OffsetY,
             TagColor:                   request.TagColor.HexColor,
-            AppliedAt:                  DateTime.UtcNow);
+            AppliedAt:                  DateTime.UtcNow,
+            TagKey:                     request.TagColor.IsNone ? null : request.TagColor.Key,
+            TagName:                    request.TagColor.IsNone ? null : request.TagName,
+            TagLabelVisible:            !request.TagColor.IsNone && request.ShowTagNameOnIcon);
         _history.Upsert(entry);
 
         _logger.LogInformation("Applied successfully to {FolderPath}", folderPath);

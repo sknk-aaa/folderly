@@ -42,6 +42,9 @@ public sealed class HistoryRepository : IDisposable
                 image_offset_x          REAL NOT NULL DEFAULT 0.0,
                 image_offset_y          REAL NOT NULL DEFAULT 0.0,
                 tag_color               TEXT,
+                tag_key                 TEXT,
+                tag_name                TEXT,
+                tag_label_visible       INTEGER NOT NULL DEFAULT 0,
                 applied_at              TEXT NOT NULL,
                 schema_version          INTEGER NOT NULL DEFAULT 1
             );
@@ -62,6 +65,26 @@ public sealed class HistoryRepository : IDisposable
                 VALUES (1, datetime('now'));
             """;
         cmd.ExecuteNonQuery();
+
+        EnsureColumn("folder_history", "tag_key", "TEXT");
+        EnsureColumn("folder_history", "tag_name", "TEXT");
+        EnsureColumn("folder_history", "tag_label_visible", "INTEGER NOT NULL DEFAULT 0");
+    }
+
+    private void EnsureColumn(string table, string column, string definition)
+    {
+        using var check = _conn.CreateCommand();
+        check.CommandText = $"PRAGMA table_info({table})";
+        using var reader = check.ExecuteReader();
+        while (reader.Read())
+        {
+            if (string.Equals(reader.GetString(reader.GetOrdinal("name")), column, StringComparison.OrdinalIgnoreCase))
+                return;
+        }
+
+        using var alter = _conn.CreateCommand();
+        alter.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {definition}";
+        alter.ExecuteNonQuery();
     }
 
     /// <summary>同一フォルダパスは上書き（UPSERT）。</summary>
@@ -74,13 +97,13 @@ public sealed class HistoryRepository : IDisposable
                 original_desktop_ini, original_desktop_ini_attrs,
                 source_image_path, icon_hash, icon_storage_path,
                 crop_mode, image_scale, image_offset_x, image_offset_y,
-                tag_color, applied_at, schema_version
+                tag_color, tag_key, tag_name, tag_label_visible, applied_at, schema_version
             ) VALUES (
                 $path, $orig_attrs, $had_ini,
                 $orig_ini, $orig_ini_attrs,
                 $src_img, $hash, $storage,
                 $crop, $scale, $offx, $offy,
-                $tag, $applied_at, $schema_ver
+                $tag, $tag_key, $tag_name, $tag_label_visible, $applied_at, $schema_ver
             )
             ON CONFLICT(folder_path) DO UPDATE SET
                 source_image_path       = excluded.source_image_path,
@@ -91,6 +114,9 @@ public sealed class HistoryRepository : IDisposable
                 image_offset_x          = excluded.image_offset_x,
                 image_offset_y          = excluded.image_offset_y,
                 tag_color               = excluded.tag_color,
+                tag_key                 = excluded.tag_key,
+                tag_name                = excluded.tag_name,
+                tag_label_visible       = excluded.tag_label_visible,
                 applied_at              = excluded.applied_at,
                 schema_version          = excluded.schema_version;
             """;
@@ -107,6 +133,9 @@ public sealed class HistoryRepository : IDisposable
         cmd.Parameters.AddWithValue("$offx", entry.ImageOffsetX);
         cmd.Parameters.AddWithValue("$offy", entry.ImageOffsetY);
         cmd.Parameters.AddWithValue("$tag", (object?)entry.TagColor ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$tag_key", (object?)entry.TagKey ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$tag_name", (object?)entry.TagName ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("$tag_label_visible", entry.TagLabelVisible ? 1 : 0);
         cmd.Parameters.AddWithValue("$applied_at", entry.AppliedAt.ToString("o"));
         cmd.Parameters.AddWithValue("$schema_ver", entry.SchemaVersion);
         cmd.ExecuteNonQuery();
@@ -191,6 +220,14 @@ public sealed class HistoryRepository : IDisposable
         if (!r.IsDBNull(r.GetOrdinal("tag_color")))
             tagColor = r.GetString(r.GetOrdinal("tag_color"));
 
+        string? tagKey = null;
+        if (!r.IsDBNull(r.GetOrdinal("tag_key")))
+            tagKey = r.GetString(r.GetOrdinal("tag_key"));
+
+        string? tagName = null;
+        if (!r.IsDBNull(r.GetOrdinal("tag_name")))
+            tagName = r.GetString(r.GetOrdinal("tag_name"));
+
         return new HistoryEntry(
             Id:                         r.GetInt64(r.GetOrdinal("id")),
             FolderPath:                 r.GetString(r.GetOrdinal("folder_path")),
@@ -209,7 +246,10 @@ public sealed class HistoryRepository : IDisposable
             AppliedAt:                  DateTime.Parse(
                                             r.GetString(r.GetOrdinal("applied_at")),
                                             null, System.Globalization.DateTimeStyles.RoundtripKind),
-            SchemaVersion:              r.GetInt32(r.GetOrdinal("schema_version")));
+            SchemaVersion:              r.GetInt32(r.GetOrdinal("schema_version")),
+            TagKey:                     tagKey,
+            TagName:                    tagName,
+            TagLabelVisible:            r.GetInt32(r.GetOrdinal("tag_label_visible")) != 0);
     }
 
     public void Dispose() => _conn.Dispose();

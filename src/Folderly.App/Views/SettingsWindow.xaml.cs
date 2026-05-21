@@ -1,4 +1,5 @@
 using Folderly.App.Infrastructure;
+using Folderly.App.Services;
 using Folderly.App.ViewModels;
 using System.Diagnostics;
 using System.Windows;
@@ -40,6 +41,16 @@ public partial class SettingsWindow : Window
     {
         try { Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true }); }
         catch { /* サイレント無視 */ }
+    }
+
+    private void EditTagNames_Click(object sender, RoutedEventArgs e)
+    {
+        _vm.Save();
+        var dialog = new TagSettingsDialog { Owner = this };
+        if (dialog.ShowDialog() == true)
+        {
+            _vm.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+        }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)

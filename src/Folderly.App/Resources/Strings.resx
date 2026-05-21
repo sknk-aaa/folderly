@@ -46,6 +46,18 @@
   <data name="TagPurple" xml:space="preserve"><value>Purple&#x0a;Design</value></data>
   <data name="TagRed" xml:space="preserve"><value>Red&#x0a;Important</value></data>
   <data name="TagGray" xml:space="preserve"><value>Gray&#x0a;Archive</value></data>
+  <data name="ColorBlue" xml:space="preserve"><value>Blue</value></data>
+  <data name="ColorGreen" xml:space="preserve"><value>Green</value></data>
+  <data name="ColorOrange" xml:space="preserve"><value>Orange</value></data>
+  <data name="ColorPurple" xml:space="preserve"><value>Purple</value></data>
+  <data name="ColorRed" xml:space="preserve"><value>Red</value></data>
+  <data name="ColorGray" xml:space="preserve"><value>Gray</value></data>
+  <data name="TagNamesSection" xml:space="preserve"><value>Tags</value></data>
+  <data name="EditTagNames" xml:space="preserve"><value>Edit tag names</value></data>
+  <data name="TagSettingsTitle" xml:space="preserve"><value>Tag settings</value></data>
+  <data name="ShowTagNameOnIcon" xml:space="preserve"><value>Show tag names on folder icons</value></data>
+  <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>Long names are automatically resized or shortened to fit the tag area.</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Apply" xml:space="preserve"><value>Apply</value></data>
   <data name="Applying" xml:space="preserve"><value>Applying...</value></data>

@@ -179,6 +179,56 @@ public class TemplateRendererTests
     }
 
     [Fact]
+    public void Render_WithTagName_DrawsTextInTagArea()
+    {
+        using var adj1 = CreateTestAdjustedImage();
+        using var adj2 = CreateTestAdjustedImage();
+        using var resultWithName = TemplateRenderer.Render(adj1, TagColors.Blue, tagName: "開発");
+        using var resultWithoutName = TemplateRenderer.Render(adj2, TagColors.Blue);
+
+        Assert.True(CountDifferentPixels(resultWithName, resultWithoutName) > 0);
+    }
+
+    [Fact]
+    public void Render_EmptyTagName_DoesNotDrawText()
+    {
+        using var adj1 = CreateTestAdjustedImage();
+        using var adj2 = CreateTestAdjustedImage();
+        using var resultNull = TemplateRenderer.Render(adj1, TagColors.Blue);
+        using var resultEmpty = TemplateRenderer.Render(adj2, TagColors.Blue, tagName: "");
+
+        Assert.True(ImagesEqual(resultNull, resultEmpty));
+    }
+
+    [Fact]
+    public void Render_LongTagName_DoesNotAffectImageArea()
+    {
+        using var adj1 = CreateTestAdjustedImage();
+        using var adj2 = CreateTestAdjustedImage();
+        using var resultWithName = TemplateRenderer.Render(
+            adj1, TagColors.Purple, tagName: "とても長いタグ名テキスト");
+        using var resultWithoutName = TemplateRenderer.Render(adj2, TagColors.Purple);
+
+        var imageRegion = FolderTemplate.ScaleRegion(
+            FolderTemplate.ImageRegion, FolderTemplate.BaseSize);
+        int sampleX = (int)(imageRegion.X + imageRegion.Width * 0.5f);
+        int sampleY = (int)(imageRegion.Y + imageRegion.Height * 0.5f);
+
+        Assert.Equal(resultWithoutName[sampleX, sampleY], resultWithName[sampleX, sampleY]);
+    }
+
+    [Fact]
+    public void Render_TagNone_IgnoresTagName()
+    {
+        using var adj1 = CreateTestAdjustedImage();
+        using var adj2 = CreateTestAdjustedImage();
+        using var resultWithName = TemplateRenderer.Render(adj1, TagColors.None, tagName: "開発");
+        using var resultWithoutName = TemplateRenderer.Render(adj2, TagColors.None);
+
+        Assert.True(ImagesEqual(resultWithoutName, resultWithName));
+    }
+
+    [Fact]
     public void Render_SmallOutputSize_DoesNotThrow()
     {
         using var adj = CreateTestAdjustedImage(16, 10);
@@ -186,4 +236,20 @@ public class TemplateRendererTests
 
         Assert.Equal(32, result.Width);
     }
+
+    private static int CountDifferentPixels(Image<Rgba32> a, Image<Rgba32> b)
+    {
+        var count = 0;
+        for (var y = 0; y < a.Height; y++)
+        for (var x = 0; x < a.Width; x++)
+        {
+            if (!a[x, y].Equals(b[x, y]))
+                count++;
+        }
+
+        return count;
+    }
+
+    private static bool ImagesEqual(Image<Rgba32> a, Image<Rgba32> b)
+        => CountDifferentPixels(a, b) == 0;
 }

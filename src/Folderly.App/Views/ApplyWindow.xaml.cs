@@ -1,4 +1,5 @@
 using Folderly.App.Infrastructure;
+using Folderly.App.Services;
 using Folderly.App.ViewModels;
 using Folderly.Core.Application;
 using Folderly.Core.Composition;
@@ -52,48 +53,62 @@ public partial class ApplyWindow : Window
 
     private void BuildTagButtons()
     {
-        var L = AppServices.Localize;
-        var labelKeys = new[] { "TagNone", "TagBlue", "TagGreen", "TagOrange", "TagPurple", "TagRed", "TagGray" };
+        TagPanel.Children.Clear();
 
-        for (int i = 0; i < TagColors.All.Count; i++)
+        foreach (var tag in TagColors.All)
         {
-            var tag = TagColors.All[i];
-            var label = L[labelKeys[i]];
+            var label = TagSettingsService.GetDisplayName(tag);
             var btn = new Button
             {
-                Width    = 54,
-                Height   = 54,
+                Width    = 72,
+                Height   = 58,
                 Margin   = new Thickness(0, 0, 8, 0),
                 ToolTip  = label,
                 Tag      = tag,
-                Template = CreateTagButtonTemplate(tag),
+                Content  = CreateTagButtonContent(tag, label),
+                Padding  = new Thickness(5, 4, 5, 4),
             };
             btn.Click += TagButton_Click;
             TagPanel.Children.Add(btn);
         }
+
+        RefreshTagButtonSelection();
     }
 
-    private static ControlTemplate CreateTagButtonTemplate(TagColor tag)
+    private static FrameworkElement CreateTagButtonContent(TagColor tag, string label)
     {
-        var template = new ControlTemplate(typeof(Button));
-        var borderFactory = new FrameworkElementFactory(typeof(Border));
-        borderFactory.Name = "Bd";
-        borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(27));
-        borderFactory.SetValue(Border.BorderThicknessProperty, new Thickness(2));
-        borderFactory.SetValue(Border.BorderBrushProperty, Brushes.Transparent);
-
-        var ellipseFactory = new FrameworkElementFactory(typeof(Ellipse));
-        ellipseFactory.SetValue(FrameworkElement.WidthProperty, 42.0);
-        ellipseFactory.SetValue(FrameworkElement.HeightProperty, 42.0);
-
         Color fill = tag.IsNone
             ? Color.FromRgb(220, 220, 220)
             : ParseHex(tag.HexColor!);
-        ellipseFactory.SetValue(Shape.FillProperty, new SolidColorBrush(fill));
 
-        borderFactory.AppendChild(ellipseFactory);
-        template.VisualTree = borderFactory;
-        return template;
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+
+        panel.Children.Add(new Ellipse
+        {
+            Width = 22,
+            Height = 22,
+            Fill = new SolidColorBrush(fill),
+            Stroke = tag.IsNone ? Brushes.Gray : Brushes.Transparent,
+            StrokeThickness = tag.IsNone ? 1 : 0,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 4),
+        });
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = label,
+            FontSize = 11,
+            TextAlignment = TextAlignment.Center,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            MaxWidth = 60,
+        });
+
+        return panel;
     }
 
     private static Color ParseHex(string hex)
@@ -167,7 +182,28 @@ public partial class ApplyWindow : Window
     private void TagButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is Core.Composition.TagColor tag)
+        {
             _vm.SelectedTagColor = tag;
+            RefreshTagButtonSelection();
+        }
+    }
+
+    private void EditTagNames_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new TagSettingsDialog { Owner = this };
+        if (dialog.ShowDialog() == true)
+            BuildTagButtons();
+    }
+
+    private void RefreshTagButtonSelection()
+    {
+        var primary = (Brush)(TryFindResource("PrimaryBrush") ?? Brushes.DodgerBlue);
+        foreach (var child in TagPanel.Children.OfType<Button>())
+        {
+            var isSelected = child.Tag is TagColor tag && tag.Key == _vm.SelectedTagColor.Key;
+            child.BorderBrush = isSelected ? primary : Brushes.Transparent;
+            child.BorderThickness = isSelected ? new Thickness(2) : new Thickness(1);
+        }
     }
 
     // ─── スライダー・リセット ────────────────────────────────────────────────
@@ -209,7 +245,9 @@ public partial class ApplyWindow : Window
                 SourceImagePath:   _vm.SourceImagePath ?? string.Empty,
                 AdjustParams:      _vm.GetAdjustParams(),
                 TagColor:          _vm.SelectedTagColor,
-                ForceApply:        false);
+                ForceApply:        false,
+                TagName:           TagSettingsService.GetDisplayName(_vm.SelectedTagColor),
+                ShowTagNameOnIcon: TagSettingsService.GetShowTagNameOnIcon());
 
             var result = await AppServices.Apply.ApplyAsync(request);
 

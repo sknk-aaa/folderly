@@ -56,6 +56,29 @@
 
         <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
 
+        <TextBlock Text="{Binding L[TagNamesSection]}"
+                   FontSize="12" FontWeight="SemiBold"
+                   Foreground="{StaticResource TextSecondaryBrush}"
+                   Margin="0,0,0,8"/>
+
+        <CheckBox Content="{Binding L[ShowTagNameOnIcon]}"
+                  IsChecked="{Binding ShowTagNameOnIcon}"
+                  FontSize="13"
+                  Margin="0,0,0,4"/>
+        <TextBlock Text="{Binding L[ShowTagNameOnIconNote]}"
+                   FontSize="12"
+                   Foreground="{StaticResource TextSecondaryBrush}"
+                   TextWrapping="Wrap"
+                   Margin="22,0,0,8"/>
+
+        <Button Content="{Binding L[EditTagNames]}"
+                Style="{StaticResource SecondaryButton}"
+                Click="EditTagNames_Click"
+                HorizontalAlignment="Left"
+                FontSize="13" Padding="12,5"/>
+
+        <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
+
         <TextBlock Text="{Binding L[RefreshSection]}"
                    FontSize="12" FontWeight="SemiBold"
                    Foreground="{StaticResource TextSecondaryBrush}"

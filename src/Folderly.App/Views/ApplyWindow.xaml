@@ -133,8 +133,19 @@
         </Grid>
 
         <StackPanel Grid.Row="7" Margin="0,0,0,0">
-            <TextBlock Text="{Binding L[TagLabel]}" Margin="0,0,0,8"/>
-            <StackPanel x:Name="TagPanel" Orientation="Horizontal"/>
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding L[TagLabel]}" VerticalAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="{Binding L[EditTagNames]}"
+                        Style="{StaticResource SecondaryButton}"
+                        Click="EditTagNames_Click"
+                        Padding="10,4"/>
+            </Grid>
+            <WrapPanel x:Name="TagPanel"/>
         </StackPanel>
 
         <!-- ボタン行 -->

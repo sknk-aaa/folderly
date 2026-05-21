@@ -1,7 +1,9 @@
 using Folderly.App.Infrastructure;
 using Folderly.App.Services;
+using Folderly.Core.Composition;
 using Folderly.Core.History;
 using System.Collections.ObjectModel;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Folderly.App.ViewModels;
@@ -65,6 +67,11 @@ public sealed class HistoryItemViewModel : ViewModelBase
     public string FolderPath => Entry.FolderPath;
     public string AppliedAtText => Entry.AppliedAt.ToLocalTime().ToString("yyyy/MM/dd  HH:mm");
     public string FolderName => Path.GetFileName(Entry.FolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+    public bool HasTag => !string.IsNullOrWhiteSpace(Entry.TagColor);
+    public string TagName => ResolveTagName();
+    public Brush? TagBrush => string.IsNullOrWhiteSpace(Entry.TagColor)
+        ? null
+        : new SolidColorBrush(ParseHex(Entry.TagColor));
 
     private BitmapSource? _thumbnail;
     public BitmapSource? Thumbnail
@@ -78,6 +85,20 @@ public sealed class HistoryItemViewModel : ViewModelBase
     }
 
     public HistoryItemViewModel(HistoryEntry entry) => Entry = entry;
+
+    private string ResolveTagName()
+    {
+        if (!string.IsNullOrWhiteSpace(Entry.TagName))
+            return Entry.TagName;
+
+        var tag = !string.IsNullOrWhiteSpace(Entry.TagKey)
+            ? TagColors.FromKey(Entry.TagKey)
+            : TagColors.All.FirstOrDefault(t => string.Equals(t.HexColor, Entry.TagColor, StringComparison.OrdinalIgnoreCase));
+
+        return tag is null || tag.IsNone
+            ? string.Empty
+            : TagSettingsService.GetDisplayName(tag);
+    }
 
     private static BitmapSource? LoadThumbnail(HistoryEntry entry)
     {
@@ -188,5 +209,14 @@ public sealed class HistoryItemViewModel : ViewModelBase
         byte[] signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
         return data.Length >= signature.Length &&
                data.Take(signature.Length).SequenceEqual(signature);
+    }
+
+    private static Color ParseHex(string hex)
+    {
+        hex = hex.TrimStart('#');
+        return Color.FromRgb(
+            Convert.ToByte(hex[..2], 16),
+            Convert.ToByte(hex.Substring(2, 2), 16),
+            Convert.ToByte(hex.Substring(4, 2), 16));
     }
 }

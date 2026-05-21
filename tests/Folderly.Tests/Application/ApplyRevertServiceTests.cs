@@ -66,7 +66,9 @@ public class ApplyRevertServiceTests : IDisposable
         bool forceApply = false,
         TagColor? tagColor = null,
         Stream? sourceImageStream = null,
-        string sourceImagePath = "/test/image.png")
+        string sourceImagePath = "/test/image.png",
+        string? tagName = null,
+        bool showTagNameOnIcon = false)
     {
         return new ApplyRequest(
             FolderPath:       folderPath ?? _tempDir,
@@ -74,7 +76,9 @@ public class ApplyRevertServiceTests : IDisposable
             SourceImagePath:  sourceImagePath,
             AdjustParams:     new ImageAdjustParams(),
             TagColor:         tagColor ?? TagColors.None,
-            ForceApply:       forceApply);
+            ForceApply:       forceApply,
+            TagName:          tagName,
+            ShowTagNameOnIcon: showTagNameOnIcon);
     }
 
     [Fact]
@@ -238,10 +242,16 @@ public class ApplyRevertServiceTests : IDisposable
     [Fact]
     public async Task ApplyAsync_WithTagColor_SavesTagInHistory()
     {
-        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
+        await _applyService.ApplyAsync(MakeRequest(
+            tagColor: TagColors.Blue,
+            tagName: "開発",
+            showTagNameOnIcon: true));
 
         var entry = _repo.GetByPath(Path.GetFullPath(_tempDir));
         Assert.Equal("#0078D4", entry!.TagColor);
+        Assert.Equal("blue", entry.TagKey);
+        Assert.Equal("開発", entry.TagName);
+        Assert.True(entry.TagLabelVisible);
     }
 
     [Fact]

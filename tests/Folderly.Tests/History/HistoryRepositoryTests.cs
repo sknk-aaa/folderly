@@ -1,4 +1,5 @@
 using Folderly.Core.History;
+using Microsoft.Data.Sqlite;
 
 namespace Folderly.Tests.History;
 
@@ -20,7 +21,10 @@ public class HistoryRepositoryTests : IDisposable
         int? originalAttributes = null,
         bool hadDesktopIni = false,
         byte[]? originalDesktopIniContent = null,
-        int? originalDesktopIniAttrs = null)
+        int? originalDesktopIniAttrs = null,
+        string? tagKey = null,
+        string? tagName = null,
+        bool tagLabelVisible = false)
     {
         return new HistoryEntry(
             Id:                         null,
@@ -38,7 +42,10 @@ public class HistoryRepositoryTests : IDisposable
             ImageOffsetY:               -5.0,
             TagColor:                   tagColor,
             AppliedAt:                  appliedAt ?? DateTime.UtcNow,
-            SchemaVersion:              1);
+            SchemaVersion:              1,
+            TagKey:                     tagKey,
+            TagName:                    tagName,
+            TagLabelVisible:            tagLabelVisible);
     }
 
     [Fact]
@@ -175,7 +182,10 @@ public class HistoryRepositoryTests : IDisposable
             ImageOffsetY:               -8.0,
             TagColor:                   "#107C10",
             AppliedAt:                  new DateTime(2026, 5, 20, 12, 0, 0, DateTimeKind.Utc),
-            SchemaVersion:              1);
+            SchemaVersion:              1,
+            TagKey:                     "green",
+            TagName:                    "大学",
+            TagLabelVisible:            true);
 
         _repo.Upsert(entry);
         var result = _repo.GetByPath(@"C:\AllFields")!;
@@ -188,6 +198,9 @@ public class HistoryRepositoryTests : IDisposable
         Assert.Equal(15.0, result.ImageOffsetX, precision: 5);
         Assert.Equal(-8.0, result.ImageOffsetY, precision: 5);
         Assert.Equal("#107C10", result.TagColor);
+        Assert.Equal("green", result.TagKey);
+        Assert.Equal("大学", result.TagName);
+        Assert.True(result.TagLabelVisible);
     }
 
     [Fact]
@@ -202,5 +215,76 @@ public class HistoryRepositoryTests : IDisposable
 
         Assert.Null(result.OriginalDesktopIniContent);
         Assert.Null(result.TagColor);
+        Assert.Null(result.TagKey);
+        Assert.Null(result.TagName);
+        Assert.False(result.TagLabelVisible);
+    }
+
+    [Fact]
+    public void Upsert_TagMetadata_RoundTrips()
+    {
+        _repo.Upsert(MakeEntry(
+            @"C:\Tagged",
+            tagColor: "#0078D4",
+            tagKey: "blue",
+            tagName: "開発",
+            tagLabelVisible: true));
+
+        var result = _repo.GetByPath(@"C:\Tagged")!;
+
+        Assert.Equal("#0078D4", result.TagColor);
+        Assert.Equal("blue", result.TagKey);
+        Assert.Equal("開発", result.TagName);
+        Assert.True(result.TagLabelVisible);
+    }
+
+    [Fact]
+    public void InitializeSchema_OldDatabase_AddsTagMetadataColumns()
+    {
+        var dbPath = Path.Combine(Path.GetTempPath(), $"folderly_old_{Guid.NewGuid():N}.db");
+        try
+        {
+            SQLitePCL.Batteries_V2.Init();
+            using (var conn = new SqliteConnection($"Data Source={dbPath}"))
+            {
+                conn.Open();
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = """
+                    CREATE TABLE folder_history (
+                        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+                        folder_path             TEXT NOT NULL UNIQUE,
+                        original_attributes     INTEGER NOT NULL,
+                        had_desktop_ini         INTEGER NOT NULL,
+                        original_desktop_ini    BLOB,
+                        original_desktop_ini_attrs INTEGER,
+                        source_image_path       TEXT NOT NULL,
+                        icon_hash               TEXT NOT NULL,
+                        icon_storage_path       TEXT NOT NULL,
+                        crop_mode               TEXT NOT NULL,
+                        image_scale             REAL NOT NULL DEFAULT 1.0,
+                        image_offset_x          REAL NOT NULL DEFAULT 0.0,
+                        image_offset_y          REAL NOT NULL DEFAULT 0.0,
+                        tag_color               TEXT,
+                        applied_at              TEXT NOT NULL,
+                        schema_version          INTEGER NOT NULL DEFAULT 1
+                    );
+                    """;
+                cmd.ExecuteNonQuery();
+            }
+
+            using var repo = new HistoryRepository(dbPath);
+            repo.Upsert(MakeEntry(@"C:\Migrated", tagColor: "#C42B1C", tagKey: "red", tagName: "重要", tagLabelVisible: true));
+            var result = repo.GetByPath(@"C:\Migrated")!;
+
+            Assert.Equal("red", result.TagKey);
+            Assert.Equal("重要", result.TagName);
+            Assert.True(result.TagLabelVisible);
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            if (File.Exists(dbPath))
+                File.Delete(dbPath);
+        }
     }
 }

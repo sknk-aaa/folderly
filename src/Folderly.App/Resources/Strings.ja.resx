@@ -46,6 +46,18 @@
   <data name="TagPurple" xml:space="preserve"><value>紫&#x0a;デザイン</value></data>
   <data name="TagRed" xml:space="preserve"><value>赤&#x0a;重要</value></data>
   <data name="TagGray" xml:space="preserve"><value>グレー&#x0a;保管</value></data>
+  <data name="ColorBlue" xml:space="preserve"><value>青</value></data>
+  <data name="ColorGreen" xml:space="preserve"><value>緑</value></data>
+  <data name="ColorOrange" xml:space="preserve"><value>橙</value></data>
+  <data name="ColorPurple" xml:space="preserve"><value>紫</value></data>
+  <data name="ColorRed" xml:space="preserve"><value>赤</value></data>
+  <data name="ColorGray" xml:space="preserve"><value>グレー</value></data>
+  <data name="TagNamesSection" xml:space="preserve"><value>タグ</value></data>
+  <data name="EditTagNames" xml:space="preserve"><value>タグ名を編集</value></data>
+  <data name="TagSettingsTitle" xml:space="preserve"><value>タグ設定</value></data>
+  <data name="ShowTagNameOnIcon" xml:space="preserve"><value>フォルダアイコン上にタグ名を表示</value></data>
+  <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>長い名前はタグ領域に収まるように自動で縮小または省略されます。</value></data>
+  <data name="Save" xml:space="preserve"><value>保存</value></data>
   <data name="Cancel" xml:space="preserve"><value>キャンセル</value></data>
   <data name="Apply" xml:space="preserve"><value>適用</value></data>
   <data name="Applying" xml:space="preserve"><value>適用中...</value></data>

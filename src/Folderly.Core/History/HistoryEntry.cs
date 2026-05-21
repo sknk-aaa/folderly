@@ -19,4 +19,7 @@ public record HistoryEntry(
     double   ImageOffsetY,
     string?  TagColor,
     DateTime AppliedAt,
-    int      SchemaVersion = 1);
+    int      SchemaVersion = 1,
+    string?  TagKey = null,
+    string?  TagName = null,
+    bool     TagLabelVisible = false);
