@@ -88,7 +88,7 @@ public sealed class ApplyService
 
         // 5. ICO 変換
         var icoBytes = IcoConverter.Convert(composed);
-        var iconHash = ComputeHash(request);
+        var iconHash = ComputeHash(icoBytes);
 
         // 6. ICO ファイル保存（パスをハッシュ由来でユニークにし、Explorer アイコンキャッシュ無効化）
         var iconFileName = $"cover_{iconHash[..8]}.ico";
@@ -138,14 +138,8 @@ public sealed class ApplyService
         return ApplyResult.Success(centralIcoPath);
     }
 
-    private static string ComputeHash(ApplyRequest request)
-    {
-        var input = $"{request.SourceImagePath}|{request.AdjustParams.Mode}|" +
-                    $"{request.AdjustParams.Scale}|{request.AdjustParams.OffsetX}|" +
-                    $"{request.AdjustParams.OffsetY}|{request.TagColor.HexColor}";
-        return Convert.ToHexString(
-            SHA256.HashData(Encoding.UTF8.GetBytes(input))).ToLowerInvariant();
-    }
+    private static string ComputeHash(byte[] icoBytes)
+        => Convert.ToHexString(SHA256.HashData(icoBytes)).ToLowerInvariant();
 
     private static async Task<(string central, string local)> SaveIcoFilesAsync(
         string folderPath, string iconHash, string localFileName, byte[] icoBytes, CancellationToken ct)
