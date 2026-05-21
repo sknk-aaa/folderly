@@ -11,6 +11,9 @@
 - 仕様: [SPEC.md](SPEC.md)
 - 実装判断ログ: [CLAUDE.md](CLAUDE.md)（21項目）
 - 手動テストチェックリスト: [docs/TESTING.md](docs/TESTING.md)
+- Microsoft Store 提出準備: [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md)
+- Store 掲載文下書き: [docs/STORE_LISTING_DRAFT.md](docs/STORE_LISTING_DRAFT.md)
+- プライバシーポリシー下書き: [docs/PRIVACY_POLICY_DRAFT.md](docs/PRIVACY_POLICY_DRAFT.md)
 - ビルド手順: [README.md](README.md)
 
 ---
@@ -279,10 +282,12 @@ git status
 
 ### Step 19 以降（Store 申請）
 
+- [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md) に沿って提出素材を準備
 - `Package.appxmanifest` の Publisher を Partner Center の正式な `CN=...` に変更
-- 製品アイコン（44x44, 50x50, 150x150, 310x310 等）を正式版に差し替え
-- Store 用スクリーンショット、説明文の準備
-- Partner Center で MSIX をアップロード
+- 製品アイコンを正式版に差し替え
+- Store 用スクリーンショット、説明文、Privacy Policy URL、サポートURLを準備
+- Store提出用パッケージ（`.msixupload` / `.appxupload` 推奨）を作成
+- Partner Center でパッケージをアップロード
 
 ---
 
@@ -293,3 +298,6 @@ git status
 - 実装判断ログ: [CLAUDE.md](CLAUDE.md)
 - ビルド手順: [README.md](README.md)
 - テストチェックリスト: [docs/TESTING.md](docs/TESTING.md)
+- Store提出準備: [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md)
+- Store掲載文下書き: [docs/STORE_LISTING_DRAFT.md](docs/STORE_LISTING_DRAFT.md)
+- プライバシーポリシー下書き: [docs/PRIVACY_POLICY_DRAFT.md](docs/PRIVACY_POLICY_DRAFT.md)
