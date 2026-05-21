@@ -67,7 +67,8 @@ public sealed class ShellNotifier : IShellNotifier
         // 対象ウィンドウの再描画を即座に強制するため、開いているウィンドウがあれば即時反映できる。
         RefreshExplorerWindows(folderPath);
 
-        // 遅延通知: ウィンドウが開いていない場合や Refresh 後もキャッシュが残る場合の保険
+        // 遅延通知: ウィンドウが開いていない場合や Refresh 後もキャッシュが残る場合の保険。
+        // 各ラウンドで System+ReadOnly を toggle して Explorer に desktop.ini 再読みを強制する。
         ScheduleDelayedNotify(folderPath);
     }
 
@@ -133,6 +134,12 @@ public sealed class ShellNotifier : IShellNotifier
         if (!Directory.Exists(folderPath)) return;
 
         TryTouchFolder(folderPath);
+
+        // System+ReadOnly を一瞬解除→即再設定することで Explorer に desktop.ini の再読みを強制する。
+        // Explorer は属性の「変化」を検知したときに desktop.ini を再評価するため、
+        // 再適用（同フォルダに別画像）でも新しいアイコンが即時反映される。
+        ToggleSystemReadOnly(folderPath);
+
         ForceIconIndexUpdate(folderPath);
 
         // PATH と PIDL 両方で通知（Explorer の受け取り方が実装依存のため）
@@ -151,6 +158,24 @@ public sealed class ShellNotifier : IShellNotifier
         NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
 
         RefreshExplorerWindows(folderPath);
+    }
+
+    private static void ToggleSystemReadOnly(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
+        try
+        {
+            var attrs = File.GetAttributes(folderPath);
+            // System か ReadOnly のどちらかが設定されているときだけ toggle する（revert 後は両方クリア済みのためスキップ）
+            if ((attrs & (FileAttributes.System | FileAttributes.ReadOnly)) == 0) return;
+
+            File.SetAttributes(folderPath, attrs & ~(FileAttributes.System | FileAttributes.ReadOnly));
+            NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
+
+            File.SetAttributes(folderPath, attrs);
+            NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
+        }
+        catch { }
     }
 
     private static void TryTouchFolder(string folderPath)
