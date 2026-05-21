@@ -13,6 +13,7 @@ public sealed class ShellNotifier : IShellNotifier
     public void NotifyFolderChanged(string folderPath)
     {
         TryTouchFolder(folderPath);
+        TouchFolderAttributesWithoutClearingCustomization(folderPath);
 
         // グローバルアイコンキャッシュを更新
         NativeMethods.SHChangeNotify(
@@ -130,6 +131,7 @@ public sealed class ShellNotifier : IShellNotifier
         if (!Directory.Exists(folderPath)) return;
 
         TryTouchFolder(folderPath);
+        TouchFolderAttributesWithoutClearingCustomization(folderPath);
         var iconPath = ResolveCurrentIconPath(folderPath);
         NotifyCurrentIcon(iconPath);
         ForceIconIndexUpdate(folderPath);
@@ -159,27 +161,27 @@ public sealed class ShellNotifier : IShellNotifier
         RefreshExplorerWindows(folderPath);
     }
 
-    private static void ToggleSystemReadOnly(string folderPath)
-    {
-        if (!Directory.Exists(folderPath)) return;
-        try
-        {
-            var attrs = File.GetAttributes(folderPath);
-            if ((attrs & (FileAttributes.System | FileAttributes.ReadOnly)) == 0) return;
-
-            // Explorer に通知せず（黄色フォルダを出さないため）サイレントに 2 回 SetAttributes する。
-            // これにより NTFS の ChangeTime が 2 回更新され、直後の SHCNE_ATTRIBUTES 通知を
-            // Explorer が受け取ったとき「属性メタデータが変化した」と判断して desktop.ini を再評価する。
-            File.SetAttributes(folderPath, attrs & ~(FileAttributes.System | FileAttributes.ReadOnly));
-            File.SetAttributes(folderPath, attrs);
-        }
-        catch { }
-    }
-
     private static void TryTouchFolder(string folderPath)
     {
         if (!Directory.Exists(folderPath)) return;
         try { Directory.SetLastWriteTimeUtc(folderPath, DateTime.UtcNow); }
+        catch { }
+    }
+
+    private static void TouchFolderAttributesWithoutClearingCustomization(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
+
+        try
+        {
+            var attrs = File.GetAttributes(folderPath);
+            var toggled = (attrs & FileAttributes.Archive) == 0
+                ? attrs | FileAttributes.Archive
+                : attrs & ~FileAttributes.Archive;
+
+            File.SetAttributes(folderPath, toggled);
+            File.SetAttributes(folderPath, attrs);
+        }
         catch { }
     }
 
