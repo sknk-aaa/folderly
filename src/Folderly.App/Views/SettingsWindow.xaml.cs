@@ -15,7 +15,7 @@ public partial class SettingsWindow : Window
         DataContext = _vm;
     }
 
-    private void DeleteHistory_Click(object sender, RoutedEventArgs e)
+    private async void DeleteHistory_Click(object sender, RoutedEventArgs e)
     {
         var L   = AppServices.Localize;
         var res = MessageBox.Show(
@@ -23,8 +23,25 @@ public partial class SettingsWindow : Window
             MessageBoxButton.OKCancel, MessageBoxImage.Warning);
         if (res != MessageBoxResult.OK) return;
 
-        foreach (var entry in AppServices.History.GetAll())
-            AppServices.History.Delete(entry.FolderPath);
+        var entries = AppServices.History.GetAll().ToList();
+        var failCount = 0;
+
+        foreach (var entry in entries)
+        {
+            try
+            {
+                await AppServices.Revert.RevertAsync(entry.FolderPath);
+            }
+            catch
+            {
+                try { AppServices.History.Delete(entry.FolderPath); } catch { }
+                failCount++;
+            }
+        }
+
+        if (failCount > 0)
+            MessageBox.Show(string.Format(L["RevertAllPartialFailed"], failCount),
+                "Folderly", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     private void Support_Click(object sender, RoutedEventArgs e)

@@ -83,15 +83,34 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ClearAllHistory_Click(object sender, RoutedEventArgs e)
+    private async void ClearAllHistory_Click(object sender, RoutedEventArgs e)
     {
         var L   = AppServices.Localize;
         var res = MessageBox.Show(L["ClearHistoryConfirmMessage"], L["ClearHistoryConfirmTitle"],
             MessageBoxButton.OKCancel, MessageBoxImage.Warning);
         if (res != MessageBoxResult.OK) return;
 
-        foreach (var entry in AppServices.History.GetAll())
-            AppServices.History.Delete(entry.FolderPath);
+        var entries = AppServices.History.GetAll().ToList();
+        var failCount = 0;
+
+        foreach (var entry in entries)
+        {
+            try
+            {
+                await AppServices.Revert.RevertAsync(entry.FolderPath);
+            }
+            catch
+            {
+                // フォルダが存在しないなど: 復元できなくても履歴レコードは削除する
+                try { AppServices.History.Delete(entry.FolderPath); } catch { }
+                failCount++;
+            }
+        }
+
+        if (failCount > 0)
+            MessageBox.Show(string.Format(L["RevertAllPartialFailed"], failCount),
+                "Folderly", MessageBoxButton.OK, MessageBoxImage.Warning);
+
         _vm.Refresh();
     }
 

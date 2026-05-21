@@ -69,7 +69,7 @@
   <data name="RecentFolders" xml:space="preserve"><value>最近変更したフォルダ</value></data>
   <data name="OpenFolder" xml:space="preserve"><value>開く</value></data>
   <data name="RevertFolder" xml:space="preserve"><value>元に戻す</value></data>
-  <data name="ClearAllHistory" xml:space="preserve"><value>履歴をすべてクリア</value></data>
+  <data name="ClearAllHistory" xml:space="preserve"><value>全フォルダを元に戻す</value></data>
   <data name="NoHistory" xml:space="preserve"><value>まだ履歴がありません。フォルダを右クリックして始めましょう。</value></data>
   <data name="RevertConfirmTitle" xml:space="preserve"><value>元の状態に戻しますか？</value></data>
   <data name="RevertConfirmMessage" xml:space="preserve"><value>{0} の表紙画像とタグを解除し、元のフォルダの見た目に戻します。</value></data>
@@ -77,8 +77,9 @@
   <data name="RevertFailed" xml:space="preserve"><value>復元に失敗しました: {0}</value></data>
   <data name="TrialBanner" xml:space="preserve"><value>無料試用：あと {0} 日</value></data>
   <data name="BuyNow" xml:space="preserve"><value>Microsoft Store で購入する</value></data>
-  <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>履歴をすべて削除しますか？</value></data>
-  <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>すべての履歴レコードを削除します。適用済みのフォルダ表紙は影響を受けません。</value></data>
+  <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>全フォルダを元に戻しますか？</value></data>
+  <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>適用済みの全フォルダのアイコンを元に戻し、履歴を削除します。この操作は取り消せません。</value></data>
+  <data name="RevertAllPartialFailed" xml:space="preserve"><value>{0} 件のフォルダの復元に失敗しました（フォルダが見つからないなど）。</value></data>
   <data name="Clear" xml:space="preserve"><value>削除</value></data>
   <data name="AppliedAt" xml:space="preserve"><value>適用日時: {0}</value></data>
 
@@ -90,7 +91,7 @@
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
   <data name="HistorySection" xml:space="preserve"><value>履歴</value></data>
   <data name="HistoryMaxCount" xml:space="preserve"><value>最大保持件数</value></data>
-  <data name="DeleteHistory" xml:space="preserve"><value>履歴をすべて削除</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>全フォルダを元に戻す</value></data>
   <data name="AboutSection" xml:space="preserve"><value>Folderly について</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>バージョン</value></data>
   <data name="LicenseLabel" xml:space="preserve"><value>ライセンス</value></data>
