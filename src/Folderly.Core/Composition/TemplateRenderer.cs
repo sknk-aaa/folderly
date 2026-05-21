@@ -18,9 +18,6 @@ public static class TemplateRenderer
         using var backTemplate = Image.Load<Rgba32>(FolderTemplate.GetBackTemplateBytes());
         backTemplate.Mutate(ctx => ctx.Resize(outputSize, outputSize));
 
-        using var frontTemplate = Image.Load<Rgba32>(FolderTemplate.GetFrontTemplateBytes());
-        frontTemplate.Mutate(ctx => ctx.Resize(outputSize, outputSize));
-
         var scaledImageRegion = FolderTemplate.ScaleRegion(
             FolderTemplate.ImageRegion, outputSize);
 
@@ -36,12 +33,12 @@ public static class TemplateRenderer
 
             using var resizedAdjusted = adjustedImage.Clone(
                 c => c.Resize(imageW, imageH));
-            ctx.DrawImage(resizedAdjusted, destPoint, 1f);
+            ctx.Clip(
+                FolderTemplate.CreateImagePath(outputSize),
+                clipped => clipped.DrawImage(resizedAdjusted, destPoint, 1f));
 
             if (tagColor is not null && !tagColor.IsNone)
                 ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateTabPath(outputSize));
-
-            ctx.DrawImage(frontTemplate, new Point(0, 0), 1f);
         });
 
         return result;

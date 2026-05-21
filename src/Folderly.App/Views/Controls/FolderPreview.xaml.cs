@@ -131,6 +131,7 @@ public partial class FolderPreview : UserControl
         Canvas.SetTop(ImageCanvas, ImageRegionPx.Y);
         ImageCanvas.Width  = ImageRegionPx.Width;
         ImageCanvas.Height = ImageRegionPx.Height;
+        ImageCanvas.Clip = CreateImageClipGeometry();
 
         TagPath.Data = CreateTabGeometry();
     }
@@ -138,7 +139,6 @@ public partial class FolderPreview : UserControl
     private void LoadTemplateImage()
     {
         TemplateImage.Source = LoadPng(FolderTemplate.GetBackTemplateBytes());
-        FrontTemplateImage.Source = LoadPng(FolderTemplate.GetFrontTemplateBytes());
     }
 
     private static BitmapImage LoadPng(byte[] bytes)
@@ -218,17 +218,34 @@ public partial class FolderPreview : UserControl
     private static Geometry CreateTabGeometry()
     {
         var points = FolderTemplate.GetTabShapePoints((float)PreviewSize);
-        var radius = Math.Min(PreviewSize * 0.035, points[2].Y * 0.45);
+        var radius = Math.Min(PreviewSize * 0.035, (points[3].Y - points[0].Y) * 0.45);
         var geometry = new StreamGeometry();
         using (var ctx = geometry.Open())
         {
-            ctx.BeginFigure(new Point(0, points[2].Y), isFilled: true, isClosed: true);
-            ctx.LineTo(new Point(0, radius), isStroked: true, isSmoothJoin: true);
-            ctx.QuadraticBezierTo(new Point(0, 0), new Point(radius, 0), isStroked: true, isSmoothJoin: true);
+            ctx.BeginFigure(new Point(points[3].X, points[3].Y), isFilled: true, isClosed: true);
+            ctx.LineTo(new Point(points[0].X, points[0].Y + radius), isStroked: true, isSmoothJoin: true);
+            ctx.QuadraticBezierTo(
+                new Point(points[0].X, points[0].Y),
+                new Point(points[0].X + radius, points[0].Y),
+                isStroked: true,
+                isSmoothJoin: true);
             ctx.LineTo(new Point(points[1].X, points[1].Y), isStroked: true, isSmoothJoin: true);
             ctx.LineTo(new Point(points[2].X, points[2].Y), isStroked: true, isSmoothJoin: true);
         }
 
+        geometry.Freeze();
+        return geometry;
+    }
+
+    private static Geometry CreateImageClipGeometry()
+    {
+        var radius = FolderTemplate.BaseSize
+            * FolderTemplate.ImageCornerRadiusRatio
+            * PreviewScale;
+        var geometry = new RectangleGeometry(
+            new Rect(0, 0, ImageRegionPx.Width, ImageRegionPx.Height),
+            radius,
+            radius);
         geometry.Freeze();
         return geometry;
     }

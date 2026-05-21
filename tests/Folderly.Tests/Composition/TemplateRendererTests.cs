@@ -106,6 +106,21 @@ public class TemplateRendererTests
     }
 
     [Fact]
+    public void Render_ImageContent_AppearsNearBottomOfRoundedImageRegion()
+    {
+        using var adj = CreateTestAdjustedImage(224, 158);
+        using var result = TemplateRenderer.Render(adj, TagColors.None);
+
+        var scaledImgRegion = FolderTemplate.ScaleRegion(
+            FolderTemplate.ImageRegion, FolderTemplate.BaseSize);
+        int sampleX = (int)(scaledImgRegion.X + scaledImgRegion.Width * 0.5f);
+        int sampleY = (int)(scaledImgRegion.Bottom - scaledImgRegion.Height * 0.12f);
+        var px = result[sampleX, sampleY];
+
+        Assert.True(px.B > px.R, "Image content should remain visible near the bottom; no front pocket should cover it");
+    }
+
+    [Fact]
     public void Render_TagNone_TagRegionNotOverriddenWithSolidColor()
     {
         using var adj = CreateTestAdjustedImage();

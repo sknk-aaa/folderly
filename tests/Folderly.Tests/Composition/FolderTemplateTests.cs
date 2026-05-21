@@ -11,9 +11,9 @@ public class FolderTemplateTests
     }
 
     [Fact]
-    public void TagRegion_HeightIs18Percent()
+    public void TagRegion_HeightMatchesTabShape()
     {
-        Assert.Equal(FolderTemplate.BaseSize * 0.18f, FolderTemplate.TagRegion.Height, precision: 3);
+        Assert.Equal(FolderTemplate.BaseSize * FolderTemplate.TagHeightRatio, FolderTemplate.TagRegion.Height, precision: 3);
     }
 
     [Fact]
