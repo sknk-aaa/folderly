@@ -37,11 +37,11 @@ public sealed class SettingsViewModel : ViewModelBase
         set => SetField(ref _historyMaxCount, Math.Clamp(value, 1, 1000));
     }
 
-    private bool _forceExplorerRestartOnReapply;
-    public bool ForceExplorerRestartOnReapply
+    private bool _forceExplorerRestartAfterApply;
+    public bool ForceExplorerRestartAfterApply
     {
-        get => _forceExplorerRestartOnReapply;
-        set => SetField(ref _forceExplorerRestartOnReapply, value);
+        get => _forceExplorerRestartAfterApply;
+        set => SetField(ref _forceExplorerRestartAfterApply, value);
     }
 
     // ─── バージョン・ライセンス ───────────────────────────────────────────────
@@ -65,7 +65,7 @@ public sealed class SettingsViewModel : ViewModelBase
     {
         _selectedLang    = AppServices.History.GetSetting("language") ?? "system";
         _historyMaxCount = int.TryParse(AppServices.History.GetSetting("history_max_count"), out var n) ? n : 100;
-        _forceExplorerRestartOnReapply =
+        _forceExplorerRestartAfterApply =
             AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
     }
 
@@ -77,7 +77,7 @@ public sealed class SettingsViewModel : ViewModelBase
         AppServices.History.SetSetting("history_max_count", HistoryMaxCount.ToString());
         AppServices.History.SetSetting(
             "force_explorer_restart_on_reapply",
-            ForceExplorerRestartOnReapply ? "true" : "false");
+            ForceExplorerRestartAfterApply ? "true" : "false");
         AppServices.Localize.SetLanguage(SelectedLang);
         AppServices.History.EnforceMaxCount(HistoryMaxCount);
     }

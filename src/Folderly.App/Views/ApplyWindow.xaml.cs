@@ -6,6 +6,7 @@ using Folderly.Core.Folder;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -205,9 +206,6 @@ public partial class ApplyWindow : Window
                 TagColor:          _vm.SelectedTagColor,
                 ForceApply:        false);
 
-            var isReapply = AppServices.History.GetByPath(
-                System.IO.Path.GetFullPath(_vm.FolderPath)) is not null;
-
             var result = await AppServices.Apply.ApplyAsync(request);
 
             if (result.IsWarning)
@@ -220,7 +218,7 @@ public partial class ApplyWindow : Window
             if (result.IsSuccess)
             {
                 ShowSuccessToast();
-                if (isReapply && ShouldForceExplorerRestartOnReapply())
+                if (ShouldForceExplorerRestartAfterApply())
                     await RestartExplorerAsync();
                 await Task.Delay(1200);
                 Close();
@@ -252,18 +250,18 @@ public partial class ApplyWindow : Window
 
     // ─── キャンセル ──────────────────────────────────────────────────────────
 
-    private static bool ShouldForceExplorerRestartOnReapply()
+    private static bool ShouldForceExplorerRestartAfterApply()
         => AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
 
     private static async Task RestartExplorerAsync()
     {
         await Task.Run(() =>
         {
-            foreach (var process in Process.GetProcessesByName("explorer"))
+            foreach (var process in GetShellExplorerProcesses())
             {
                 try
                 {
-                    process.Kill(entireProcessTree: true);
+                    process.Kill();
                     process.WaitForExit(2000);
                 }
                 catch { }
@@ -273,7 +271,7 @@ public partial class ApplyWindow : Window
                 }
             }
 
-            Thread.Sleep(300);
+            Thread.Sleep(500);
             try
             {
                 Process.Start(new ProcessStartInfo("explorer.exe")
@@ -284,6 +282,34 @@ public partial class ApplyWindow : Window
             catch { }
         });
     }
+
+    private static List<Process> GetShellExplorerProcesses()
+    {
+        var shellWindow = GetShellWindow();
+        if (shellWindow != nint.Zero)
+        {
+            _ = GetWindowThreadProcessId(shellWindow, out var shellProcessId);
+            if (shellProcessId != 0)
+            {
+                try
+                {
+                    var shellProcess = Process.GetProcessById((int)shellProcessId);
+                    if (string.Equals(shellProcess.ProcessName, "explorer", StringComparison.OrdinalIgnoreCase))
+                        return [shellProcess];
+                    shellProcess.Dispose();
+                }
+                catch { }
+            }
+        }
+
+        return Process.GetProcessesByName("explorer").ToList();
+    }
+
+    [DllImport("user32.dll")]
+    private static extern nint GetShellWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(nint hWnd, out uint processId);
 
     private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
 }
