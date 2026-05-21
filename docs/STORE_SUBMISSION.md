@@ -42,13 +42,14 @@ Folderly を Microsoft Store に出す前に確認する項目です。
 
 アイコンは、`icons/` 配下の元画像から各サイズへ書き出す運用にする。
 
-- `icons/ストア用アイコン.png`: Store/スタートメニュー等のPNG生成元
+- `icons/ストア用アイコン.png`: Store 用ロゴのPNG生成元
 - `icons/透過アイコン.png`: 右クリックメニュー用ICOとアプリ表示用PNGの生成元
 
 現方針:
 
 - `StoreLogo.png` は `icons/ストア用アイコン.png` 由来
 - `FolderlyContext.ico`, `Square44x44Logo.png`, `Square150x150Logo.png`, `Wide310x150Logo.png`, `SplashScreen.png` は `icons/透過アイコン.png` 由来
+- ストア提出用画像以外は、背景透過の見た目で統一する
 
 ## Partner Center 側で必要なもの
 
@@ -98,6 +99,7 @@ Store提出では、通常は `.msix` 単体より `.msixupload` / `.appxupload`
 - [x] MSIX作成
 - [x] テスト証明書で署名
 - [x] サイドロードインストール
+- [x] Store 用ロゴと透過版アプリ表示アイコンを反映
 - [x] 右クリックメニュー表示
 - [x] 右クリックから適用画面起動
 - [x] A -> B -> C の再適用反映
@@ -105,7 +107,7 @@ Store提出では、通常は `.msix` 単体より `.msixupload` / `.appxupload`
 - [x] 解除後の通常フォルダプレビュー復元
 - [ ] 日本語フォルダ名
 - [ ] 長いパス
-- [ ] 新アイコン反映後の画像確認
+- [ ] 新アイコン反映後の実機表示確認（右クリックメニュー、スタートメニュー、アプリ一覧）
 - [ ] Store提出用パッケージ作成
 - [ ] Partner Center upload
 
