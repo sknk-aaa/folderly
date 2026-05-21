@@ -31,14 +31,16 @@ public static class TemplateRenderer
                 (int)scaledImageRegion.X,
                 (int)scaledImageRegion.Y);
 
+            if (tagColor is not null && !tagColor.IsNone)
+                ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateTabPath(outputSize));
+
+            ctx.Fill(Color.ParseHex("#FFC72C"), FolderTemplate.CreateImagePath(outputSize));
+
             using var resizedAdjusted = adjustedImage.Clone(
                 c => c.Resize(imageW, imageH));
             ctx.Clip(
                 FolderTemplate.CreateImagePath(outputSize),
                 clipped => clipped.DrawImage(resizedAdjusted, destPoint, 1f));
-
-            if (tagColor is not null && !tagColor.IsNone)
-                ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateTabPath(outputSize));
         });
 
         return result;

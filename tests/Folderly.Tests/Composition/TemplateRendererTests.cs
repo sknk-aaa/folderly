@@ -1,5 +1,6 @@
 using Folderly.Core.Composition;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -64,6 +65,46 @@ public class TemplateRendererTests
         Assert.InRange(px.R, expR - 10, expR + 10);
         Assert.InRange(px.G, expG - 10, expG + 10);
         Assert.InRange(px.B, expB - 10, expB + 10);
+    }
+
+    [Fact]
+    public void Render_WithTagColor_ImageRegionStaysInFrontOfTag()
+    {
+        var tag = new TagColor("#0078D4", "test");
+        using var adj = CreateTestAdjustedImage();
+        using var result = TemplateRenderer.Render(adj, tag);
+
+        var imageRegion = FolderTemplate.ScaleRegion(
+            FolderTemplate.ImageRegion, FolderTemplate.BaseSize);
+        int sampleX = (int)(imageRegion.X + imageRegion.Width * 0.16f);
+        int sampleY = (int)(imageRegion.Y + imageRegion.Height * 0.03f);
+        var px = result[sampleX, sampleY];
+
+        Assert.True(px.B > px.R, "Image content should be in front of the tag where they overlap");
+    }
+
+    [Fact]
+    public void Render_TransparentPadding_RevealsYellowImageBaseNotTag()
+    {
+        var tag = new TagColor("#0078D4", "test");
+        var region = FolderTemplate.ImageRegion;
+        using var adj = new Image<Rgba32>((int)region.Width, (int)region.Height);
+        adj.Mutate(ctx =>
+        {
+            ctx.Clear(Color.Transparent);
+            ctx.Fill(
+                new Rgba32(100, 150, 200, 255),
+                new Rectangle((int)(adj.Width * 0.25f), 0, (int)(adj.Width * 0.5f), adj.Height));
+        });
+        using var result = TemplateRenderer.Render(adj, tag);
+
+        var imageRegion = FolderTemplate.ScaleRegion(
+            FolderTemplate.ImageRegion, FolderTemplate.BaseSize);
+        int sampleX = (int)(imageRegion.X + imageRegion.Width * 0.08f);
+        int sampleY = (int)(imageRegion.Y + imageRegion.Height * 0.03f);
+        var px = result[sampleX, sampleY];
+
+        Assert.True(px.R > 230 && px.G > 170 && px.B < 80, "Transparent padding should reveal the yellow image base");
     }
 
     [Fact]

@@ -15,7 +15,7 @@ public static class FolderTemplate
     public const int BaseSize = 256;
     public const float TabXRatio = 0.047f;
     public const float TabYRatio = 0.094f;
-    public const float TabTopWidthRatio = 0.37f;
+    public const float TabTopWidthRatio = 0.335f;
     public const float TabSlopeEndRatio = 0.49f;
     public const float TagHeightRatio = 0.24f;
     public const float ImageCornerRadiusRatio = 0.043f;

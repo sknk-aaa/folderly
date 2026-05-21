@@ -18,6 +18,14 @@
                IsHitTestVisible="False"
                RenderOptions.BitmapScalingMode="HighQuality"/>
 
+        <Path x:Name="TagPath"
+              IsHitTestVisible="False"
+              Visibility="Collapsed"/>
+
+        <Path x:Name="ImageBasePath"
+              Fill="#FFC72C"
+              IsHitTestVisible="False"/>
+
         <Canvas x:Name="ImageCanvas"
                 ClipToBounds="True"
                 Background="Transparent"
@@ -33,10 +41,6 @@
                 </Image.RenderTransform>
             </Image>
         </Canvas>
-
-        <Path x:Name="TagPath"
-              IsHitTestVisible="False"
-              Visibility="Collapsed"/>
 
         <Border x:Name="Placeholder"
                 Width="320" Height="320"

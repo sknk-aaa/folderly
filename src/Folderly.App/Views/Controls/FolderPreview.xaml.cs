@@ -134,6 +134,7 @@ public partial class FolderPreview : UserControl
         ImageCanvas.Clip = CreateImageClipGeometry();
 
         TagPath.Data = CreateTabGeometry();
+        ImageBasePath.Data = CreateImageBaseGeometry();
     }
 
     private void LoadTemplateImage()
@@ -246,6 +247,16 @@ public partial class FolderPreview : UserControl
             new Rect(0, 0, ImageRegionPx.Width, ImageRegionPx.Height),
             radius,
             radius);
+        geometry.Freeze();
+        return geometry;
+    }
+
+    private static Geometry CreateImageBaseGeometry()
+    {
+        var radius = FolderTemplate.BaseSize
+            * FolderTemplate.ImageCornerRadiusRatio
+            * PreviewScale;
+        var geometry = new RectangleGeometry(ImageRegionPx, radius, radius);
         geometry.Freeze();
         return geometry;
     }
