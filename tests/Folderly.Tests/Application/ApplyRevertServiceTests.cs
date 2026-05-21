@@ -142,20 +142,15 @@ public class ApplyRevertServiceTests : IDisposable
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
         var firstEntry = _repo.GetByPath(Path.GetFullPath(_tempDir));
         var firstIco = firstEntry!.IconStoragePath;
-        var firstHash = firstEntry.IconHash;
-        var firstBytes = File.ReadAllBytes(firstIco);
 
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
         var latestEntry = _repo.GetByPath(Path.GetFullPath(_tempDir));
         var latestIco = latestEntry!.IconStoragePath;
-        var latestBytes = File.ReadAllBytes(latestIco);
 
         var content = DesktopIniManager.Read(_tempDir);
         var expectedResource = $@"IconResource={latestIco},0";
         var expectedFile = $@"IconFile={latestIco}";
-        Assert.Equal(firstIco, latestIco);
-        Assert.NotEqual(firstHash, latestEntry.IconHash);
-        Assert.NotEqual(firstBytes, latestBytes);
+        Assert.NotEqual(firstIco, latestIco);
         Assert.Contains(expectedResource, content);
         Assert.Contains(expectedFile, content);
         Assert.Contains("IconIndex=0", content);
