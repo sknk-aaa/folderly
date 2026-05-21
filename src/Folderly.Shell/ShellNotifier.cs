@@ -69,57 +69,44 @@ public sealed class ShellNotifier : IShellNotifier
 
     private static void ScheduleDelayedNotify(string folderPath)
     {
-        var t = new Thread(() =>
+        // 350ms・900ms・1800ms の3ラウンドで通知する。
+        // Explorer のコンテンツサムネイル→カスタムアイコンモード切替は非同期で、
+        // 切替完了タイミングが環境により異なるため複数回通知することで確実に捕捉する。
+        foreach (var delayMs in new[] { 350, 900, 1800 })
         {
-            Thread.Sleep(1200);
-            TryTouchFolder(folderPath);
-            ForceIconIndexUpdate(folderPath);
+            var d = delayMs;
+            var t = new Thread(() =>
+            {
+                Thread.Sleep(d);
+                RunDelayedNotify(folderPath);
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.IsBackground = true;
+            t.Start();
+        }
+    }
 
-            var pidl = NativeMethods.ILCreateFromPath(folderPath);
-            if (pidl == nint.Zero) return;
-            try
-            {
-                NativeMethods.SHChangeNotify(
-                    NativeMethods.SHCNE_ATTRIBUTES,
-                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                    pidl, nint.Zero);
-                NativeMethods.SHChangeNotify(
-                    NativeMethods.SHCNE_UPDATEITEM,
-                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                    pidl, nint.Zero);
-                NativeMethods.SHChangeNotify(
-                    NativeMethods.SHCNE_UPDATEDIR,
-                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                    pidl, nint.Zero);
-            }
-            finally
-            {
-                NativeMethods.ILFree(pidl);
-            }
+    private static void RunDelayedNotify(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
 
-            var parentPath = Directory.GetParent(folderPath)?.FullName;
-            if (string.IsNullOrWhiteSpace(parentPath)) return;
-            var parentPidl = NativeMethods.ILCreateFromPath(parentPath);
-            if (parentPidl == nint.Zero) return;
-            try
-            {
-                NativeMethods.SHChangeNotify(
-                    NativeMethods.SHCNE_UPDATEITEM,
-                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                    parentPidl, nint.Zero);
-                NativeMethods.SHChangeNotify(
-                    NativeMethods.SHCNE_UPDATEDIR,
-                    NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                    parentPidl, nint.Zero);
-            }
-            finally
-            {
-                NativeMethods.ILFree(parentPidl);
-            }
-        });
-        t.SetApartmentState(ApartmentState.STA);
-        t.IsBackground = true;
-        t.Start();
+        TryTouchFolder(folderPath);
+        ForceIconIndexUpdate(folderPath);
+
+        // PATH と PIDL 両方で通知（Explorer の受け取り方が実装依存のため）
+        NotifyPath(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
+        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPath(folderPath, NativeMethods.SHCNE_UPDATEDIR);
+        NotifyPidl(folderPath, NativeMethods.SHCNE_ATTRIBUTES);
+        NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPidl(folderPath, NativeMethods.SHCNE_UPDATEDIR);
+
+        var parentPath = Directory.GetParent(folderPath)?.FullName;
+        if (string.IsNullOrWhiteSpace(parentPath)) return;
+        NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPath(parentPath, NativeMethods.SHCNE_UPDATEDIR);
+        NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEITEM);
+        NotifyPidl(parentPath, NativeMethods.SHCNE_UPDATEDIR);
     }
 
     private static void TryTouchFolder(string folderPath)
