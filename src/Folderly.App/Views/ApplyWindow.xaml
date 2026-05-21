@@ -4,7 +4,7 @@
         xmlns:ctrl="clr-namespace:Folderly.App.Views.Controls"
         xmlns:conv="clr-namespace:Folderly.App.Infrastructure"
         Title="{Binding L[ApplyWindowTitle]}"
-        Width="560" Height="720"
+        Width="700" Height="720"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource SurfaceBrush}"
@@ -49,6 +49,8 @@
                                 OffsetX="{Binding OffsetX, Mode=TwoWay}"
                                 OffsetY="{Binding OffsetY, Mode=TwoWay}"
                                 SelectedTagColor="{Binding SelectedTagColor}"
+                                TagName="{Binding SelectedTagName}"
+                                ShowTagNameOnIcon="{Binding ShowTagNameOnIcon}"
                                 CropMode="{Binding CropMode}"
                                 PositionChanged="Preview_PositionChanged"
                                 ScaleChanged="Preview_ScaleChanged"/>

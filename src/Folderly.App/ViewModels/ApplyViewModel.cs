@@ -87,7 +87,23 @@ public sealed class ApplyViewModel : ViewModelBase
     public TagColor SelectedTagColor
     {
         get => _selectedTagColor;
-        set => SetField(ref _selectedTagColor, value);
+        set
+        {
+            if (EqualityComparer<TagColor>.Default.Equals(_selectedTagColor, value)) return;
+            _selectedTagColor = value;
+            Notify();
+            Notify(nameof(SelectedTagName));
+        }
+    }
+
+    public string SelectedTagName => TagSettingsService.GetDisplayName(SelectedTagColor);
+
+    public bool ShowTagNameOnIcon => TagSettingsService.GetShowTagNameOnIcon();
+
+    public void RefreshTagSettings()
+    {
+        Notify(nameof(SelectedTagName));
+        Notify(nameof(ShowTagNameOnIcon));
     }
 
     // ─── 状態 ─────────────────────────────────────────────────────────────────

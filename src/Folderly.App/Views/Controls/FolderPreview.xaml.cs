@@ -51,6 +51,14 @@ public partial class FolderPreview : UserControl
         DependencyProperty.Register(nameof(SelectedTagColor), typeof(TagColor), typeof(FolderPreview),
             new PropertyMetadata(TagColors.None, OnRenderPropertyChanged));
 
+    public static readonly DependencyProperty TagNameProperty =
+        DependencyProperty.Register(nameof(TagName), typeof(string), typeof(FolderPreview),
+            new PropertyMetadata(null, OnRenderPropertyChanged));
+
+    public static readonly DependencyProperty ShowTagNameOnIconProperty =
+        DependencyProperty.Register(nameof(ShowTagNameOnIcon), typeof(bool), typeof(FolderPreview),
+            new PropertyMetadata(false, OnRenderPropertyChanged));
+
     public static readonly DependencyProperty CropModeProperty =
         DependencyProperty.Register(nameof(CropMode), typeof(CoreCropMode), typeof(FolderPreview),
             new PropertyMetadata(CoreCropMode.Center, OnRenderPropertyChanged));
@@ -90,6 +98,18 @@ public partial class FolderPreview : UserControl
     {
         get => (TagColor)GetValue(SelectedTagColorProperty);
         set => SetValue(SelectedTagColorProperty, value);
+    }
+
+    public string? TagName
+    {
+        get => (string?)GetValue(TagNameProperty);
+        set => SetValue(TagNameProperty, value);
+    }
+
+    public bool ShowTagNameOnIcon
+    {
+        get => (bool)GetValue(ShowTagNameOnIconProperty);
+        set => SetValue(ShowTagNameOnIconProperty, value);
     }
 
     /// <summary>クロップモード（Center / Pad）。</summary>
@@ -132,6 +152,22 @@ public partial class FolderPreview : UserControl
         ImageCanvas.Width  = ImageRegionPx.Width;
         ImageCanvas.Height = ImageRegionPx.Height;
         ImageCanvas.Clip = CreateImageClipGeometry();
+
+        var imageRadius = FolderTemplate.BaseSize
+            * FolderTemplate.ImageCornerRadiusRatio
+            * PreviewScale;
+        Canvas.SetLeft(ImageBoundsOutline, ImageRegionPx.X);
+        Canvas.SetTop(ImageBoundsOutline, ImageRegionPx.Y);
+        ImageBoundsOutline.Width = ImageRegionPx.Width;
+        ImageBoundsOutline.Height = ImageRegionPx.Height;
+        ImageBoundsOutline.RadiusX = imageRadius;
+        ImageBoundsOutline.RadiusY = imageRadius;
+
+        var textBounds = GetTagTextBounds();
+        Canvas.SetLeft(TagNameViewbox, textBounds.X);
+        Canvas.SetTop(TagNameViewbox, textBounds.Y);
+        TagNameViewbox.Width = textBounds.Width;
+        TagNameViewbox.Height = textBounds.Height;
 
         TagPath.Data = CreateTabGeometry();
         ImageBasePath.Data = CreateImageBaseGeometry();
@@ -177,6 +213,7 @@ public partial class FolderPreview : UserControl
         }
 
         UpdateTagColor();
+        UpdateTagName();
     }
 
     private void UpdateImageTransform(BitmapSource src)
@@ -214,6 +251,23 @@ public partial class FolderPreview : UserControl
 
         TagPath.Visibility = Visibility.Visible;
         TagPath.Fill = new SolidColorBrush(ParseHexColor(tag.HexColor!));
+    }
+
+    private void UpdateTagName()
+    {
+        var tag = SelectedTagColor;
+        var text = TagName?.Trim();
+        if (!ShowTagNameOnIcon || tag is null || tag.IsNone || string.IsNullOrWhiteSpace(text))
+        {
+            TagNameViewbox.Visibility = Visibility.Collapsed;
+            TagNameText.Text = string.Empty;
+            return;
+        }
+
+        var tagColor = ParseHexColor(tag.HexColor!);
+        TagNameText.Text = text;
+        TagNameText.Foreground = new SolidColorBrush(GetReadableTextColor(tagColor));
+        TagNameViewbox.Visibility = Visibility.Visible;
     }
 
     private static Geometry CreateTabGeometry()
@@ -278,6 +332,23 @@ public partial class FolderPreview : UserControl
         return geometry;
     }
 
+    private static Rect GetTagTextBounds()
+    {
+        var points = FolderTemplate.GetVisibleTagShapePoints((float)PreviewSize);
+        var padX = PreviewSize * 0.04;
+        var padY = PreviewSize * 0.012;
+        var left = points[0].X + padX;
+        var top = points[0].Y + padY;
+        var right = points[1].X - padX;
+        var bottom = points[3].Y - padY;
+
+        return new Rect(
+            left,
+            top,
+            Math.Max(1, right - left),
+            Math.Max(1, bottom - top));
+    }
+
     private static Color ParseHexColor(string hex)
     {
         hex = hex.TrimStart('#');
@@ -285,6 +356,12 @@ public partial class FolderPreview : UserControl
         byte g = Convert.ToByte(hex.Substring(2, 2), 16);
         byte b = Convert.ToByte(hex.Substring(4, 2), 16);
         return Color.FromRgb(r, g, b);
+    }
+
+    private static Color GetReadableTextColor(Color background)
+    {
+        var luminance = (0.299 * background.R + 0.587 * background.G + 0.114 * background.B) / 255.0;
+        return luminance < 0.56 ? Colors.White : Color.FromRgb(32, 32, 32);
     }
 
     // ─── Mouse / Drag ────────────────────────────────────────────────────────

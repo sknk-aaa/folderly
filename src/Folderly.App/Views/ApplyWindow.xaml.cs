@@ -192,7 +192,10 @@ public partial class ApplyWindow : Window
     {
         var dialog = new TagSettingsDialog { Owner = this };
         if (dialog.ShowDialog() == true)
+        {
+            _vm.RefreshTagSettings();
             BuildTagButtons();
+        }
     }
 
     private void RefreshTagButtonSelection()

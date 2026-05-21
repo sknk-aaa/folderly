@@ -22,6 +22,19 @@
               IsHitTestVisible="False"
               Visibility="Collapsed"/>
 
+        <Viewbox x:Name="TagNameViewbox"
+                 Stretch="Uniform"
+                 StretchDirection="DownOnly"
+                 IsHitTestVisible="False"
+                 Visibility="Collapsed">
+            <TextBlock x:Name="TagNameText"
+                       FontFamily="Yu Gothic UI"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       TextAlignment="Center"
+                       TextTrimming="CharacterEllipsis"/>
+        </Viewbox>
+
         <Path x:Name="ImageBasePath"
               Fill="#FFC72C"
               IsHitTestVisible="False"/>
@@ -41,6 +54,15 @@
                 </Image.RenderTransform>
             </Image>
         </Canvas>
+
+        <Rectangle x:Name="ImageBoundsOutline"
+                   Stroke="#99000000"
+                   StrokeThickness="1.4"
+                   StrokeDashArray="4 3"
+                   RadiusX="6"
+                   RadiusY="6"
+                   Fill="Transparent"
+                   IsHitTestVisible="False"/>
 
         <Border x:Name="Placeholder"
                 Width="320" Height="320"
