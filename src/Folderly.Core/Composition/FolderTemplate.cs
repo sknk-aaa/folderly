@@ -12,13 +12,16 @@ namespace Folderly.Core.Composition;
 public static class FolderTemplate
 {
     public const int BaseSize = 256;
+    public const float TabTopWidthRatio = 0.36f;
+    public const float TabSlopeEndRatio = 0.48f;
+    public const float TagHeightRatio = 0.18f;
 
-    // タグ領域: フォルダ左上のタブ部分（全幅 45%、高さ 18%）
+    // タグ領域: フォルダ左上のタブ部分。矩形ではなく TabShapePoints の外接領域として扱う。
     public static readonly RectangleF TagRegion = new(
         x: 0f,
         y: 0f,
-        width: BaseSize * 0.45f,
-        height: BaseSize * 0.18f);
+        width: BaseSize * TabSlopeEndRatio,
+        height: BaseSize * TagHeightRatio);
 
     // フォルダ本体: タグタブより下の全体
     public static readonly RectangleF FolderBodyRegion = new(
@@ -29,10 +32,10 @@ public static class FolderTemplate
 
     // 画像表示領域: フォルダ本体内の内側マージン付きエリア
     public static readonly RectangleF ImageRegion = new(
-        x: BaseSize * 0.03f,
-        y: BaseSize * 0.22f,
-        width: BaseSize * 0.94f,
-        height: BaseSize * 0.66f);
+        x: BaseSize * 0.02f,
+        y: BaseSize * 0.205f,
+        width: BaseSize * 0.96f,
+        height: BaseSize * 0.715f);
 
     private static byte[]? _templateCache;
     private static readonly object _lock = new();
@@ -86,15 +89,12 @@ public static class FolderTemplate
         {
             ctx.Fill(Color.Transparent);
 
-            float tagW = TagRegion.Width * scale;
-            float tagH = TagRegion.Height * scale;
             float bodyY = FolderBodyRegion.Y * scale;
             float bodyH = BaseSize * 0.75f * scale;
             float bodyW = size;
 
-            // タグタブ（左上の台形形状）
-            var tagPath = new RectangularPolygon(0f, 0f, tagW, tagH);
-            ctx.Fill(tagColor, tagPath);
+            // タグタブ（左上のタブ形状）
+            ctx.Fill(tagColor, CreateTabPath(size));
 
             // フォルダ本体（全幅の矩形）
             var bodyRect = new RectangularPolygon(0f, bodyY, bodyW, bodyH);
@@ -120,4 +120,23 @@ public static class FolderTemplate
             region.Width * scale,
             region.Height * scale);
     }
+
+    public static PointF[] GetTabShapePoints(float targetSize)
+    {
+        float scale = targetSize / BaseSize;
+        float tabTopW = BaseSize * TabTopWidthRatio * scale;
+        float tabEndX = BaseSize * TabSlopeEndRatio * scale;
+        float tabH = BaseSize * TagHeightRatio * scale;
+
+        return
+        [
+            new PointF(0f, 0f),
+            new PointF(tabTopW, 0f),
+            new PointF(tabEndX, tabH),
+            new PointF(0f, tabH),
+        ];
+    }
+
+    public static IPath CreateTabPath(float targetSize)
+        => new Polygon(GetTabShapePoints(targetSize));
 }

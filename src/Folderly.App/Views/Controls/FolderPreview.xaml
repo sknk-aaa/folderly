@@ -6,7 +6,7 @@
         RootCanvas: 320x320 の固定キャンバス。
         - TemplateImage: フォルダ型テンプレート PNG（背景）
         - ImageCanvas:   ユーザー画像（ImageRegion に ClipToBounds で切り抜き）
-        - TagRect:       タグ色の塗りつぶし矩形（TagRegion に重ねる）
+        - TagPath:       タグ色の塗りつぶしパス（フォルダタブ形状に重ねる）
         - Placeholder:   画像未選択時の案内テキスト
         座標は FolderPreview.xaml.cs で ImageRegion / TagRegion を 320px にスケールして設定する。
     -->
@@ -44,10 +44,10 @@
             </Image>
         </Canvas>
 
-        <!-- タグ色オーバーレイ（TagRegion に重ねる） -->
-        <Rectangle x:Name="TagRect"
-                   IsHitTestVisible="False"
-                   Visibility="Collapsed"/>
+        <!-- タグ色オーバーレイ（フォルダタブ形状に重ねる） -->
+        <Path x:Name="TagPath"
+              IsHitTestVisible="False"
+              Visibility="Collapsed"/>
 
         <!-- 画像未選択時のプレースホルダー -->
         <Border x:Name="Placeholder"

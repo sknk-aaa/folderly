@@ -31,8 +31,6 @@ public static class TemplateRenderer
         // ImageRegion をスケール変換
         var scaledImageRegion = FolderTemplate.ScaleRegion(
             FolderTemplate.ImageRegion, outputSize);
-        var scaledTagRegion = FolderTemplate.ScaleRegion(
-            FolderTemplate.TagRegion, outputSize);
 
         // 結果キャンバス（テンプレートのコピー）
         var result = template.Clone();
@@ -54,16 +52,9 @@ public static class TemplateRenderer
                 c => c.Resize(imageW, imageH));
             ctx.DrawImage(resizedAdjusted, destPoint, 1f);
 
-            // タグ色を TagRegion に上書き描画（タグなしの場合はスキップ）
+            // タグ色をフォルダ左上のタブ形状に上書き描画（タグなしの場合はスキップ）
             if (tagColor is not null && !tagColor.IsNone)
-            {
-                var tagRect = new RectangularPolygon(
-                    scaledTagRegion.X,
-                    scaledTagRegion.Y,
-                    scaledTagRegion.Width,
-                    scaledTagRegion.Height);
-                ctx.Fill(tagColor.ToImageSharpColor(), tagRect);
-            }
+                ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateTabPath(outputSize));
         });
 
         return result;

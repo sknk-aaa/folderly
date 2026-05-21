@@ -20,16 +20,13 @@ public partial class FolderPreview : UserControl
     private const double PreviewSize = 320.0;
     private static readonly double PreviewScale = PreviewSize / FolderTemplate.BaseSize; // 1.25
 
-    // ImageRegion / TagRegion をプレビュー座標（320px）に変換した値（静的初期化）
+    // ImageRegion をプレビュー座標（320px）に変換した値（静的初期化）
     private static readonly Rect ImageRegionPx;
-    private static readonly Rect TagRegionPx;
 
     static FolderPreview()
     {
         var imageRegion = FolderTemplate.ScaleRegion(FolderTemplate.ImageRegion, (float)PreviewSize);
-        var tagRegion = FolderTemplate.ScaleRegion(FolderTemplate.TagRegion, (float)PreviewSize);
         ImageRegionPx = new Rect(imageRegion.X, imageRegion.Y, imageRegion.Width, imageRegion.Height);
-        TagRegionPx = new Rect(tagRegion.X, tagRegion.Y, tagRegion.Width, tagRegion.Height);
     }
 
     // ─── Dependency Properties ───────────────────────────────────────────────
@@ -135,11 +132,7 @@ public partial class FolderPreview : UserControl
         ImageCanvas.Width  = ImageRegionPx.Width;
         ImageCanvas.Height = ImageRegionPx.Height;
 
-        // TagRect を TagRegion に配置
-        Canvas.SetLeft(TagRect, TagRegionPx.X);
-        Canvas.SetTop(TagRect, TagRegionPx.Y);
-        TagRect.Width  = TagRegionPx.Width;
-        TagRect.Height = TagRegionPx.Height;
+        TagPath.Data = CreateTabGeometry();
     }
 
     private void LoadTemplateImage()
@@ -209,12 +202,27 @@ public partial class FolderPreview : UserControl
         var tag = SelectedTagColor;
         if (tag is null || tag.IsNone)
         {
-            TagRect.Visibility = Visibility.Collapsed;
+            TagPath.Visibility = Visibility.Collapsed;
             return;
         }
 
-        TagRect.Visibility = Visibility.Visible;
-        TagRect.Fill = new SolidColorBrush(ParseHexColor(tag.HexColor!));
+        TagPath.Visibility = Visibility.Visible;
+        TagPath.Fill = new SolidColorBrush(ParseHexColor(tag.HexColor!));
+    }
+
+    private static Geometry CreateTabGeometry()
+    {
+        var points = FolderTemplate.GetTabShapePoints((float)PreviewSize);
+        var geometry = new StreamGeometry();
+        using (var ctx = geometry.Open())
+        {
+            ctx.BeginFigure(new Point(points[0].X, points[0].Y), isFilled: true, isClosed: true);
+            for (var i = 1; i < points.Length; i++)
+                ctx.LineTo(new Point(points[i].X, points[i].Y), isStroked: true, isSmoothJoin: true);
+        }
+
+        geometry.Freeze();
+        return geometry;
     }
 
     private static Color ParseHexColor(string hex)
