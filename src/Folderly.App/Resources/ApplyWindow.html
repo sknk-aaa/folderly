@@ -832,6 +832,13 @@
           </div>
           <div class="switch" id="toggle-switch" aria-hidden="true"></div>
         </div>
+        <div class="toggle-row" id="toggle-show-icon" role="switch" aria-checked="false">
+          <div class="tg-meta">
+            <div class="t">フォルダアイコン上にアイコンを表示</div>
+            <div class="s">タグごとに選んだアイコンを左上タブに表示します</div>
+          </div>
+          <div class="switch" id="toggle-icon-switch" aria-hidden="true"></div>
+        </div>
 
         <div class="ep-section">
           <div class="lbl">カラー</div>
@@ -948,14 +955,16 @@
     selectedTagKey: 'none',
     hasImage: false,
     tags: {},           // key -> {name, hexColor, iconIndex}
-    showTagNameOnIcon: false
+    showTagNameOnIcon: false,
+    showTagIconOnIcon: false
   };
 
   // Edit view state
   var editState = {
     editingKey: null,
     pending: {},        // key -> {name, hexColor, iconIndex}
-    showTagName: false
+    showTagName: false,
+    showTagIcon: false
   };
 
   // Slider handles
@@ -995,6 +1004,7 @@
       refreshEditTagList();
     }
     appState.showTagNameOnIcon = !!state.showTagNameOnIcon;
+    appState.showTagIconOnIcon = !!state.showTagIconOnIcon;
 
     // Scale / offset / cropMode
     appState.scale   = state.scale   !== undefined ? state.scale   : 1.0;
@@ -1194,6 +1204,14 @@
     editState.showTagName = on;
   }
 
+  function setIconToggle(on) {
+    var sw  = document.getElementById('toggle-icon-switch');
+    var row = document.getElementById('toggle-show-icon');
+    if (sw)  sw.classList.toggle('on', on);
+    if (row) row.setAttribute('aria-checked', on ? 'true' : 'false');
+    editState.showTagIcon = on;
+  }
+
   // ===== Initialization =====
   document.addEventListener('DOMContentLoaded', function() {
 
@@ -1226,7 +1244,9 @@
           editState.pending[k] = {name: t.name, hexColor: t.hexColor, iconIndex: t.iconIndex};
         });
         editState.showTagName = appState.showTagNameOnIcon;
+        editState.showTagIcon = appState.showTagIconOnIcon;
         setToggle(editState.showTagName);
+        setIconToggle(editState.showTagIcon);
 
         // Select first tag
         var firstRow = document.querySelector('#edit-taglist .tlrow');
@@ -1279,6 +1299,12 @@
     if (toggleRow) {
       toggleRow.addEventListener('click', function() {
         setToggle(!editState.showTagName);
+      });
+    }
+    var iconToggleRow = document.getElementById('toggle-show-icon');
+    if (iconToggleRow) {
+      iconToggleRow.addEventListener('click', function() {
+        setIconToggle(!editState.showTagIcon);
       });
     }
 
@@ -1384,7 +1410,7 @@
           var p = editState.pending[k];
           return {key:k, name:p.name, hexColor:p.hexColor, iconIndex:p.iconIndex};
         });
-        postMsg({type:'saveTagSettings', data:{tags:tags, showTagNameOnIcon:editState.showTagName}});
+        postMsg({type:'saveTagSettings', data:{tags:tags, showTagNameOnIcon:editState.showTagName, showTagIconOnIcon:editState.showTagIcon}});
         win.setAttribute('data-view', 'main');
       });
     }

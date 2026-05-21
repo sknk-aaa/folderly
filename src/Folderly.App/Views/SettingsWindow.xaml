@@ -71,6 +71,16 @@
                    TextWrapping="Wrap"
                    Margin="22,0,0,8"/>
 
+        <CheckBox Content="{Binding L[ShowTagIconOnIcon]}"
+                  IsChecked="{Binding ShowTagIconOnIcon}"
+                  FontSize="13"
+                  Margin="0,0,0,4"/>
+        <TextBlock Text="{Binding L[ShowTagIconOnIconNote]}"
+                   FontSize="12"
+                   Foreground="{StaticResource TextSecondaryBrush}"
+                   TextWrapping="Wrap"
+                   Margin="22,0,0,8"/>
+
         <Button Content="{Binding L[EditTagNames]}"
                 Style="{StaticResource SecondaryButton}"
                 Click="EditTagNames_Click"

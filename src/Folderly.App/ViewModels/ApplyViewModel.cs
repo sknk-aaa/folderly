@@ -108,11 +108,13 @@ public sealed class ApplyViewModel : ViewModelBase
             : new TagColor(TagSettingsService.GetTagHexColor(SelectedTagColor), SelectedTagColor.Key);
 
     public bool ShowTagNameOnIcon => TagSettingsService.GetShowTagNameOnIcon();
+    public bool ShowTagIconOnIcon => TagSettingsService.GetShowTagIconOnIcon();
 
     public void RefreshTagSettings()
     {
         Notify(nameof(SelectedTagName));
         Notify(nameof(ShowTagNameOnIcon));
+        Notify(nameof(ShowTagIconOnIcon));
         Notify(nameof(EffectiveSelectedTagColor));
     }
 

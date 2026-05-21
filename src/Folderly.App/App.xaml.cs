@@ -154,7 +154,25 @@ public partial class App : Application
         };
 
         win.Show();
-        win.Activate();
+        BringToFront(win);
+    }
+
+    private static void BringToFront(Window window)
+    {
+        if (window.WindowState == WindowState.Minimized)
+            window.WindowState = WindowState.Normal;
+
+        window.Activate();
+        window.Topmost = true;
+        window.Topmost = false;
+        window.Focus();
+        window.Dispatcher.BeginInvoke(() =>
+        {
+            window.Activate();
+            window.Topmost = true;
+            window.Topmost = false;
+            window.Focus();
+        }, DispatcherPriority.ApplicationIdle);
     }
 
     private void ScheduleIdleShutdownIfNeeded()

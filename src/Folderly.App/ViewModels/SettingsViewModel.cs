@@ -51,6 +51,13 @@ public sealed class SettingsViewModel : ViewModelBase
         set => SetField(ref _showTagNameOnIcon, value);
     }
 
+    private bool _showTagIconOnIcon;
+    public bool ShowTagIconOnIcon
+    {
+        get => _showTagIconOnIcon;
+        set => SetField(ref _showTagIconOnIcon, value);
+    }
+
     // ─── バージョン・ライセンス ───────────────────────────────────────────────
 
     public string AppVersion
@@ -75,6 +82,7 @@ public sealed class SettingsViewModel : ViewModelBase
         _reopenExplorerWindowsAfterApply =
             AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
         _showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+        _showTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
     }
 
     // ─── 保存 ─────────────────────────────────────────────────────────────────
@@ -87,6 +95,7 @@ public sealed class SettingsViewModel : ViewModelBase
             "force_explorer_restart_on_reapply",
             ReopenExplorerWindowsAfterApply ? "true" : "false");
         TagSettingsService.SetShowTagNameOnIcon(ShowTagNameOnIcon);
+        TagSettingsService.SetShowTagIconOnIcon(ShowTagIconOnIcon);
         AppServices.Localize.SetLanguage(SelectedLang);
         AppServices.History.EnforceMaxCount(HistoryMaxCount);
     }

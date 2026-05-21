@@ -22,7 +22,9 @@ public record ApplyRequest(
     TagColor TagColor,
     bool ForceApply = false,
     string? TagName = null,
-    bool ShowTagNameOnIcon = false);
+    bool ShowTagNameOnIcon = false,
+    int TagIconIndex = -1,
+    bool ShowTagIconOnIcon = false);
 
 public record ApplyResult(bool IsSuccess, bool IsWarning, string? Message, string? IconPath)
 {
@@ -87,7 +89,12 @@ public sealed class ApplyService
         // 4. テンプレート合成
         var tagNameForIcon = request.ShowTagNameOnIcon ? request.TagName : null;
         using var composed = TemplateRenderer.Render(
-            adjustedImage, request.TagColor, FolderTemplate.BaseSize, tagNameForIcon);
+            adjustedImage,
+            request.TagColor,
+            FolderTemplate.BaseSize,
+            tagNameForIcon,
+            request.TagIconIndex,
+            request.ShowTagIconOnIcon);
 
         // 5. ICO 変換
         var icoBytes = IcoConverter.Convert(composed);

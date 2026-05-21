@@ -114,6 +114,9 @@ public partial class MainWindow : Window
         var win = new ApplyWindow(folderPath) { Owner = this };
         win.Closed += (_, _) => _vm.Refresh();
         win.Show();
-        Activate();
+        win.Activate();
+        win.Topmost = true;
+        win.Topmost = false;
+        win.Focus();
     }
 }

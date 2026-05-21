@@ -29,6 +29,7 @@ public sealed class TagSettingsDialog : Window
     private readonly StackPanel _rightPanel = new() { Margin = new Thickness(20, 16, 20, 16) };
     private TextBox? _nameBox;
     private bool _showTagNameOnIcon;
+    private bool _showTagIconOnIcon;
 
     public TagSettingsDialog()
     {
@@ -43,6 +44,7 @@ public sealed class TagSettingsDialog : Window
         FontFamily = new FontFamily("Segoe UI Variable");
 
         _showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+        _showTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
 
         foreach (var tag in TagColors.All.Where(t => !t.IsNone))
         {
@@ -292,7 +294,9 @@ public sealed class TagSettingsDialog : Window
             FontSize          = 13,
             VerticalAlignment = VerticalAlignment.Center,
         });
-        var toggle = BuildToggleSwitch(_showTagNameOnIcon);
+        var toggle = BuildToggleSwitch(
+            _showTagNameOnIcon,
+            value => _showTagNameOnIcon = value);
         Grid.SetColumn(toggle, 1);
         toggleRow.Children.Add(toggle);
         _rightPanel.Children.Add(toggleRow);
@@ -300,6 +304,31 @@ public sealed class TagSettingsDialog : Window
         _rightPanel.Children.Add(new TextBlock
         {
             Text        = L["ShowTagNameOnIconNote"],
+            FontSize    = 11,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground  = (Brush)(Application.Current.TryFindResource("TextSecondaryBrush") ?? Brushes.DimGray),
+            Margin      = new Thickness(0, 0, 0, 14),
+        });
+
+        var iconToggleRow = new Grid { Margin = new Thickness(0, 0, 0, 4) };
+        iconToggleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        iconToggleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        iconToggleRow.Children.Add(new TextBlock
+        {
+            Text              = L["ShowTagIconOnIcon"],
+            FontSize          = 13,
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+        var iconToggle = BuildToggleSwitch(
+            _showTagIconOnIcon,
+            value => _showTagIconOnIcon = value);
+        Grid.SetColumn(iconToggle, 1);
+        iconToggleRow.Children.Add(iconToggle);
+        _rightPanel.Children.Add(iconToggleRow);
+
+        _rightPanel.Children.Add(new TextBlock
+        {
+            Text        = L["ShowTagIconOnIconNote"],
             FontSize    = 11,
             TextWrapping = TextWrapping.Wrap,
             Foreground  = (Brush)(Application.Current.TryFindResource("TextSecondaryBrush") ?? Brushes.DimGray),
@@ -369,7 +398,7 @@ public sealed class TagSettingsDialog : Window
         return chip;
     }
 
-    private FrameworkElement BuildToggleSwitch(bool isOn)
+    private FrameworkElement BuildToggleSwitch(bool isOn, Action<bool> onChanged)
     {
         var onColor  = Color.FromRgb(0, 120, 212);
         var offColor = Color.FromRgb(180, 180, 180);
@@ -395,9 +424,10 @@ public sealed class TagSettingsDialog : Window
 
         track.MouseLeftButtonUp += (_, _) =>
         {
-            _showTagNameOnIcon            = !_showTagNameOnIcon;
-            track.Background              = new SolidColorBrush(_showTagNameOnIcon ? onColor : offColor);
-            thumb.HorizontalAlignment     = _showTagNameOnIcon ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+            isOn = !isOn;
+            onChanged(isOn);
+            track.Background          = new SolidColorBrush(isOn ? onColor : offColor);
+            thumb.HorizontalAlignment = isOn ? HorizontalAlignment.Right : HorizontalAlignment.Left;
         };
 
         return track;
@@ -599,6 +629,7 @@ public sealed class TagSettingsDialog : Window
             if (idx >= 0) TagSettingsService.SetTagIconIndex(tag, idx);
 
         TagSettingsService.SetShowTagNameOnIcon(_showTagNameOnIcon);
+        TagSettingsService.SetShowTagIconOnIcon(_showTagIconOnIcon);
         DialogResult = true;
     }
 

@@ -6,6 +6,7 @@ namespace Folderly.App.Services;
 public static class TagSettingsService
 {
     public const string ShowTagNameOnIconKey = "show_tag_name_on_icon";
+    public const string ShowTagIconOnIconKey = "show_tag_icon_on_icon";
     private const string TagNamePrefix = "tag_name.";
     private const string TagHexPrefix  = "tag_hex.";
     private const string TagIconPrefix = "tag_icon.";
@@ -86,6 +87,12 @@ public static class TagSettingsService
 
     public static void SetShowTagNameOnIcon(bool value)
         => AppServices.History.SetSetting(ShowTagNameOnIconKey, value ? "true" : "false");
+
+    public static bool GetShowTagIconOnIcon()
+        => AppServices.History.GetSetting(ShowTagIconOnIconKey) == "true";
+
+    public static void SetShowTagIconOnIcon(bool value)
+        => AppServices.History.SetSetting(ShowTagIconOnIconKey, value ? "true" : "false");
 
     // ─── Default name ────────────────────────────────────────────────────────
 

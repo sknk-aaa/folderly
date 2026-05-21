@@ -197,6 +197,7 @@ public partial class ApplyWindow : Window
             offsetY           = _vm.OffsetY,
             cropMode          = _vm.CropMode.ToString(),
             showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon(),
+            showTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon(),
             tags,
         };
 
@@ -213,6 +214,8 @@ public partial class ApplyWindow : Window
         OffscreenPreview.SelectedTagColor = _vm.EffectiveSelectedTagColor;
         OffscreenPreview.TagName          = TagSettingsService.GetDisplayName(_vm.SelectedTagColor);
         OffscreenPreview.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+        OffscreenPreview.TagIconIndex     = TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor);
+        OffscreenPreview.ShowTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
         OffscreenPreview.Scale            = _vm.Scale;
         OffscreenPreview.OffsetX          = _vm.OffsetX;
         OffscreenPreview.OffsetY          = _vm.OffsetY;
@@ -360,6 +363,9 @@ public partial class ApplyWindow : Window
         if (data.TryGetProperty("showTagNameOnIcon", out var showEl))
             TagSettingsService.SetShowTagNameOnIcon(showEl.GetBoolean());
 
+        if (data.TryGetProperty("showTagIconOnIcon", out var showIconEl))
+            TagSettingsService.SetShowTagIconOnIcon(showIconEl.GetBoolean());
+
         _vm.RefreshTagSettings();
         await SendTagDataAsync();
         await SendPreviewAsync();
@@ -400,7 +406,9 @@ public partial class ApplyWindow : Window
                 TagColor:          _vm.EffectiveSelectedTagColor,
                 ForceApply:        false,
                 TagName:           TagSettingsService.GetDisplayName(_vm.SelectedTagColor),
-                ShowTagNameOnIcon: TagSettingsService.GetShowTagNameOnIcon());
+                ShowTagNameOnIcon: TagSettingsService.GetShowTagNameOnIcon(),
+                TagIconIndex:      TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor),
+                ShowTagIconOnIcon: TagSettingsService.GetShowTagIconOnIcon());
 
             var result = await AppServices.Apply.ApplyAsync(request);
 

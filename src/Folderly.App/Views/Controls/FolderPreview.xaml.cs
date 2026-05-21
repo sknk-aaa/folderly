@@ -1,4 +1,5 @@
 using Folderly.Core.Composition;
+using Folderly.App.Views;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -59,6 +60,14 @@ public partial class FolderPreview : UserControl
         DependencyProperty.Register(nameof(ShowTagNameOnIcon), typeof(bool), typeof(FolderPreview),
             new PropertyMetadata(false, OnRenderPropertyChanged));
 
+    public static readonly DependencyProperty TagIconIndexProperty =
+        DependencyProperty.Register(nameof(TagIconIndex), typeof(int), typeof(FolderPreview),
+            new PropertyMetadata(-1, OnRenderPropertyChanged));
+
+    public static readonly DependencyProperty ShowTagIconOnIconProperty =
+        DependencyProperty.Register(nameof(ShowTagIconOnIcon), typeof(bool), typeof(FolderPreview),
+            new PropertyMetadata(false, OnRenderPropertyChanged));
+
     public static readonly DependencyProperty CropModeProperty =
         DependencyProperty.Register(nameof(CropMode), typeof(CoreCropMode), typeof(FolderPreview),
             new PropertyMetadata(CoreCropMode.Center, OnRenderPropertyChanged));
@@ -110,6 +119,18 @@ public partial class FolderPreview : UserControl
     {
         get => (bool)GetValue(ShowTagNameOnIconProperty);
         set => SetValue(ShowTagNameOnIconProperty, value);
+    }
+
+    public int TagIconIndex
+    {
+        get => (int)GetValue(TagIconIndexProperty);
+        set => SetValue(TagIconIndexProperty, value);
+    }
+
+    public bool ShowTagIconOnIcon
+    {
+        get => (bool)GetValue(ShowTagIconOnIconProperty);
+        set => SetValue(ShowTagIconOnIconProperty, value);
     }
 
     /// <summary>クロップモード（Center / Pad）。</summary>
@@ -169,6 +190,9 @@ public partial class FolderPreview : UserControl
         TagNameViewbox.Width = textBounds.Width;
         TagNameViewbox.Height = textBounds.Height;
 
+        Canvas.SetLeft(TagIconHost, textBounds.X);
+        Canvas.SetTop(TagIconHost, textBounds.Y);
+
         TagPath.Data = CreateTabGeometry();
         ImageBasePath.Data = CreateImageBaseGeometry();
     }
@@ -213,6 +237,7 @@ public partial class FolderPreview : UserControl
         }
 
         UpdateTagColor();
+        UpdateTagIcon();
         UpdateTagName();
     }
 
@@ -268,9 +293,47 @@ public partial class FolderPreview : UserControl
         }
 
         var tagColor = ParseHexColor(tag.HexColor!);
+        var bounds = GetTagTextBounds();
+        var showIcon = ShowTagIconOnIcon && TagIconLibrary.IsValidIndex(TagIconIndex);
+        if (showIcon)
+        {
+            var iconRect = GetTagIconBounds(bounds, hasText: true);
+            var gap = PreviewSize * 0.018;
+            var left = iconRect.Right + gap;
+            bounds = new Rect(left, bounds.Y, Math.Max(1, bounds.Right - left), bounds.Height);
+        }
+
+        Canvas.SetLeft(TagNameViewbox, bounds.X);
+        Canvas.SetTop(TagNameViewbox, bounds.Y);
+        TagNameViewbox.Width = bounds.Width;
+        TagNameViewbox.Height = bounds.Height;
         TagNameText.Text = text;
         TagNameText.Foreground = new SolidColorBrush(GetReadableTextColor(tagColor));
         TagNameViewbox.Visibility = Visibility.Visible;
+    }
+
+    private void UpdateTagIcon()
+    {
+        var tag = SelectedTagColor;
+        if (!ShowTagIconOnIcon || tag is null || tag.IsNone || !TagIconLibrary.IsValidIndex(TagIconIndex))
+        {
+            TagIconHost.Visibility = Visibility.Collapsed;
+            TagIconHost.Content = null;
+            return;
+        }
+
+        var hasText = ShowTagNameOnIcon && !string.IsNullOrWhiteSpace(TagName);
+        var bounds = GetTagIconBounds(GetTagTextBounds(), hasText);
+        var tagColor = ParseHexColor(tag.HexColor!);
+        TagIconHost.Content = IconHelper.CreateIconElement(
+            TagIconIndex,
+            bounds.Width,
+            new SolidColorBrush(GetReadableTextColor(tagColor)));
+        Canvas.SetLeft(TagIconHost, bounds.X);
+        Canvas.SetTop(TagIconHost, bounds.Y);
+        TagIconHost.Width = bounds.Width;
+        TagIconHost.Height = bounds.Height;
+        TagIconHost.Visibility = Visibility.Visible;
     }
 
     private static Geometry CreateTabGeometry()
@@ -350,6 +413,16 @@ public partial class FolderPreview : UserControl
             top,
             Math.Max(1, right - left),
             Math.Max(1, bottom - top));
+    }
+
+    private static Rect GetTagIconBounds(Rect bounds, bool hasText)
+    {
+        var size = Math.Min(bounds.Height * 0.72, bounds.Width * (hasText ? 0.22 : 0.45));
+        var x = hasText
+            ? bounds.X
+            : bounds.X + (bounds.Width - size) / 2.0;
+        var y = bounds.Y + (bounds.Height - size) / 2.0;
+        return new Rect(x, y, size, size);
     }
 
     private static Color ParseHexColor(string hex)

@@ -62,6 +62,8 @@
   <data name="TagSettingsTitle" xml:space="preserve"><value>タグ設定</value></data>
   <data name="ShowTagNameOnIcon" xml:space="preserve"><value>フォルダアイコン上にタグ名を表示</value></data>
   <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>長い名前はタグ領域に収まるように自動で縮小または省略されます。</value></data>
+  <data name="ShowTagIconOnIcon" xml:space="preserve"><value>フォルダアイコン上にアイコンを表示</value></data>
+  <data name="ShowTagIconOnIconNote" xml:space="preserve"><value>タグごとに選んだアイコンを左上タブに表示します。</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>
   <data name="Cancel" xml:space="preserve"><value>キャンセル</value></data>
   <data name="Apply" xml:space="preserve"><value>適用</value></data>

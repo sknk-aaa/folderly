@@ -62,6 +62,8 @@
   <data name="TagSettingsTitle" xml:space="preserve"><value>Tag settings</value></data>
   <data name="ShowTagNameOnIcon" xml:space="preserve"><value>Show tag names on folder icons</value></data>
   <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>Long names are automatically resized or shortened to fit the tag area.</value></data>
+  <data name="ShowTagIconOnIcon" xml:space="preserve"><value>Show icons on folder icons</value></data>
+  <data name="ShowTagIconOnIconNote" xml:space="preserve"><value>Shows the selected tag icon on the folder tab.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Apply" xml:space="preserve"><value>Apply</value></data>

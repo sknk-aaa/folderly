@@ -22,6 +22,10 @@
               IsHitTestVisible="False"
               Visibility="Collapsed"/>
 
+        <ContentControl x:Name="TagIconHost"
+                        IsHitTestVisible="False"
+                        Visibility="Collapsed"/>
+
         <Viewbox x:Name="TagNameViewbox"
                  Stretch="Uniform"
                  StretchDirection="DownOnly"

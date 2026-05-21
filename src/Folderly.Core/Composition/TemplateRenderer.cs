@@ -1,8 +1,10 @@
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Globalization;
 
 namespace Folderly.Core.Composition;
 
@@ -15,7 +17,9 @@ public static class TemplateRenderer
         Image adjustedImage,
         TagColor? tagColor,
         int outputSize = FolderTemplate.BaseSize,
-        string? tagName = null)
+        string? tagName = null,
+        int tagIconIndex = -1,
+        bool showTagIcon = false)
     {
         using var backTemplate = Image.Load<Rgba32>(FolderTemplate.GetBackTemplateBytes());
         backTemplate.Mutate(ctx => ctx.Resize(outputSize, outputSize));
@@ -36,7 +40,7 @@ public static class TemplateRenderer
             if (tagColor is not null && !tagColor.IsNone)
             {
                 ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateVisibleTagPath(outputSize));
-                DrawTagName(ctx, tagColor, tagName, outputSize);
+                DrawTagContent(ctx, tagColor, tagName, tagIconIndex, showTagIcon, outputSize);
             }
 
             ctx.Fill(Color.ParseHex("#FFC72C"), FolderTemplate.CreateImagePath(outputSize));
@@ -51,16 +55,62 @@ public static class TemplateRenderer
         return result;
     }
 
-    private static void DrawTagName(IImageProcessingContext ctx, TagColor tagColor, string? tagName, int outputSize)
+    private static void DrawTagContent(
+        IImageProcessingContext ctx,
+        TagColor tagColor,
+        string? tagName,
+        int tagIconIndex,
+        bool showTagIcon,
+        int outputSize)
     {
-        if (string.IsNullOrWhiteSpace(tagName))
+        var label = tagName?.Trim();
+        var hasText = !string.IsNullOrWhiteSpace(label);
+        var hasIcon = showTagIcon && TagIconLibrary.IsValidIndex(tagIconIndex);
+        if (!hasText && !hasIcon)
             return;
 
-        var label = tagName.Trim();
         var bounds = GetTagTextBounds(outputSize);
         if (bounds.Width <= 0f || bounds.Height <= 0f)
             return;
 
+        var color = GetReadableTextColor(tagColor);
+        if (hasIcon)
+        {
+            var iconBounds = GetTagIconBounds(bounds, hasText);
+            DrawTagIcon(ctx, tagIconIndex, color, iconBounds);
+            if (hasText)
+            {
+                var gap = outputSize * 0.018f;
+                var left = iconBounds.Right + gap;
+                bounds = new RectangleF(
+                    left,
+                    bounds.Y,
+                    Math.Max(1f, bounds.Right - left),
+                    bounds.Height);
+            }
+        }
+
+        if (hasText)
+            DrawTagName(ctx, color, label!, bounds, outputSize);
+    }
+
+    private static RectangleF GetTagIconBounds(RectangleF bounds, bool hasText)
+    {
+        var size = Math.Min(bounds.Height * 0.72f, bounds.Width * (hasText ? 0.22f : 0.45f));
+        var x = hasText
+            ? bounds.X
+            : bounds.X + (bounds.Width - size) / 2f;
+        var y = bounds.Y + (bounds.Height - size) / 2f;
+        return new RectangleF(x, y, size, size);
+    }
+
+    private static void DrawTagName(
+        IImageProcessingContext ctx,
+        Color textColor,
+        string label,
+        RectangleF bounds,
+        int outputSize)
+    {
         var font = CreateFittingFont(label, bounds, outputSize, out var measured, out var displayText);
         if (string.IsNullOrWhiteSpace(displayText))
             return;
@@ -68,7 +118,7 @@ public static class TemplateRenderer
         var origin = new PointF(
             bounds.X + (bounds.Width - measured.Width) / 2f,
             bounds.Y + (bounds.Height - measured.Height) / 2f - measured.Top);
-        ctx.DrawText(displayText, font, GetReadableTextColor(tagColor), origin);
+        ctx.DrawText(displayText, font, textColor, origin);
     }
 
     private static RectangleF GetTagTextBounds(int outputSize)
@@ -151,4 +201,149 @@ public static class TemplateRenderer
         var luminance = (0.299 * px.R + 0.587 * px.G + 0.114 * px.B) / 255.0;
         return luminance > 0.55 ? Color.ParseHex("#1F1F1F") : Color.White;
     }
+
+    private static void DrawTagIcon(IImageProcessingContext ctx, int iconIndex, Color color, RectangleF bounds)
+    {
+        if (iconIndex == 5)
+        {
+            var cy = bounds.Y + bounds.Height / 2f;
+            var r = bounds.Width * 0.09f;
+            foreach (var xFactor in new[] { 0.26f, 0.5f, 0.74f })
+                ctx.Fill(color, CreateCirclePolygon(bounds.X + bounds.Width * xFactor, cy, r));
+            return;
+        }
+
+        var pathData = TagIconLibrary.IconPaths[iconIndex];
+        if (string.IsNullOrWhiteSpace(pathData))
+            return;
+
+        var path = BuildIconPath(pathData, bounds);
+        ctx.Draw(color, Math.Max(1f, bounds.Width * 0.075f), path);
+    }
+
+    private static IPath CreateCirclePolygon(float cx, float cy, float r)
+    {
+        var points = new PointF[16];
+        for (var i = 0; i < points.Length; i++)
+        {
+            var a = MathF.PI * 2f * i / points.Length;
+            points[i] = new PointF(cx + MathF.Cos(a) * r, cy + MathF.Sin(a) * r);
+        }
+        var builder = new PathBuilder();
+        builder.AddLines(points);
+        builder.CloseFigure();
+        return builder.Build();
+    }
+
+    private static IPath BuildIconPath(string data, RectangleF bounds)
+    {
+        var tokens = TokenizePathData(data);
+        var builder = new PathBuilder();
+        var i = 0;
+        var cmd = ' ';
+        var current = new PointF(0, 0);
+
+        while (i < tokens.Count)
+        {
+            if (IsCommand(tokens[i]))
+                cmd = tokens[i++][0];
+            if (cmd == ' ')
+                break;
+
+            switch (cmd)
+            {
+                case 'M':
+                    current = ReadPoint(tokens, ref i, bounds);
+                    builder.MoveTo(current);
+                    cmd = 'L';
+                    break;
+                case 'L':
+                    current = ReadPoint(tokens, ref i, bounds);
+                    builder.LineTo(current);
+                    break;
+                case 'H':
+                    current = new PointF(MapX(ReadFloat(tokens, ref i), bounds), current.Y);
+                    builder.LineTo(current);
+                    break;
+                case 'V':
+                    current = new PointF(current.X, MapY(ReadFloat(tokens, ref i), bounds));
+                    builder.LineTo(current);
+                    break;
+                case 'A':
+                {
+                    var rx = ReadFloat(tokens, ref i) * bounds.Width / 24f;
+                    var ry = ReadFloat(tokens, ref i) * bounds.Height / 24f;
+                    var rotation = ReadFloat(tokens, ref i);
+                    var largeArc = ReadFloat(tokens, ref i) != 0f;
+                    var sweep = ReadFloat(tokens, ref i) != 0f;
+                    current = ReadPoint(tokens, ref i, bounds);
+                    builder.ArcTo(rx, ry, rotation, largeArc, sweep, current);
+                    break;
+                }
+                case 'Z':
+                case 'z':
+                    builder.CloseFigure();
+                    cmd = ' ';
+                    break;
+                default:
+                    i++;
+                    break;
+            }
+        }
+
+        return builder.Build();
+    }
+
+    private static List<string> TokenizePathData(string data)
+    {
+        var tokens = new List<string>();
+        for (var i = 0; i < data.Length;)
+        {
+            var ch = data[i];
+            if (char.IsWhiteSpace(ch) || ch == ',')
+            {
+                i++;
+                continue;
+            }
+            if (char.IsLetter(ch))
+            {
+                tokens.Add(ch.ToString());
+                i++;
+                continue;
+            }
+
+            var start = i;
+            i++;
+            while (i < data.Length)
+            {
+                ch = data[i];
+                if (char.IsWhiteSpace(ch) || ch == ',' || char.IsLetter(ch))
+                    break;
+                if ((ch == '-' || ch == '+') && data[i - 1] != 'e' && data[i - 1] != 'E')
+                    break;
+                i++;
+            }
+            tokens.Add(data[start..i]);
+        }
+        return tokens;
+    }
+
+    private static bool IsCommand(string token)
+        => token.Length == 1 && char.IsLetter(token[0]);
+
+    private static PointF ReadPoint(IReadOnlyList<string> tokens, ref int i, RectangleF bounds)
+    {
+        var x = ReadFloat(tokens, ref i);
+        var y = ReadFloat(tokens, ref i);
+        return new PointF(MapX(x, bounds), MapY(y, bounds));
+    }
+
+    private static float ReadFloat(IReadOnlyList<string> tokens, ref int i)
+        => float.Parse(tokens[i++], CultureInfo.InvariantCulture);
+
+    private static float MapX(float x, RectangleF bounds)
+        => bounds.X + x / 24f * bounds.Width;
+
+    private static float MapY(float y, RectangleF bounds)
+        => bounds.Y + y / 24f * bounds.Height;
 }
