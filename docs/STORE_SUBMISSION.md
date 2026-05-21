@@ -33,14 +33,17 @@ Folderly を Microsoft Store に出す前に確認する項目です。
 
 | ファイル | サイズ | 用途 |
 | --- | --- | --- |
-| `FolderlyContext.ico` | 256 x 256 | 右クリックメニュー |
+| `FolderlyContext.ico` | 16 / 20 / 24 / 32 / 48 / 64 / 128 / 256 を含むICO | 右クリックメニュー |
 | `Square44x44Logo.png` | 44 x 44 | アプリ小アイコン |
 | `Square150x150Logo.png` | 150 x 150 | スタートメニュー等 |
 | `StoreLogo.png` | 50 x 50 | Store/パッケージロゴ |
 | `Wide310x150Logo.png` | 310 x 150 | ワイドタイル |
 | `SplashScreen.png` | 620 x 300 | スプラッシュ |
 
-アイコンは、1024 x 1024 の透過PNGを元にして各サイズへ書き出す運用にする。
+アイコンは、`icons/` 配下の元画像から各サイズへ書き出す運用にする。
+
+- `icons/ストア用アイコン.png`: Store/スタートメニュー等のPNG生成元
+- `icons/透過アイコン.png`: 右クリックメニュー用ICO生成元
 
 ## Partner Center 側で必要なもの
 
