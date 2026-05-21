@@ -6,13 +6,16 @@ namespace Folderly.App.Services;
 public static class TagSettingsService
 {
     public const string ShowTagNameOnIconKey = "show_tag_name_on_icon";
+    private const string TagNamePrefix = "tag_name.";
+    private static readonly object Sync = new();
+    private static Dictionary<string, string>? _tagNames;
 
     public static string GetDisplayName(TagColor tag)
     {
         if (tag.IsNone)
             return AppServices.Localize["TagNone"];
 
-        var saved = AppServices.History.GetSetting(GetNameKey(tag));
+        var saved = GetSavedTagNames().GetValueOrDefault(GetNameKey(tag));
         return string.IsNullOrWhiteSpace(saved) ? GetDefaultName(tag) : saved.Trim();
     }
 
@@ -24,6 +27,11 @@ public static class TagSettingsService
             ? GetDefaultName(tag)
             : name.Trim();
         AppServices.History.SetSetting(GetNameKey(tag), clean);
+        lock (Sync)
+        {
+            _tagNames ??= [];
+            _tagNames[GetNameKey(tag)] = clean;
+        }
     }
 
     public static bool GetShowTagNameOnIcon()
@@ -51,5 +59,19 @@ public static class TagSettingsService
     }
 
     private static string GetNameKey(TagColor tag)
-        => $"tag_name.{tag.Key}";
+        => $"{TagNamePrefix}{tag.Key}";
+
+    private static IReadOnlyDictionary<string, string> GetSavedTagNames()
+    {
+        lock (Sync)
+            if (_tagNames is not null)
+                return _tagNames;
+
+        var loaded = AppServices.History.GetSettingsByPrefix(TagNamePrefix);
+        lock (Sync)
+        {
+            _tagNames ??= new Dictionary<string, string>(loaded, StringComparer.OrdinalIgnoreCase);
+            return _tagNames;
+        }
+    }
 }

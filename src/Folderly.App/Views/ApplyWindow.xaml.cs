@@ -31,22 +31,6 @@ public partial class ApplyWindow : Window
         DataContext = _vm;
 
         BuildTagButtons();
-        CheckProtectionOnStartup();
-    }
-
-    // ─── 起動時保護チェック ──────────────────────────────────────────────────
-
-    private void CheckProtectionOnStartup()
-    {
-        var result = FolderProtection.CheckPath(_vm.FolderPath);
-        if (!result.IsDenied) return;
-
-        var L = AppServices.Localize;
-        MessageBox.Show(
-            string.Format(L["ProtectionDeniedDetail"], result.Reason),
-            L["ProtectionDeniedTitle"],
-            MessageBoxButton.OK, MessageBoxImage.Warning);
-        Close();
     }
 
     // ─── タグボタン動的生成 ──────────────────────────────────────────────────

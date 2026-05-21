@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.IO.Pipes;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Folderly.App;
 
@@ -11,13 +12,17 @@ public partial class App : Application
 {
     private const string MutexName = "Folderly_SingleInstance_v1";
     private const string PipeName  = "FolderlyIPC_v1";
+    private static readonly TimeSpan IdleShutdownDelay = TimeSpan.FromMinutes(5);
 
     private Mutex?       _mutex;
     private MainWindow?  _mainWindow;
+    private DispatcherTimer? _idleShutdownTimer;
+    private int _applyWindowCount;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         // Explorer から COM サーバーモードで起動された場合は UI を表示せず COM ループに入る
         if (e.Args.Contains("--com-server", StringComparer.OrdinalIgnoreCase))
@@ -80,6 +85,8 @@ public partial class App : Application
 
                     Dispatcher.Invoke(() =>
                     {
+                        StopIdleShutdownTimer();
+
                         if (!string.IsNullOrWhiteSpace(path))
                         {
                             OpenApplyWindow(path);
@@ -119,11 +126,19 @@ public partial class App : Application
     {
         if (_mainWindow != null) return _mainWindow;
         _mainWindow = new MainWindow();
+        _mainWindow.Closed += (_, _) =>
+        {
+            _mainWindow = null;
+            ScheduleIdleShutdownIfNeeded();
+        };
         return _mainWindow;
     }
 
     private void OpenApplyWindow(string folderPath)
     {
+        StopIdleShutdownTimer();
+        _applyWindowCount++;
+
         var win = new ApplyWindow(folderPath);
         if (_mainWindow?.IsVisible == true)
         {
@@ -131,7 +146,40 @@ public partial class App : Application
             win.Closed += (_, _) => _mainWindow?.RefreshHistory();
         }
 
+        win.Closed += (_, _) =>
+        {
+            if (_applyWindowCount > 0)
+                _applyWindowCount--;
+            ScheduleIdleShutdownIfNeeded();
+        };
+
         win.Show();
         win.Activate();
+    }
+
+    private void ScheduleIdleShutdownIfNeeded()
+    {
+        if (_applyWindowCount > 0) return;
+        if (_mainWindow?.IsVisible == true) return;
+
+        _idleShutdownTimer ??= new DispatcherTimer
+        {
+            Interval = IdleShutdownDelay,
+        };
+        _idleShutdownTimer.Tick -= IdleShutdownTimer_Tick;
+        _idleShutdownTimer.Tick += IdleShutdownTimer_Tick;
+        _idleShutdownTimer.Stop();
+        _idleShutdownTimer.Start();
+    }
+
+    private void StopIdleShutdownTimer()
+    {
+        _idleShutdownTimer?.Stop();
+    }
+
+    private void IdleShutdownTimer_Tick(object? sender, EventArgs e)
+    {
+        StopIdleShutdownTimer();
+        Shutdown();
     }
 }

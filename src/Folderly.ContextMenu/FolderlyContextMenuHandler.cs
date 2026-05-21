@@ -87,25 +87,20 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
     {
         try
         {
-            Log("Invoke started.");
             if (psiItemArray == null)
-            {
-                Log("Invoke skipped: shell item array is null.");
                 return S_OK;
-            }
+
             psiItemArray.GetItemAt(0, out IShellItem item);
             item.GetDisplayName(SIGDN_FILESYSPATH, out string path);
             var exePath = GetFolderlyExePath();
-            Log($"Launching '{exePath}' for '{path}'.");
             Process.Start(new ProcessStartInfo(exePath, $"\"{path}\"")
             {
                 UseShellExecute = false
             });
-            Log("Launch requested.");
         }
         catch (Exception ex)
         {
-            Log(ex.ToString());
+            Debug.WriteLine(ex);
         }
 
         return S_OK;
@@ -134,21 +129,5 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
         return colocatedExe is not null && File.Exists(colocatedExe)
             ? colocatedExe
             : "Folderly.exe";
-    }
-
-    private static void Log(string message)
-    {
-        try
-        {
-            var logPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Folderly",
-                "context-menu.log");
-            Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
-            File.AppendAllText(logPath, $"{DateTimeOffset.Now:O} {message}{Environment.NewLine}");
-        }
-        catch
-        {
-        }
     }
 }

@@ -178,6 +178,19 @@ public sealed class HistoryRepository : IDisposable
         return result is DBNull or null ? null : (string)result;
     }
 
+    public IReadOnlyDictionary<string, string> GetSettingsByPrefix(string prefix)
+    {
+        using var cmd = _conn.CreateCommand();
+        cmd.CommandText = "SELECT key, value FROM settings WHERE key LIKE $prefix";
+        cmd.Parameters.AddWithValue("$prefix", prefix + "%");
+
+        using var reader = cmd.ExecuteReader();
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        while (reader.Read())
+            result[reader.GetString(0)] = reader.GetString(1);
+        return result;
+    }
+
     public void SetSetting(string key, string value)
     {
         using var cmd = _conn.CreateCommand();
