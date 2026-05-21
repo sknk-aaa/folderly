@@ -43,7 +43,12 @@ Folderly を Microsoft Store に出す前に確認する項目です。
 アイコンは、`icons/` 配下の元画像から各サイズへ書き出す運用にする。
 
 - `icons/ストア用アイコン.png`: Store/スタートメニュー等のPNG生成元
-- `icons/透過アイコン.png`: 右クリックメニュー用ICO生成元
+- `icons/透過アイコン.png`: 右クリックメニュー用ICOとアプリ表示用PNGの生成元
+
+現方針:
+
+- `StoreLogo.png` は `icons/ストア用アイコン.png` 由来
+- `FolderlyContext.ico`, `Square44x44Logo.png`, `Square150x150Logo.png`, `Wide310x150Logo.png`, `SplashScreen.png` は `icons/透過アイコン.png` 由来
 
 ## Partner Center 側で必要なもの
 
