@@ -99,10 +99,12 @@ public sealed class ApplyService
         var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
         Directory.CreateDirectory(folderlyDir);
 
-        // 8. desktop.ini 書き込み（IconResource はユニーク名を指す）
+        // 8. desktop.ini 書き込み
+        // Explorer は OneDrive 配下の ICO をすぐ再読込しないことがあるため、
+        // IconResource は常にローカル AppData に保存した ICO を指す。
         DesktopIniManager.Write(
             folderPath,
-            $@"{FolderlyConstants.FolderlyDirectoryName}\{iconFileName}",
+            centralIcoPath,
             existingIniContent);
 
         // 9. ファイル属性設定

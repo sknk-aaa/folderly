@@ -139,17 +139,17 @@ public class ApplyRevertServiceTests : IDisposable
     [Fact]
     public async Task ApplyAsync_Reapply_DesktopIniPointsToLatestIco()
     {
-        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
-
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
-        var firstIco = Directory.GetFiles(folderlyDir, "cover_*.ico").Single();
+        var firstEntry = _repo.GetByPath(Path.GetFullPath(_tempDir));
+        var firstIco = firstEntry!.IconStoragePath;
 
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
-        var latestIco = Directory.GetFiles(folderlyDir, "cover_*.ico")
-            .Single(p => !string.Equals(p, firstIco, StringComparison.OrdinalIgnoreCase));
+        var latestEntry = _repo.GetByPath(Path.GetFullPath(_tempDir));
+        var latestIco = latestEntry!.IconStoragePath;
 
         var content = DesktopIniManager.Read(_tempDir);
-        var expected = $@"IconResource={FolderlyConstants.FolderlyDirectoryName}\{Path.GetFileName(latestIco)},0";
+        var expected = $@"IconResource={latestIco},0";
+        Assert.NotEqual(firstIco, latestIco);
         Assert.Contains(expected, content);
     }
 
