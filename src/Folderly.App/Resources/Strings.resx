@@ -55,6 +55,10 @@
   <data name="ColorGray" xml:space="preserve"><value>Gray</value></data>
   <data name="TagNamesSection" xml:space="preserve"><value>Tags</value></data>
   <data name="EditTagNames" xml:space="preserve"><value>Edit tag names</value></data>
+  <data name="ImageAdjustSection" xml:space="preserve"><value>Image Adjustment</value></data>
+  <data name="DisplayModeLabel" xml:space="preserve"><value>Display mode</value></data>
+  <data name="DragHint" xml:space="preserve"><value>Drag on the preview to adjust image position</value></data>
+  <data name="TagNameLabel" xml:space="preserve"><value>Tag name</value></data>
   <data name="TagSettingsTitle" xml:space="preserve"><value>Tag settings</value></data>
   <data name="ShowTagNameOnIcon" xml:space="preserve"><value>Show tag names on folder icons</value></data>
   <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>Long names are automatically resized or shortened to fit the tag area.</value></data>
@@ -73,6 +77,19 @@
   <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;Continue?</value></data>
   <data name="Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="OK" xml:space="preserve"><value>OK</value></data>
+  <data name="SelectImageTitle" xml:space="preserve"><value>Select an image</value></data>
+  <data name="DndSubtext" xml:space="preserve"><value>or drag and drop an image here</value></data>
+  <data name="SelectFileBtn" xml:space="preserve"><value>Browse files</value></data>
+  <data name="HintTitle" xml:space="preserve"><value>Hint</value></data>
+  <data name="HintPreviewRange" xml:space="preserve"><value>The dotted border in the preview shows the actual display area</value></data>
+  <data name="TagEditTitle" xml:space="preserve"><value>Edit Tags</value></data>
+  <data name="TagEditDesc" xml:space="preserve"><value>Customize tag names and icons</value></data>
+  <data name="TagEditHeadTitle" xml:space="preserve"><value>Edit tag</value></data>
+  <data name="EditingTag" xml:space="preserve"><value>Editing &quot;{0}&quot;</value></data>
+  <data name="TagColorLabel" xml:space="preserve"><value>Color</value></data>
+  <data name="TagIconLabel" xml:space="preserve"><value>Icon</value></data>
+  <data name="TagDeleteBtn" xml:space="preserve"><value>Delete tag</value></data>
+  <data name="NewTagBtn" xml:space="preserve"><value>Add new tag</value></data>
 
   <!-- MainWindow -->
   <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>

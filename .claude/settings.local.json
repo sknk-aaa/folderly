@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"/c/Program Files/Microsoft Visual Studio/\" 2>&1 | head -20)",
+      "Read(//c/Program Files/Microsoft Visual Studio//**)",
+      "Read(//c/Program Files/Microsoft Visual Studio/**)",
+      "Read(//c/Program Files/Microsoft Visual Studio/18/**)",
+      "Bash(powershell.exe -NoProfile -Command 'Get-ChildItem Cert:\\\\CurrentUser\\\\My | Where-Object { $_.Subject -like '\\\\''*Folderly*'\\\\'' } | Select-Object Subject, Thumbprint | Format-Table -AutoSize')",
+      "PowerShell($msbuild = \"${env:ProgramFiles}\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild .\\\\src\\\\Folderly.App\\\\Folderly.App.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false; if \\(-not $?\\) { throw \"Folderly.App build failed\" })",
+      "PowerShell($msbuild = \"${env:ProgramFiles}\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild .\\\\src\\\\Folderly.ContextMenu\\\\Folderly.ContextMenu.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false /v:m; if \\(-not $?\\) { throw \"Folderly.ContextMenu build failed\" })",
+      "PowerShell($msbuild = \"${env:ProgramFiles}\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild .\\\\src\\\\Folderly.Package\\\\Folderly.Package.wapproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false /v:m; if \\(-not $?\\) { throw \"Folderly.Package build failed\" })",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "PowerShell(Write-Output \"=== logs ディレクトリ ===\"; Get-ChildItem \"$env:LOCALAPPDATA\\\\Folderly\\\\logs\" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize; Write-Output \"=== 最新ログ末尾 120 行 ===\"; Get-ChildItem \"$env:LOCALAPPDATA\\\\Folderly\\\\logs\" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content -Tail 120)",
+      "Bash(dotnet test *)",
+      "PowerShell($msbuild = \"${env:ProgramFiles}\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"; & $msbuild .\\\\src\\\\Folderly.App\\\\Folderly.App.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false /v:m; if \\(-not $?\\) { throw \"Folderly.App build failed\" }; & $msbuild .\\\\src\\\\Folderly.ContextMenu\\\\Folderly.ContextMenu.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false /v:m; if \\(-not $?\\) { throw \"Folderly.ContextMenu build failed\" }; & $msbuild .\\\\src\\\\Folderly.Package\\\\Folderly.Package.wapproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false /v:m; if \\(-not $?\\) { throw \"Folderly.Package build failed\" })",
+      "PowerShell(Remove-AppxPackage)",
+      "PowerShell(Stop-Process -Name dllhost -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Add-AppxPackage $out)",
+      "PowerShell(Stop-Process -Name explorer -Force)",
+      "PowerShell(Start-Process explorer.exe)",
+      "PowerShell($out = \"c:\\\\src\\\\folderly-win\\\\src\\\\Folderly.Package\\\\AppPackages\\\\Folderly_1.0.0.1_x64.msix\")",
+      "PowerShell(if \\(-not $?\\) { throw \"Add-AppxPackage failed\" })",
+      "PowerShell(Get-ChildItem \"$env:LOCALAPPDATA\\\\Folderly\\\\logs\" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content -Tail 60)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(python3 -c ' *)",
+      "PowerShell(Get-ChildItem \"${env:ProgramFiles}\\\\Microsoft Visual Studio\" -Recurse -Filter MSBuild.exe -ErrorAction SilentlyContinue | Select-Object -First 3 FullName)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe\" src/Folderly.App/Folderly.App.csproj /t:Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false /v:minimal)",
+      "PowerShell(Add-AppxPackage \"C:\\\\src\\\\folderly-win\\\\_out\\\\Folderly.msix\" -ForceUpdateFromAnyVersion 2>&1)"
+    ]
+  }
+}

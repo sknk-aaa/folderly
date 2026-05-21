@@ -95,10 +95,17 @@ public sealed class ApplyViewModel : ViewModelBase
             _selectedTagColor = value;
             Notify();
             Notify(nameof(SelectedTagName));
+            Notify(nameof(EffectiveSelectedTagColor));
         }
     }
 
     public string SelectedTagName => TagSettingsService.GetDisplayName(SelectedTagColor);
+
+    // Returns SelectedTagColor with any user-defined hex color override applied.
+    public TagColor EffectiveSelectedTagColor =>
+        SelectedTagColor.IsNone
+            ? SelectedTagColor
+            : new TagColor(TagSettingsService.GetTagHexColor(SelectedTagColor), SelectedTagColor.Key);
 
     public bool ShowTagNameOnIcon => TagSettingsService.GetShowTagNameOnIcon();
 
@@ -106,6 +113,7 @@ public sealed class ApplyViewModel : ViewModelBase
     {
         Notify(nameof(SelectedTagName));
         Notify(nameof(ShowTagNameOnIcon));
+        Notify(nameof(EffectiveSelectedTagColor));
     }
 
     // ─── 状態 ─────────────────────────────────────────────────────────────────

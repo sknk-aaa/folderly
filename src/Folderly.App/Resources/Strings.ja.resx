@@ -55,6 +55,10 @@
   <data name="ColorGray" xml:space="preserve"><value>グレー</value></data>
   <data name="TagNamesSection" xml:space="preserve"><value>タグ</value></data>
   <data name="EditTagNames" xml:space="preserve"><value>タグ名を編集</value></data>
+  <data name="ImageAdjustSection" xml:space="preserve"><value>画像の調整</value></data>
+  <data name="DisplayModeLabel" xml:space="preserve"><value>表示モード</value></data>
+  <data name="DragHint" xml:space="preserve"><value>プレビュー上でドラッグして画像位置を調整できます</value></data>
+  <data name="TagNameLabel" xml:space="preserve"><value>タグ名</value></data>
   <data name="TagSettingsTitle" xml:space="preserve"><value>タグ設定</value></data>
   <data name="ShowTagNameOnIcon" xml:space="preserve"><value>フォルダアイコン上にタグ名を表示</value></data>
   <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>長い名前はタグ領域に収まるように自動で縮小または省略されます。</value></data>
@@ -73,6 +77,19 @@
   <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;続行しますか？</value></data>
   <data name="Continue" xml:space="preserve"><value>続行</value></data>
   <data name="OK" xml:space="preserve"><value>OK</value></data>
+  <data name="SelectImageTitle" xml:space="preserve"><value>画像を選択してください</value></data>
+  <data name="DndSubtext" xml:space="preserve"><value>または画像をここにドラッグ&amp;ドロップ</value></data>
+  <data name="SelectFileBtn" xml:space="preserve"><value>ファイルを選ぶ</value></data>
+  <data name="HintTitle" xml:space="preserve"><value>ヒント</value></data>
+  <data name="HintPreviewRange" xml:space="preserve"><value>プレビューの点線枠内が実際に表示される範囲です</value></data>
+  <data name="TagEditTitle" xml:space="preserve"><value>タグを編集</value></data>
+  <data name="TagEditDesc" xml:space="preserve"><value>タグ名とアイコンをカスタマイズできます</value></data>
+  <data name="TagEditHeadTitle" xml:space="preserve"><value>タグの編集</value></data>
+  <data name="EditingTag" xml:space="preserve"><value>「{0}」を編集中</value></data>
+  <data name="TagColorLabel" xml:space="preserve"><value>カラー</value></data>
+  <data name="TagIconLabel" xml:space="preserve"><value>アイコン</value></data>
+  <data name="TagDeleteBtn" xml:space="preserve"><value>削除</value></data>
+  <data name="NewTagBtn" xml:space="preserve"><value>新規タグを追加</value></data>
 
   <!-- MainWindow -->
   <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>

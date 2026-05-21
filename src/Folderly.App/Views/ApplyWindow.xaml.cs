@@ -4,109 +4,270 @@ using Folderly.App.ViewModels;
 using Folderly.Core.Application;
 using Folderly.Core.Composition;
 using Folderly.Core.Folder;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using CoreCropMode = Folderly.Core.Composition.CropMode;
 
 namespace Folderly.App.Views;
 
-/// <summary>
-/// 画像選択画面（SPEC Section 4.1, F-02 〜 F-05）。
-/// 右クリックメニューから起動される。コマンドライン引数でフォルダパスを受け取る。
-/// </summary>
 public partial class ApplyWindow : Window
 {
     private readonly ApplyViewModel _vm;
+    private bool _webViewReady;
 
     public ApplyWindow(string folderPath)
     {
         InitializeComponent();
         _vm = new ApplyViewModel(folderPath);
-        DataContext = _vm;
 
-        BuildTagButtons();
+        Loaded += async (_, _) => await InitWebViewAsync();
     }
 
-    // ─── タグボタン動的生成 ──────────────────────────────────────────────────
+    // ─── WebView2 初期化 ────────────────────────────────────────────────────
 
-    private void BuildTagButtons()
+    private async Task InitWebViewAsync()
     {
-        TagPanel.Children.Clear();
-
-        foreach (var tag in TagColors.All)
+        try
         {
-            var label = TagSettingsService.GetDisplayName(tag);
-            var btn = new Button
-            {
-                Width    = 72,
-                Height   = 58,
-                Margin   = new Thickness(0, 0, 8, 0),
-                ToolTip  = label,
-                Tag      = tag,
-                Content  = CreateTagButtonContent(tag, label),
-                Padding  = new Thickness(5, 4, 5, 4),
-            };
-            btn.Click += TagButton_Click;
-            TagPanel.Children.Add(btn);
+            var userDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Folderly", "WebView2");
+            var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+            await WebView.EnsureCoreWebView2Async(env);
+
+            WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
+            WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled   = false;
+            WebView.CoreWebView2.Settings.AreDevToolsEnabled              = false;
+
+            WebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
+            WebView.CoreWebView2.NavigationCompleted += OnNavigationCompleted;
+
+            var html = LoadHtml();
+            WebView.NavigateToString(html);
         }
-
-        RefreshTagButtonSelection();
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"WebView2 の初期化に失敗しました。\n{ex.Message}",
+                "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
+            Close();
+        }
     }
 
-    private static FrameworkElement CreateTagButtonContent(TagColor tag, string label)
+    private string LoadHtml()
     {
-        Color fill = tag.IsNone
-            ? Color.FromRgb(220, 220, 220)
-            : ParseHex(tag.HexColor!);
+        var asm = Assembly.GetExecutingAssembly();
+        using var stream = asm.GetManifestResourceStream("Folderly.App.Resources.ApplyWindow.html");
+        if (stream is null) throw new InvalidOperationException("ApplyWindow.html が見つかりません");
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
 
-        var panel = new StackPanel
+    private async void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
+    {
+        // 初回ナビゲーション完了後のみ状態を送信
+        if (!_webViewReady)
         {
-            Orientation = Orientation.Vertical,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
+            _webViewReady = true;
+            await SendStateAsync();
+            await SendPreviewAsync();
+        }
+    }
+
+    // ─── JS → C# メッセージ受信 ──────────────────────────────────────────────
+
+    private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        var raw = e.TryGetWebMessageAsString();
+        if (string.IsNullOrEmpty(raw)) return;
+
+        Dispatcher.InvokeAsync(async () =>
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(raw);
+                var root = doc.RootElement;
+                var type = root.GetProperty("type").GetString();
+
+                switch (type)
+                {
+                    case "ready":
+                        await SendStateAsync();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "selectImage":
+                        SelectImageFromDialog();
+                        break;
+
+                    case "dropImage":
+                        await HandleDropImageAsync(root);
+                        break;
+
+                    case "scale":
+                        _vm.Scale = root.GetProperty("value").GetDouble();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "offsetX":
+                        _vm.OffsetX = root.GetProperty("value").GetDouble();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "offsetY":
+                        _vm.OffsetY = root.GetProperty("value").GetDouble();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "cropMode":
+                        var modeStr = root.GetProperty("mode").GetString() ?? "Center";
+                        _vm.CropMode = modeStr switch
+                        {
+                            "FitWidth"  => CoreCropMode.FitWidth,
+                            "FitHeight" => CoreCropMode.FitHeight,
+                            _           => CoreCropMode.Center,
+                        };
+                        await SendPreviewAsync();
+                        break;
+
+                    case "resetPosition":
+                        _vm.ResetPosition();
+                        await SendStateAsync();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "selectTag":
+                        var key = root.GetProperty("key").GetString() ?? "none";
+                        _vm.SelectedTagColor = TagColors.All.FirstOrDefault(t => t.Key == key)
+                                               ?? TagColors.None;
+                        await SendPreviewAsync();
+                        break;
+
+                    case "saveTagSettings":
+                        await SaveTagSettingsAsync(root.GetProperty("data"));
+                        break;
+
+                    case "apply":
+                        await ApplyAsync();
+                        break;
+
+                    case "cancel":
+                        Close();
+                        break;
+
+                    case "minimize":
+                        WindowState = WindowState.Minimized;
+                        break;
+                }
+            }
+            catch { /* JSON parse 失敗などは無視 */ }
+        });
+    }
+
+    // ─── C# → JS: 状態送信 ──────────────────────────────────────────────────
+
+    private async Task SendStateAsync()
+    {
+        if (!_webViewReady) return;
+
+        var tags = TagColors.All
+            .Where(t => !t.IsNone)
+            .Select(t => new
+            {
+                key       = t.Key,
+                name      = TagSettingsService.GetDisplayName(t),
+                hexColor  = TagSettingsService.GetTagHexColor(t) ?? t.HexColor ?? "#888888",
+                iconIndex = TagSettingsService.GetTagIconIndex(t),
+            })
+            .ToList();
+
+        var state = new
+        {
+            folderPath        = _vm.FolderPath,
+            selectedTagKey    = _vm.SelectedTagColor?.IsNone == true ? "none" : (_vm.SelectedTagColor?.Key ?? "none"),
+            scale             = _vm.Scale,
+            offsetX           = _vm.OffsetX,
+            offsetY           = _vm.OffsetY,
+            cropMode          = _vm.CropMode.ToString(),
+            showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon(),
+            tags,
         };
 
-        panel.Children.Add(new Ellipse
-        {
-            Width = 22,
-            Height = 22,
-            Fill = new SolidColorBrush(fill),
-            Stroke = tag.IsNone ? Brushes.Gray : Brushes.Transparent,
-            StrokeThickness = tag.IsNone ? 1 : 0,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 4),
-        });
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = label,
-            FontSize = 11,
-            TextAlignment = TextAlignment.Center,
-            TextTrimming = TextTrimming.CharacterEllipsis,
-            MaxWidth = 60,
-        });
-
-        return panel;
+        var json = JsonSerializer.Serialize(state);
+        await ExecuteScriptSafeAsync($"window.folderlySetState({json})");
     }
 
-    private static Color ParseHex(string hex)
+    private async Task SendPreviewAsync()
     {
-        hex = hex.TrimStart('#');
-        return Color.FromRgb(
-            Convert.ToByte(hex.Substring(0, 2), 16),
-            Convert.ToByte(hex.Substring(2, 2), 16),
-            Convert.ToByte(hex.Substring(4, 2), 16));
+        if (!_webViewReady) return;
+
+        // OffscreenPreview プロパティを現在の ViewModel 状態に同期
+        OffscreenPreview.SourceImage      = _vm.SourceImage;
+        OffscreenPreview.SelectedTagColor = _vm.EffectiveSelectedTagColor;
+        OffscreenPreview.TagName          = TagSettingsService.GetDisplayName(_vm.SelectedTagColor);
+        OffscreenPreview.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+        OffscreenPreview.Scale            = _vm.Scale;
+        OffscreenPreview.OffsetX          = _vm.OffsetX;
+        OffscreenPreview.OffsetY          = _vm.OffsetY;
+        OffscreenPreview.CropMode         = _vm.CropMode;
+
+        // WPF レイアウトを強制更新してからレンダリング
+        OffscreenPreview.Measure(new Size(320, 320));
+        OffscreenPreview.Arrange(new Rect(0, 0, 320, 320));
+        OffscreenPreview.UpdateLayout();
+
+        var rtb = new RenderTargetBitmap(320, 320, 96, 96, PixelFormats.Pbgra32);
+        rtb.Render(OffscreenPreview);
+
+        using var ms = new MemoryStream();
+        var enc = new PngBitmapEncoder();
+        enc.Frames.Add(BitmapFrame.Create(rtb));
+        enc.Save(ms);
+
+        var b64     = Convert.ToBase64String(ms.ToArray());
+        var dataUrl = $"data:image/png;base64,{b64}";
+
+        await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}')");
     }
 
-    // ─── 画像選択 ────────────────────────────────────────────────────────────
+    private async Task SendTagDataAsync()
+    {
+        if (!_webViewReady) return;
 
-    private void SelectImage_Click(object sender, RoutedEventArgs e)
+        var tags = TagColors.All
+            .Where(t => !t.IsNone)
+            .Select(t => new
+            {
+                key       = t.Key,
+                name      = TagSettingsService.GetDisplayName(t),
+                hexColor  = TagSettingsService.GetTagHexColor(t) ?? t.HexColor ?? "#888888",
+                iconIndex = TagSettingsService.GetTagIconIndex(t),
+            })
+            .ToList();
+
+        var json = JsonSerializer.Serialize(tags);
+        await ExecuteScriptSafeAsync($"window.folderlyUpdateTags({json})");
+    }
+
+    private async Task ExecuteScriptSafeAsync(string script)
+    {
+        try
+        {
+            await WebView.ExecuteScriptAsync(script);
+        }
+        catch { /* WebView2 が閉じられた後などは無視 */ }
+    }
+
+    // ─── 画像選択・ロード ───────────────────────────────────────────────────
+
+    private void SelectImageFromDialog()
     {
         var dlg = new OpenFileDialog
         {
@@ -117,29 +278,30 @@ public partial class ApplyWindow : Window
         LoadImage(dlg.FileName);
     }
 
-    private void Window_Drop(object sender, DragEventArgs e)
+    private async Task HandleDropImageAsync(JsonElement root)
     {
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
-        var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-        if (files?.Length > 0)
-            LoadImage(files[0]);
-    }
+        var dataUrl = root.GetProperty("dataUrl").GetString();
+        if (string.IsNullOrEmpty(dataUrl)) return;
 
-    private void LoadImage(string path)
-    {
+        // data:image/png;base64,xxxx から bytes を取得
+        var commaIdx = dataUrl.IndexOf(',');
+        if (commaIdx < 0) return;
+        var bytes = Convert.FromBase64String(dataUrl.Substring(commaIdx + 1));
+
         try
         {
             var bitmap = new BitmapImage();
+            using var ms = new MemoryStream(bytes);
             bitmap.BeginInit();
-            bitmap.UriSource        = new Uri(path);
-            bitmap.CacheOption      = BitmapCacheOption.OnLoad;
-            bitmap.CreateOptions    = BitmapCreateOptions.IgnoreImageCache;
+            bitmap.StreamSource = ms;
+            bitmap.CacheOption  = BitmapCacheOption.OnLoad;
             bitmap.EndInit();
             bitmap.Freeze();
 
             _vm.SourceImage     = bitmap;
-            _vm.SourceImagePath = path;
+            _vm.SourceImagePath = string.Empty;
             _vm.ResetPosition();
+            await SendPreviewAsync();
         }
         catch
         {
@@ -148,67 +310,71 @@ public partial class ApplyWindow : Window
         }
     }
 
-    // ─── プレビューイベント ──────────────────────────────────────────────────
-
-    private void Preview_PositionChanged(object sender, (double OffsetX, double OffsetY) e)
+    private void LoadImage(string path)
     {
-        _vm.OffsetX = e.OffsetX;
-        _vm.OffsetY = e.OffsetY;
-    }
-
-    private void Preview_ScaleChanged(object sender, double scale)
-    {
-        _vm.Scale = scale;
-    }
-
-    // ─── タグ選択 ────────────────────────────────────────────────────────────
-
-    private void TagButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Core.Composition.TagColor tag)
+        try
         {
-            _vm.SelectedTagColor = tag;
-            RefreshTagButtonSelection();
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource     = new Uri(path);
+            bitmap.CacheOption   = BitmapCacheOption.OnLoad;
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            _vm.SourceImage     = bitmap;
+            _vm.SourceImagePath = path;
+            _vm.ResetPosition();
+
+            _ = SendPreviewAsync();
+        }
+        catch
+        {
+            MessageBox.Show(AppServices.Localize["ImageLoadError"], "Folderly",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
-    private void EditTagNames_Click(object sender, RoutedEventArgs e)
+    // ─── タグ設定保存 ───────────────────────────────────────────────────────
+
+    private async Task SaveTagSettingsAsync(JsonElement data)
     {
-        var dialog = new TagSettingsDialog { Owner = this };
-        if (dialog.ShowDialog() == true)
+        if (data.TryGetProperty("tags", out var tagsEl))
         {
-            _vm.RefreshTagSettings();
-            BuildTagButtons();
+            foreach (var t in tagsEl.EnumerateArray())
+            {
+                var tagKey    = t.GetProperty("key").GetString() ?? string.Empty;
+                var name      = t.GetProperty("name").GetString() ?? string.Empty;
+                var hexColor  = t.GetProperty("hexColor").GetString() ?? string.Empty;
+                var iconIndex = t.GetProperty("iconIndex").GetInt32();
+
+                var tagColor = TagColors.All.FirstOrDefault(tc => tc.Key == tagKey);
+                if (tagColor is null || tagColor.IsNone) continue;
+
+                TagSettingsService.SetDisplayName(tagColor, name);
+                TagSettingsService.SetTagHexColor(tagColor, hexColor);
+                TagSettingsService.SetTagIconIndex(tagColor, iconIndex);
+            }
         }
+
+        if (data.TryGetProperty("showTagNameOnIcon", out var showEl))
+            TagSettingsService.SetShowTagNameOnIcon(showEl.GetBoolean());
+
+        _vm.RefreshTagSettings();
+        await SendTagDataAsync();
+        await SendPreviewAsync();
     }
-
-    private void RefreshTagButtonSelection()
-    {
-        var primary = (Brush)(TryFindResource("PrimaryBrush") ?? Brushes.DodgerBlue);
-        foreach (var child in TagPanel.Children.OfType<Button>())
-        {
-            var isSelected = child.Tag is TagColor tag && tag.Key == _vm.SelectedTagColor.Key;
-            child.BorderBrush = isSelected ? primary : Brushes.Transparent;
-            child.BorderThickness = isSelected ? new Thickness(2) : new Thickness(1);
-        }
-    }
-
-    // ─── スライダー・リセット ────────────────────────────────────────────────
-
-    private void ResetPosition_Click(object sender, RoutedEventArgs e)
-        => _vm.ResetPosition();
 
     // ─── 適用 ────────────────────────────────────────────────────────────────
 
-    private async void Apply_Click(object sender, RoutedEventArgs e)
+    private async Task ApplyAsync()
     {
         if (!_vm.CanApply) return;
 
-        // 警告チェック（OneDrive 等）
         var protection = FolderProtection.CheckPath(_vm.FolderPath);
         if (protection.IsWarning)
         {
-            var L = AppServices.Localize;
+            var L   = AppServices.Localize;
             var msg = string.Format(L["WarningGenericMessage"], protection.Reason);
             var res = MessageBox.Show(msg, L["WarningGenericTitle"],
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning);
@@ -216,7 +382,7 @@ public partial class ApplyWindow : Window
         }
 
         _vm.IsApplying = true;
-        ApplyBtn.Content = AppServices.Localize["Applying"];
+        await ExecuteScriptSafeAsync("window.folderlySetApplying(true)");
 
         try
         {
@@ -231,7 +397,7 @@ public partial class ApplyWindow : Window
                 SourceImageStream: stream,
                 SourceImagePath:   _vm.SourceImagePath ?? string.Empty,
                 AdjustParams:      _vm.GetAdjustParams(),
-                TagColor:          _vm.SelectedTagColor,
+                TagColor:          _vm.EffectiveSelectedTagColor,
                 ForceApply:        false,
                 TagName:           TagSettingsService.GetDisplayName(_vm.SelectedTagColor),
                 ShowTagNameOnIcon: TagSettingsService.GetShowTagNameOnIcon());
@@ -239,19 +405,18 @@ public partial class ApplyWindow : Window
             var result = await AppServices.Apply.ApplyAsync(request);
 
             if (result.IsWarning)
-            {
-                // ForceApply で再試行（OneDrive 等、Apply 内部の Warning）
-                var req2 = request with { ForceApply = true };
-                result = await AppServices.Apply.ApplyAsync(req2);
-            }
+                result = await AppServices.Apply.ApplyAsync(request with { ForceApply = true });
 
             if (result.IsSuccess)
             {
-                ShowSuccessToast();
+                await ExecuteScriptSafeAsync(
+                    "document.getElementById('btn-apply').textContent='✓ 適用完了';");
+
                 Hide();
-                if (ShouldReopenExplorerWindowsAfterApply())
+                if (ShouldReopenExplorer())
                     await ReopenExplorerWindowsAsync(_vm.FolderPath);
                 Close();
+                return;
             }
         }
         catch (FolderProtectionException ex)
@@ -268,26 +433,20 @@ public partial class ApplyWindow : Window
         finally
         {
             _vm.IsApplying = false;
-            ApplyBtn.Content = AppServices.Localize["Apply"];
+            await ExecuteScriptSafeAsync("window.folderlySetApplying(false)");
         }
     }
 
-    private void ShowSuccessToast()
-    {
-        ApplyBtn.Content = AppServices.Localize["ApplySuccess"];
-        ApplyBtn.Background = new SolidColorBrush(Color.FromRgb(16, 124, 16));
-    }
+    // ─── Explorer 再起動 ─────────────────────────────────────────────────────
 
-    // ─── キャンセル ──────────────────────────────────────────────────────────
-
-    private static bool ShouldReopenExplorerWindowsAfterApply()
+    private static bool ShouldReopenExplorer()
         => AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
 
     private static async Task ReopenExplorerWindowsAsync(string folderPath)
     {
         await Task.Run(() =>
         {
-            var parentPath = Directory.GetParent(folderPath)?.FullName;
+            var parentPath    = Directory.GetParent(folderPath)?.FullName;
             var pathsToReopen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             try
@@ -295,29 +454,27 @@ public partial class ApplyWindow : Window
                 var shellType = Type.GetTypeFromProgID("Shell.Application");
                 if (shellType != null)
                 {
-                    var shell = Activator.CreateInstance(shellType);
-                    var windows = shellType.InvokeMember("Windows", BindingFlags.InvokeMethod, null, shell, null);
-                    var countObj = windows?.GetType().InvokeMember("Count", BindingFlags.GetProperty, null, windows, null);
-                    var count = countObj is int c ? c : 0;
+                    var shell   = Activator.CreateInstance(shellType);
+                    var windows = shellType.InvokeMember("Windows", System.Reflection.BindingFlags.InvokeMethod, null, shell, null);
+                    var count   = windows?.GetType().InvokeMember("Count", System.Reflection.BindingFlags.GetProperty, null, windows, null) is int c ? c : 0;
 
                     for (var i = count - 1; i >= 0; i--)
                     {
                         try
                         {
-                            var win = windows?.GetType().InvokeMember("Item", BindingFlags.InvokeMethod, null, windows, new object[] { i });
+                            var win = windows?.GetType().InvokeMember("Item", System.Reflection.BindingFlags.InvokeMethod, null, windows, new object[] { i });
                             if (win == null) continue;
+                            var url  = win.GetType().InvokeMember("LocationURL", System.Reflection.BindingFlags.GetProperty, null, win, null) as string;
+                            if (string.IsNullOrWhiteSpace(url)) continue;
+                            var loc  = Uri.TryCreate(url, UriKind.Absolute, out var uri) ? uri.LocalPath : null;
+                            if (string.IsNullOrWhiteSpace(loc)) continue;
 
-                            var locationUrl = win.GetType().InvokeMember("LocationURL", BindingFlags.GetProperty, null, win, null) as string;
-                            if (string.IsNullOrWhiteSpace(locationUrl)) continue;
-                            var locationPath = Uri.TryCreate(locationUrl, UriKind.Absolute, out var uri) ? uri.LocalPath : null;
-                            if (string.IsNullOrWhiteSpace(locationPath)) continue;
-
-                            if (!string.Equals(locationPath, parentPath, StringComparison.OrdinalIgnoreCase) &&
-                                !string.Equals(locationPath, folderPath, StringComparison.OrdinalIgnoreCase))
-                                continue;
-
-                            pathsToReopen.Add(locationPath);
-                            win.GetType().InvokeMember("Quit", BindingFlags.InvokeMethod, null, win, null);
+                            if (string.Equals(loc, parentPath, StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(loc, folderPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                pathsToReopen.Add(loc);
+                                win.GetType().InvokeMember("Quit", System.Reflection.BindingFlags.InvokeMethod, null, win, null);
+                            }
                         }
                         catch { }
                     }
@@ -334,16 +491,12 @@ public partial class ApplyWindow : Window
             {
                 try
                 {
-                    if (!Directory.Exists(path)) continue;
-                    Process.Start(new ProcessStartInfo("explorer.exe", $"\"{path}\"")
-                    {
-                        UseShellExecute = true,
-                    });
+                    if (Directory.Exists(path))
+                        Process.Start(new ProcessStartInfo("explorer.exe", $"\"{path}\"")
+                            { UseShellExecute = true });
                 }
                 catch { }
             }
         });
     }
-
-    private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
 }
