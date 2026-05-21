@@ -30,10 +30,10 @@ public static class FolderTemplate
         height: BaseSize * 0.78f);
 
     public static readonly RectangleF ImageRegion = new(
-        x: BaseSize * 0.025f,
-        y: BaseSize * 0.205f,
-        width: BaseSize * 0.95f,
-        height: BaseSize * 0.715f);
+        x: 0f,
+        y: BaseSize * 0.18f,
+        width: BaseSize,
+        height: BaseSize * 0.58f);
 
     public static readonly RectangleF FrontPocketRegion = new(
         x: 0f,
@@ -84,18 +84,18 @@ public static class FolderTemplate
         {
             ctx.Fill(Color.Transparent);
 
-            // Tab (slightly darker than body)
-            ctx.Fill(Color.ParseHex("#1A2240"), CreateTabPath(size));
+            // Tab — rich dark amber (tag color overrides this when selected)
+            ctx.Fill(Color.ParseHex("#C87B10"), CreateTabPath(size));
 
-            // Folder body — subtle two-tone (top lighter, bottom darker)
-            ctx.Fill(Color.ParseHex("#273062"),
-                new RectangularPolygon(0f, bodyTop, size, bodyH * 0.5f));
-            ctx.Fill(Color.ParseHex("#222B58"),
-                new RectangularPolygon(0f, bodyTop + bodyH * 0.5f, size, bodyH * 0.5f));
+            // Folder body — warm golden, slightly lighter at top for depth
+            ctx.Fill(Color.ParseHex("#F5B030"),
+                new RectangularPolygon(0f, bodyTop, size, bodyH * 0.28f));
+            ctx.Fill(Color.ParseHex("#EFA020"),
+                new RectangularPolygon(0f, bodyTop + bodyH * 0.28f, size, bodyH * 0.72f));
 
-            // Accent line at top of body (separates tab from body visually)
-            ctx.Fill(Color.ParseHex("#4A6DC8"),
-                new RectangularPolygon(0f, bodyTop, size, 2.5f * scale));
+            // Thin highlight line at very top of body
+            ctx.Fill(Color.ParseHex("#FACA50"),
+                new RectangularPolygon(0f, bodyTop, size, 2f * scale));
         });
 
         using var ms = new MemoryStream();
@@ -113,9 +113,11 @@ public static class FolderTemplate
         {
             ctx.Fill(Color.Transparent);
 
-            // Thin bottom edge only — no pocket overlay
-            ctx.Fill(Color.ParseHex("#0D1525"),
-                new RectangularPolygon(0f, bodyBottom - 4f * scale, size, 4f * scale));
+            // Shadow bands at the bottom of the golden footer (no pocket overlay)
+            ctx.Fill(Color.ParseHex("#B06C10"),
+                new RectangularPolygon(0f, bodyBottom - 14f * scale, size, 8f * scale));
+            ctx.Fill(Color.ParseHex("#7A4808"),
+                new RectangularPolygon(0f, bodyBottom - 6f * scale, size, 6f * scale));
         });
 
         using var ms = new MemoryStream();
