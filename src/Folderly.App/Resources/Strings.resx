@@ -93,8 +93,8 @@
   <data name="HistoryMaxCount" xml:space="preserve"><value>Maximum history count</value></data>
   <data name="DeleteHistory" xml:space="preserve"><value>Revert All Folders</value></data>
   <data name="RefreshSection" xml:space="preserve"><value>Explorer Refresh</value></data>
-  <data name="ForceExplorerRestartAfterApply" xml:space="preserve"><value>Restart Explorer after applying folder icons</value></data>
-  <data name="ForceExplorerRestartAfterApplyNote" xml:space="preserve"><value>This makes icon changes appear immediately, but the taskbar may briefly close and reopen.</value></data>
+  <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>Reopen Explorer windows after applying folder icons</value></data>
+  <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>This makes icon changes appear immediately by reopening the affected Explorer window. The taskbar and Start menu are not restarted.</value></data>
   <data name="AboutSection" xml:space="preserve"><value>About Folderly</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>Version</value></data>
   <data name="LicenseLabel" xml:space="preserve"><value>License</value></data>

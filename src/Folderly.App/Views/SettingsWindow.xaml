@@ -61,11 +61,11 @@
                    Foreground="{StaticResource TextSecondaryBrush}"
                    Margin="0,0,0,8"/>
 
-        <CheckBox Content="{Binding L[ForceExplorerRestartAfterApply]}"
-                  IsChecked="{Binding ForceExplorerRestartAfterApply}"
+        <CheckBox Content="{Binding L[ReopenExplorerWindowsAfterApply]}"
+                  IsChecked="{Binding ReopenExplorerWindowsAfterApply}"
                   FontSize="13"
                   Margin="0,0,0,4"/>
-        <TextBlock Text="{Binding L[ForceExplorerRestartAfterApplyNote]}"
+        <TextBlock Text="{Binding L[ReopenExplorerWindowsAfterApplyNote]}"
                    FontSize="12"
                    Foreground="{StaticResource TextSecondaryBrush}"
                    TextWrapping="Wrap"

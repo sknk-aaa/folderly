@@ -6,7 +6,7 @@ using Folderly.Core.Folder;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -218,8 +218,8 @@ public partial class ApplyWindow : Window
             if (result.IsSuccess)
             {
                 ShowSuccessToast();
-                if (ShouldForceExplorerRestartAfterApply())
-                    await RestartExplorerAsync();
+                if (ShouldReopenExplorerWindowsAfterApply())
+                    await ReopenExplorerWindowsAsync(_vm.FolderPath);
                 await Task.Delay(1200);
                 Close();
             }
@@ -250,66 +250,70 @@ public partial class ApplyWindow : Window
 
     // ─── キャンセル ──────────────────────────────────────────────────────────
 
-    private static bool ShouldForceExplorerRestartAfterApply()
+    private static bool ShouldReopenExplorerWindowsAfterApply()
         => AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
 
-    private static async Task RestartExplorerAsync()
+    private static async Task ReopenExplorerWindowsAsync(string folderPath)
     {
         await Task.Run(() =>
         {
-            foreach (var process in GetShellExplorerProcesses())
-            {
-                try
-                {
-                    process.Kill();
-                    process.WaitForExit(2000);
-                }
-                catch { }
-                finally
-                {
-                    process.Dispose();
-                }
-            }
+            var parentPath = Directory.GetParent(folderPath)?.FullName;
+            var pathsToReopen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            Thread.Sleep(500);
             try
             {
-                Process.Start(new ProcessStartInfo("explorer.exe")
+                var shellType = Type.GetTypeFromProgID("Shell.Application");
+                if (shellType != null)
                 {
-                    UseShellExecute = true,
-                });
+                    var shell = Activator.CreateInstance(shellType);
+                    var windows = shellType.InvokeMember("Windows", BindingFlags.InvokeMethod, null, shell, null);
+                    var countObj = windows?.GetType().InvokeMember("Count", BindingFlags.GetProperty, null, windows, null);
+                    var count = countObj is int c ? c : 0;
+
+                    for (var i = count - 1; i >= 0; i--)
+                    {
+                        try
+                        {
+                            var win = windows?.GetType().InvokeMember("Item", BindingFlags.InvokeMethod, null, windows, new object[] { i });
+                            if (win == null) continue;
+
+                            var locationUrl = win.GetType().InvokeMember("LocationURL", BindingFlags.GetProperty, null, win, null) as string;
+                            if (string.IsNullOrWhiteSpace(locationUrl)) continue;
+                            var locationPath = Uri.TryCreate(locationUrl, UriKind.Absolute, out var uri) ? uri.LocalPath : null;
+                            if (string.IsNullOrWhiteSpace(locationPath)) continue;
+
+                            if (!string.Equals(locationPath, parentPath, StringComparison.OrdinalIgnoreCase) &&
+                                !string.Equals(locationPath, folderPath, StringComparison.OrdinalIgnoreCase))
+                                continue;
+
+                            pathsToReopen.Add(locationPath);
+                            win.GetType().InvokeMember("Quit", BindingFlags.InvokeMethod, null, win, null);
+                        }
+                        catch { }
+                    }
+                }
             }
             catch { }
-        });
-    }
 
-    private static List<Process> GetShellExplorerProcesses()
-    {
-        var shellWindow = GetShellWindow();
-        if (shellWindow != nint.Zero)
-        {
-            _ = GetWindowThreadProcessId(shellWindow, out var shellProcessId);
-            if (shellProcessId != 0)
+            if (pathsToReopen.Count == 0 && !string.IsNullOrWhiteSpace(parentPath))
+                pathsToReopen.Add(parentPath);
+
+            Thread.Sleep(300);
+
+            foreach (var path in pathsToReopen)
             {
                 try
                 {
-                    var shellProcess = Process.GetProcessById((int)shellProcessId);
-                    if (string.Equals(shellProcess.ProcessName, "explorer", StringComparison.OrdinalIgnoreCase))
-                        return [shellProcess];
-                    shellProcess.Dispose();
+                    if (!Directory.Exists(path)) continue;
+                    Process.Start(new ProcessStartInfo("explorer.exe", $"\"{path}\"")
+                    {
+                        UseShellExecute = true,
+                    });
                 }
                 catch { }
             }
-        }
-
-        return Process.GetProcessesByName("explorer").ToList();
+        });
     }
-
-    [DllImport("user32.dll")]
-    private static extern nint GetShellWindow();
-
-    [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(nint hWnd, out uint processId);
 
     private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
 }
