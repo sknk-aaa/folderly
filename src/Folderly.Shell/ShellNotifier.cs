@@ -10,6 +10,11 @@ public sealed class ShellNotifier : IShellNotifier
 {
     public void NotifyFolderChanged(string folderPath)
     {
+        // フォルダの LastWriteTime を現在時刻に更新してサムネイルキャッシュを無効化する。
+        // 中身があるフォルダは content-preview サムネイルがキャッシュされているため、
+        // タイムスタンプを変えることでキャッシュミスを起こし desktop.ini アイコンを再読みさせる。
+        TryTouchFolder(folderPath);
+
         // グローバルアイコンキャッシュを更新
         NativeMethods.SHChangeNotify(
             NativeMethods.SHCNE_UPDATEIMAGE,
@@ -56,38 +61,17 @@ public sealed class ShellNotifier : IShellNotifier
         // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
         NotifyRenameFolderToSelf(folderPath);
 
-        NativeMethods.SHChangeNotify(
-            NativeMethods.SHCNE_ASSOCCHANGED,
-            NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-            nint.Zero,
-            nint.Zero);
-
-        // 中身があるフォルダ向けサムネイルキャッシュ強制無効化。
-        // RMDIR→MKDIR の連続通知で Explorer にフォルダの再評価を強制し、
-        // desktop.ini のカスタムアイコンを content-preview サムネイルより優先させる。
-        ForceThumbnailCacheRefresh(folderPath);
+        // 中身があるフォルダ: MKDIR 通知で「フォルダが新たに存在する」と Explorer に伝え、
+        // desktop.ini を含めてメタデータを再読みさせる。RMDIR を先行させると黄色フォルダへの
+        // フラッシュが生じるため MKDIR のみ使う。
+        NotifyPidl(folderPath, NativeMethods.SHCNE_MKDIR);
     }
 
-    private static void ForceThumbnailCacheRefresh(string folderPath)
+    private static void TryTouchFolder(string folderPath)
     {
         if (!Directory.Exists(folderPath)) return;
-        var pidl = NativeMethods.ILCreateFromPath(folderPath);
-        if (pidl == nint.Zero) return;
-        try
-        {
-            NativeMethods.SHChangeNotify(
-                NativeMethods.SHCNE_RMDIR,
-                NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                pidl, nint.Zero);
-            NativeMethods.SHChangeNotify(
-                NativeMethods.SHCNE_MKDIR,
-                NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
-                pidl, nint.Zero);
-        }
-        finally
-        {
-            NativeMethods.ILFree(pidl);
-        }
+        try { Directory.SetLastWriteTimeUtc(folderPath, DateTime.UtcNow); }
+        catch { }
     }
 
     private static void ForceIconIndexUpdate(string path)
