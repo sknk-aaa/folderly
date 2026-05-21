@@ -92,6 +92,9 @@
   <data name="HistorySection" xml:space="preserve"><value>History</value></data>
   <data name="HistoryMaxCount" xml:space="preserve"><value>Maximum history count</value></data>
   <data name="DeleteHistory" xml:space="preserve"><value>Revert All Folders</value></data>
+  <data name="RefreshSection" xml:space="preserve"><value>Explorer Refresh</value></data>
+  <data name="ForceExplorerRestartOnReapply" xml:space="preserve"><value>Restart Explorer after reapplying to the same folder</value></data>
+  <data name="ForceExplorerRestartOnReapplyNote" xml:space="preserve"><value>This makes repeated image changes appear immediately, but Explorer windows and the taskbar may briefly close and reopen.</value></data>
   <data name="AboutSection" xml:space="preserve"><value>About Folderly</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>Version</value></data>
   <data name="LicenseLabel" xml:space="preserve"><value>License</value></data>

@@ -92,6 +92,9 @@
   <data name="HistorySection" xml:space="preserve"><value>履歴</value></data>
   <data name="HistoryMaxCount" xml:space="preserve"><value>最大保持件数</value></data>
   <data name="DeleteHistory" xml:space="preserve"><value>全フォルダを元に戻す</value></data>
+  <data name="RefreshSection" xml:space="preserve"><value>Explorer の反映</value></data>
+  <data name="ForceExplorerRestartOnReapply" xml:space="preserve"><value>同じフォルダへの再適用後に Explorer を再起動する</value></data>
+  <data name="ForceExplorerRestartOnReapplyNote" xml:space="preserve"><value>画像A→Bのような再適用をすぐ反映します。Explorer ウィンドウとタスクバーが一瞬閉じて開き直します。</value></data>
   <data name="AboutSection" xml:space="preserve"><value>Folderly について</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>バージョン</value></data>
   <data name="LicenseLabel" xml:space="preserve"><value>ライセンス</value></data>

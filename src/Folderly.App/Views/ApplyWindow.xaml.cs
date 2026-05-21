@@ -4,6 +4,7 @@ using Folderly.Core.Application;
 using Folderly.Core.Composition;
 using Folderly.Core.Folder;
 using Microsoft.Win32;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -204,6 +205,9 @@ public partial class ApplyWindow : Window
                 TagColor:          _vm.SelectedTagColor,
                 ForceApply:        false);
 
+            var isReapply = AppServices.History.GetByPath(
+                System.IO.Path.GetFullPath(_vm.FolderPath)) is not null;
+
             var result = await AppServices.Apply.ApplyAsync(request);
 
             if (result.IsWarning)
@@ -216,6 +220,8 @@ public partial class ApplyWindow : Window
             if (result.IsSuccess)
             {
                 ShowSuccessToast();
+                if (isReapply && ShouldForceExplorerRestartOnReapply())
+                    await RestartExplorerAsync();
                 await Task.Delay(1200);
                 Close();
             }
@@ -245,6 +251,39 @@ public partial class ApplyWindow : Window
     }
 
     // ─── キャンセル ──────────────────────────────────────────────────────────
+
+    private static bool ShouldForceExplorerRestartOnReapply()
+        => AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
+
+    private static async Task RestartExplorerAsync()
+    {
+        await Task.Run(() =>
+        {
+            foreach (var process in Process.GetProcessesByName("explorer"))
+            {
+                try
+                {
+                    process.Kill(entireProcessTree: true);
+                    process.WaitForExit(2000);
+                }
+                catch { }
+                finally
+                {
+                    process.Dispose();
+                }
+            }
+
+            Thread.Sleep(300);
+            try
+            {
+                Process.Start(new ProcessStartInfo("explorer.exe")
+                {
+                    UseShellExecute = true,
+                });
+            }
+            catch { }
+        });
+    }
 
     private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
 }
