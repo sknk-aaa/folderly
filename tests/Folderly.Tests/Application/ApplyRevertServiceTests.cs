@@ -1,6 +1,7 @@
 using Folderly.Core;
 using Folderly.Core.Application;
 using Folderly.Core.Composition;
+using Folderly.Core.Folder;
 using Folderly.Core.History;
 using Folderly.Core.Shell;
 using SixLabors.ImageSharp;
@@ -105,11 +106,14 @@ public class ApplyRevertServiceTests : IDisposable
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
         var firstIco = Directory.GetFiles(folderlyDir, "cover_*.ico").Single();
 
-        // タグ色を変えて再適用 → 別のファイル名になり、前のファイルは消える
+        // タグ色を変えて再適用 → 別のファイル名になる。
+        // 旧ICOは Explorer が一時的に参照している可能性があるため、適用時には消さない。
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
         var icoFiles = Directory.GetFiles(folderlyDir, "cover_*.ico");
-        Assert.Single(icoFiles);
-        Assert.NotEqual(firstIco, icoFiles[0]);
+
+        Assert.Equal(2, icoFiles.Length);
+        Assert.Contains(firstIco, icoFiles);
+        Assert.Contains(icoFiles, p => !string.Equals(p, firstIco, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -127,8 +131,26 @@ public class ApplyRevertServiceTests : IDisposable
             sourceImagePath: "/test/same-image.png"));
         var icoFiles = Directory.GetFiles(folderlyDir, "cover_*.ico");
 
-        Assert.Single(icoFiles);
-        Assert.NotEqual(firstIco, icoFiles[0]);
+        Assert.Equal(2, icoFiles.Length);
+        Assert.Contains(firstIco, icoFiles);
+        Assert.Contains(icoFiles, p => !string.Equals(p, firstIco, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task ApplyAsync_Reapply_DesktopIniPointsToLatestIco()
+    {
+        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
+
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
+        var firstIco = Directory.GetFiles(folderlyDir, "cover_*.ico").Single();
+
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
+        var latestIco = Directory.GetFiles(folderlyDir, "cover_*.ico")
+            .Single(p => !string.Equals(p, firstIco, StringComparison.OrdinalIgnoreCase));
+
+        var content = DesktopIniManager.Read(_tempDir);
+        var expected = $@"IconResource={FolderlyConstants.FolderlyDirectoryName}\{Path.GetFileName(latestIco)},0";
+        Assert.Contains(expected, content);
     }
 
     [Fact]

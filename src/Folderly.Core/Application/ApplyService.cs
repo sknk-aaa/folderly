@@ -156,17 +156,6 @@ public sealed class ApplyService
         var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
         Directory.CreateDirectory(folderlyDir);
 
-        // 前世代の cover ファイル群を掃除（同名再上書きでは Explorer キャッシュが剥がれないため）
-        foreach (var stale in Directory.EnumerateFiles(folderlyDir, "cover*.ico"))
-        {
-            try
-            {
-                File.SetAttributes(stale, FileAttributes.Normal);
-                File.Delete(stale);
-            }
-            catch { /* 残ってしまっても致命ではない */ }
-        }
-
         // 旧バージョンが残した .folderly ディレクトリも片付ける（OneDrive で消える前提だが
         // 非 OneDrive パスで残っているケースもあるため）
         var legacyDir = Path.Combine(folderPath, FolderlyConstants.LegacyFolderlyDirectoryName);
