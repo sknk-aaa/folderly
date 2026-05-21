@@ -128,27 +128,53 @@ Core テスト 88 件は WSL2 で全 pass 確認済み。
 
 ## 未完了・継続中の項目
 
-### Explorer 即時反映の問題（解決済み 2026-05-20）
+### Explorer 即時反映の問題（2026-05-21 現在・調査継続中）
 
-**状態**: 解決済み。コミット `b5fd369` の [src/Folderly.Shell/ShellNotifier.cs](src/Folderly.Shell/ShellNotifier.cs#L61-L77) の `ForceIconIndexUpdate`（`SHGetFileInfo` でシステムイメージリストを強制更新 → 取得した icon index に対して `SHCNE_UPDATEIMAGE | SHCNF_DWORD` を発火）を含む MSIX で、`C:\Users\625so\Desktop\FolderlyTest_A` と `C:\Users\625so\Documents\FolderlyTest_B` の両方で親ディレクトリのフォルダアイコンが Explorer 再起動なし & F5 なしで即時更新されることを確認。
+**根本原因（判明済み）**:
+Explorer は「フォルダに `System+ReadOnly` 属性が付いていて `desktop.ini` に `IconResource` がある」状態でもサムネイルキャッシュ（`thumbcache_*.db`）を優先して表示する。キャッシュを破棄するのは **属性が「なし → System+ReadOnly」に遷移したとき**のみ。再適用時は属性変化がないためキャッシュが残り、Explorer のバックグラウンド更新サイクル（2〜30 秒）で自然更新されるまで古いアイコンが見える。
 
-残課題: 多少のラグがある（数百ミリ秒程度）。実用上は許容範囲だがさらに詰める余地はある。優先度は低い。
+**試みた手法と結果**:
+
+| 手法 | 結果 | 廃棄理由 |
+|------|------|---------|
+| `SHGetFileInfo + SHCNE_UPDATEIMAGE | SHCNF_DWORD` (ForceIconIndexUpdate) | 初回適用は即時、再適用は 2〜30 秒 | Windows の根本的な制約 |
+| `IThumbnailCache::GetThumbnail(WTS_FORCEEXTRACTION)` | 15〜20 秒ブロック | UX 劣化、その後の SHChangeNotify でキャッシュが上書きされる |
+| `ToggleSystemReadOnly`（System+ReadOnly を消して即復元） + SHCNE 通知 | 黄色フォルダが一瞬表示される | 属性クリア時に SHCNE_ATTRIBUTES を送ると Explorer が「アイコン無効」と解釈する |
+| `ToggleSystemReadOnly` サイレント（通知なし） | OneDrive 同期が走り 20〜30 秒に悪化 | `SetAttributes` 2 回だけで OneDrive が変化を検知して sync cycle が動く |
+| `SHCNE_RENAMEFOLDER`（自己リネームトリック） + `Shell.Application.Document.Refresh()` | 部分改善、依然 4〜30 秒のケースあり | Explorer が再描画タイミングを選べず |
+
+**現在のコード**（最新 MSIX インストール済み）:
+- `ToggleSystemReadOnly` は `ShellNotifier` に定義のみ残り、どこからも呼ばれない
+- `ForceThumbnailExtraction`（IThumbnailCache 利用）は削除済み
+- 遅延通知は 350ms / 900ms / 1800ms の 3 ラウンドで `SHCNE_ATTRIBUTES+UPDATEITEM+UPDATEDIR`、`ForceIconIndexUpdate`、`RefreshExplorerWindows` を再実行
+
+**実機テスト結果**:
+- 初回適用（キャッシュなし）: 即時〜数百ミリ秒 ✓
+- 再適用（同フォルダ、別画像）: 2〜30 秒（環境・OneDrive 有無で変動）△
+- Revert 後→再適用: 即時（Revert でキャッシュが無効化されるため）✓
+
+**次に試すべきアプローチ（未実装）**:
+1. `SHCNE_RMDIR + SHCNE_MKDIR` コンビネーション通知: フォルダを「削除→再作成」としてシェルに通知し、thumbnail cache エントリを強制破棄させる（フォルダ内容は変化しない）。副作用として Explorer のフォルダ一覧が一瞬更新される可能性あり。
+2. `thumbcache_*.db` を直接操作: 管理者権限不要のプロセスから書き込みロックを取れないため実質不可。
+3. UX 側の対応: 「適用中…」スピナーを表示し、遅延通知が完了するまでウィンドウを開いたままにする（Explorer 自体の限界をユーザに明示する）。
 
 ### 修正済みバグ（2026-05-21）
 
-以下の 3 件はコードと MSIX 実機で確認済み:
+以下はコードと MSIX 実機で確認済み:
 
 | バグ | 修正コミット | 概要 |
 |------|------------|------|
 | Revert が OneDrive 配下で失敗 | `d5aa336` | 属性クリア → 操作 → 最大 5 回リトライに変更 |
 | 再適用時に画像が更新されない | `d5aa336` | ICO ファイル名に 8 文字ハッシュを付加（Explorer キャッシュ無効化） |
 | OneDrive が `.folderly` を削除する | `70ee0d0` | ディレクトリ名を `_folderly`（アンダースコア始まり）に変更 |
+| 「全フォルダを元に戻す」が DB 削除のみで実際に Revert しない | 2026-05-21 | `ClearAllHistory_Click` / `DeleteHistory_Click` を async に変更し `RevertAsync` を呼ぶよう修正 |
+| `ToggleSystemReadOnly` が OneDrive 同期を誘発し 20〜30 秒遅延 | 2026-05-21 | `RunDelayedNotify` から `ToggleSystemReadOnly` 呼び出しを除去 |
 
 ### 手動テスト未完了項目（[docs/TESTING.md](docs/TESTING.md)）
 
-「要再確認」セクション:
 - [ ] 日本語フォルダ名で文字化けなく適用できること
 - [ ] docs/TESTING.md 全項目を上から実施
+- [ ] 再適用の遅延が実用上許容範囲かユーザが判断（許容できない場合は「次に試すべきアプローチ」を実装）
 
 ---
 
@@ -213,9 +239,11 @@ WSL2 側の最新コミットは `b5fd369 fix: force icon index update via SHGet
 
 ## 次にやるべきこと
 
-### Step 17.5: 完了（2026-05-20）
+### Step 17.5: Explorer 即時反映（2026-05-21 現在・部分解決）
 
-最優先課題だった Explorer 即時反映は `b5fd369` の `ForceIconIndexUpdate` で解決。Desktop / Documents 配下で再起動なしの即時反映を確認済み（多少のラグあり、実用上問題なし）。
+- 初回適用 / Revert 後の再適用 は即時反映 ✓
+- **同フォルダへの再適用（上書き適用）は 2〜30 秒の遅延が残る**（Windows Explorer の thumbnail cache 仕様による根本的制約）
+- 試みた手法と廃棄理由、次に試すべき手法は「Explorer 即時反映の問題」セクション参照
 
 ### Step 18 残作業: docs/TESTING.md 完走
 
