@@ -25,7 +25,7 @@
 | 4  | Core - TemplateRenderer | 完了 |
 | 5  | Core - IcoConverter | 完了 |
 | 6  | Core - DesktopIniManager + FolderAttributesService | 完了 |
-| 7  | Shell - ShellNotifier + IShellNotifier | 完了（`b5fd369` の `ForceIconIndexUpdate` で即時反映確認済 2026-05-20） |
+| 7  | Shell - ShellNotifier + IShellNotifier | 完了（通知だけでは不安定なため、最終的に対象 Explorer ウィンドウ開き直しで安定化） |
 | 8  | Core - HistoryRepository | 完了 |
 | 9  | Core - FolderProtection | 完了 |
 | 10 | Core - ApplyService + RevertService | 完了 |
@@ -38,7 +38,7 @@
 | 17 | COM IExplorerCommand 右クリックメニュー | 実装完了・MSIX 動作確認済 |
 | 18 | docs/TESTING.md + README.md 整備 | 完了（手動テストは継続中） |
 
-Core テスト 88 件は WSL2 で全 pass 確認済み。
+Core テスト 110 件は Windows で全 pass 確認済み。
 
 ---
 
@@ -95,7 +95,7 @@ Core テスト 88 件は WSL2 で全 pass 確認済み。
 - [src/Folderly.Package/Package.appxmanifest](src/Folderly.Package/Package.appxmanifest)
 
 ### テスト
-- [tests/Folderly.Tests/](tests/Folderly.Tests/)（Core テスト 88 件、全 pass 確認済）
+- [tests/Folderly.Tests/](tests/Folderly.Tests/)（Core テスト 110 件、全 pass 確認済）
 
 ---
 
@@ -118,7 +118,7 @@ Core テスト 88 件は WSL2 で全 pass 確認済み。
 | 19 | IExplorerCommand IID | `a08ce4d0-fa25-44ab-b57c-c7b1c323e0b9`（要注意：間違えやすい） |
 | 19 | Context menu CLSID | `2A7A05DA-70D8-4302-8B23-AE8D79D801B6` |
 | 20 | SQLite ネイティブ DLL は `e_sqlite3.dll` を package に同梱必須 | 起動時クラッシュ防止 |
-| 21 | Shell 通知は folder / desktop.ini / dir 全部送る | 即時反映のため |
+| 21 | Shell 通知は folder / desktop.ini / dir 全部送る | Explorer への内部更新通知。通知だけでは再適用が遅れるため、対象 Explorer ウィンドウ開き直しを併用 |
 
 ### テスト証明書（サイドロード用）
 - CN=Folderly
@@ -126,37 +126,50 @@ Core テスト 88 件は WSL2 で全 pass 確認済み。
 
 ---
 
-## 未完了・継続中の項目
+## 現在の重要仕様・解決済み項目
 
-### Explorer 即時反映の問題（2026-05-21 現在・調査継続中）
+### Explorer 反映仕様（2026-05-21 現在・解決済み）
 
-**根本原因（判明済み）**:
-Explorer は「フォルダに `System+ReadOnly` 属性が付いていて `desktop.ini` に `IconResource` がある」状態でもサムネイルキャッシュ（`thumbcache_*.db`）を優先して表示する。キャッシュを破棄するのは **属性が「なし → System+ReadOnly」に遷移したとき**のみ。再適用時は属性変化がないためキャッシュが残り、Explorer のバックグラウンド更新サイクル（2〜30 秒）で自然更新されるまで古いアイコンが見える。
+**結論**:
+Folderly は適用成功後、対象フォルダまたは親フォルダを表示している Explorer ウィンドウだけを閉じて開き直す。`explorer.exe` 本体、タスクバー、スタートメニューは再起動しない。
+
+**理由**:
+Windows Explorer は `desktop.ini` と ICO が正しく更新されていても、フォルダアイコン/サムネイルキャッシュを保持して古い見た目を表示し続けることがある。特に同一フォルダへの A→B 再適用では、通知だけだと 30〜40 秒遅れるケースが実機で確認された。
+
+**ユーザー向け説明**:
+Store/説明文には「アイコン更新時に Explorer ウィンドウを開き直します。これは Windows のアイコンキャッシュ更新のための仕様です。」と記載する。
+
+**実機テスト結果**:
+- 画像A 初回適用: 数秒以内に反映 ✓
+- 画像B 再適用: 30〜40秒待ちなし、数秒以内に反映 ✓
+- 画像C 再適用: 数秒以内に反映 ✓
+- 対象 Explorer ウィンドウの開き直しは軽い ✓
+- タスクバー / スタートメニューの乱れなし ✓
+- 「全フォルダを元に戻す」成功 ✓
+- OneDrive 配下で A→B→C 成功 ✓
+
+**採用した実装**:
+- `src/Folderly.App/Views/ApplyWindow.xaml.cs`
+  - 適用成功後に `ReopenExplorerWindowsAsync(folderPath)` を実行
+  - `Shell.Application.Windows()` から対象フォルダ/親フォルダを表示している Explorer ウィンドウを探す
+  - 該当ウィンドウだけ `Quit()` し、同じパスを `explorer.exe "<path>"` で開き直す
+- `src/Folderly.App/Views/SettingsWindow.xaml`
+  - 設定名: 「フォルダアイコン適用後に Explorer ウィンドウを開き直す」
+  - 既定オン
 
 **試みた手法と結果**:
 
-| 手法 | 結果 | 廃棄理由 |
-|------|------|---------|
-| `SHGetFileInfo + SHCNE_UPDATEIMAGE | SHCNF_DWORD` (ForceIconIndexUpdate) | 初回適用は即時、再適用は 2〜30 秒 | Windows の根本的な制約 |
-| `IThumbnailCache::GetThumbnail(WTS_FORCEEXTRACTION)` | 15〜20 秒ブロック | UX 劣化、その後の SHChangeNotify でキャッシュが上書きされる |
-| `ToggleSystemReadOnly`（System+ReadOnly を消して即復元） + SHCNE 通知 | 黄色フォルダが一瞬表示される | 属性クリア時に SHCNE_ATTRIBUTES を送ると Explorer が「アイコン無効」と解釈する |
-| `ToggleSystemReadOnly` サイレント（通知なし） | OneDrive 同期が走り 20〜30 秒に悪化 | `SetAttributes` 2 回だけで OneDrive が変化を検知して sync cycle が動く |
-| `SHCNE_RENAMEFOLDER`（自己リネームトリック） + `Shell.Application.Document.Refresh()` | 部分改善、依然 4〜30 秒のケースあり | Explorer が再描画タイミングを選べず |
-
-**現在のコード**（最新 MSIX インストール済み）:
-- `ToggleSystemReadOnly` は `ShellNotifier` に定義のみ残り、どこからも呼ばれない
-- `ForceThumbnailExtraction`（IThumbnailCache 利用）は削除済み
-- 遅延通知は 350ms / 900ms / 1800ms の 3 ラウンドで `SHCNE_ATTRIBUTES+UPDATEITEM+UPDATEDIR`、`ForceIconIndexUpdate`、`RefreshExplorerWindows` を再実行
-
-**実機テスト結果**:
-- 初回適用（キャッシュなし）: 即時〜数百ミリ秒 ✓
-- 再適用（同フォルダ、別画像）: 2〜30 秒（環境・OneDrive 有無で変動）△
-- Revert 後→再適用: 即時（Revert でキャッシュが無効化されるため）✓
-
-**次に試すべきアプローチ（未実装）**:
-1. `SHCNE_RMDIR + SHCNE_MKDIR` コンビネーション通知: フォルダを「削除→再作成」としてシェルに通知し、thumbnail cache エントリを強制破棄させる（フォルダ内容は変化しない）。副作用として Explorer のフォルダ一覧が一瞬更新される可能性あり。
-2. `thumbcache_*.db` を直接操作: 管理者権限不要のプロセスから書き込みロックを取れないため実質不可。
-3. UX 側の対応: 「適用中…」スピナーを表示し、遅延通知が完了するまでウィンドウを開いたままにする（Explorer 自体の限界をユーザに明示する）。
+| 手法 | 結果 | 判断 |
+|------|------|------|
+| `SHGetFileInfo + SHCNE_UPDATEIMAGE | SHCNF_DWORD` | 初回は効くが、再適用は 30〜40 秒遅れる場合あり | 補助通知として維持 |
+| PATH/PIDL の `SHChangeNotify` | 同上 | 補助通知として維持 |
+| `Shell.Application.Document.Refresh()` | 開いているウィンドウの再描画には効くが、古いアイコンキャッシュが残る場合あり | 補助処理として維持 |
+| `SHCNE_ASSOCCHANGED` | 初回適用まで 20 秒程度に悪化 | 削除済み |
+| `SHCNE_RMDIR + SHCNE_MKDIR` | 黄色フォルダへ戻る瞬間が出る | 廃棄 |
+| `ToggleSystemReadOnly` | OneDrive 同期を誘発し遅延悪化 | 廃棄 |
+| `IThumbnailCache::GetThumbnail(WTS_FORCEEXTRACTION)` | 15〜20 秒ブロック | 廃棄 |
+| `explorer.exe` 本体再起動 | 反映は確実だが Start/タスクバーが乱れる | 廃棄 |
+| 対象 Explorer ウィンドウだけ開き直し | A/B/C すべて数秒以内、再起も軽い | 採用 |
 
 ### 修正済みバグ（2026-05-21）
 
@@ -164,17 +177,19 @@ Explorer は「フォルダに `System+ReadOnly` 属性が付いていて `deskt
 
 | バグ | 修正コミット | 概要 |
 |------|------------|------|
-| Revert が OneDrive 配下で失敗 | `d5aa336` | 属性クリア → 操作 → 最大 5 回リトライに変更 |
-| 再適用時に画像が更新されない | `d5aa336` | ICO ファイル名に 8 文字ハッシュを付加（Explorer キャッシュ無効化） |
-| OneDrive が `.folderly` を削除する | `70ee0d0` | ディレクトリ名を `_folderly`（アンダースコア始まり）に変更 |
-| 「全フォルダを元に戻す」が DB 削除のみで実際に Revert しない | 2026-05-21 | `ClearAllHistory_Click` / `DeleteHistory_Click` を async に変更し `RevertAsync` を呼ぶよう修正 |
-| `ToggleSystemReadOnly` が OneDrive 同期を誘発し 20〜30 秒遅延 | 2026-05-21 | `RunDelayedNotify` から `ToggleSystemReadOnly` 呼び出しを除去 |
+| Revert が OneDrive 配下で失敗 | `d5aa336` 以降 | 属性クリア → 操作 → 最大 5 回リトライに変更 |
+| 再適用時に画像が更新されない / 30〜40 秒待ち | `0453fc2` | 対象 Explorer ウィンドウだけを開き直し、Explorer キャッシュを最新化 |
+| Explorer 本体再起動で Start/タスクバーが乱れる | `0453fc2` | `explorer.exe` 本体 kill を廃止し、対象ウィンドウだけ `Quit()` |
+| OneDrive 配下の ICO 参照が不安定 | `2770a81` 以降 | `desktop.ini` の参照先を `%LOCALAPPDATA%\Folderly\icons\cover_<hash>.ico` に変更 |
+| 再適用時に Revert 用バックアップが壊れる | `78d3464` | History upsert 時に元状態バックアップを保持 |
+| 「全フォルダを元に戻す」が実フォルダを戻さない/残骸が残る | `c9460d2` | 履歴 entries の Revert と、Desktop/Documents/OneDrive 周辺の orphan Folderly 残骸掃除を追加 |
+| `SHCNE_ASSOCCHANGED` で初回適用まで遅くなる | `c8a1108` | 重い関連付け更新通知を削除 |
+| MSIX後の手動 Explorer 再起動が重い | `a412b8c` | README の手順を軽量化。通常はインストール後に Explorer 本体再起動しない |
 
 ### 手動テスト未完了項目（[docs/TESTING.md](docs/TESTING.md)）
 
 - [ ] 日本語フォルダ名で文字化けなく適用できること
 - [ ] docs/TESTING.md 全項目を上から実施
-- [ ] 再適用の遅延が実用上許容範囲かユーザが判断（許容できない場合は「次に試すべきアプローチ」を実装）
 
 ---
 
@@ -185,10 +200,10 @@ Explorer は「フォルダに `System+ReadOnly` 属性が付いていて `deskt
 ```powershell
 cd C:\path\to\folderly
 git pull
-git status   # PROMPT.md の変更が残っているかも（無視してよい）
+git status
 ```
 
-WSL2 側の最新コミットは `b5fd369 fix: force icon index update via SHGetFileInfo`。これが pull できているか確認。
+2026-05-21 時点の重要コミットは `0453fc2 fix: Explorer本体ではなく対象ウィンドウを開き直す`。これ以降の履歴を確認すること。
 
 ### 2. ビルド & MSIX パック手順
 
@@ -239,11 +254,12 @@ WSL2 側の最新コミットは `b5fd369 fix: force icon index update via SHGet
 
 ## 次にやるべきこと
 
-### Step 17.5: Explorer 即時反映（2026-05-21 現在・部分解決）
+### Step 17.5: Explorer 反映（2026-05-21 解決済み）
 
-- 初回適用 / Revert 後の再適用 は即時反映 ✓
-- **同フォルダへの再適用（上書き適用）は 2〜30 秒の遅延が残る**（Windows Explorer の thumbnail cache 仕様による根本的制約）
-- 試みた手法と廃棄理由、次に試すべき手法は「Explorer 即時反映の問題」セクション参照
+- 初回適用 / 同フォルダ再適用 / A→B→C 連続適用 は数秒以内に反映 ✓
+- 通知だけではなく、対象 Explorer ウィンドウを開き直して Explorer キャッシュを最新化する仕様
+- Explorer 本体・タスクバー・スタートメニューは再起動しない
+- Store/説明文では「アイコン更新時に Explorer ウィンドウを開き直します。これは Windows のアイコンキャッシュ更新のための仕様です。」と明記する
 
 ### Step 18 残作業: docs/TESTING.md 完走
 
@@ -256,6 +272,7 @@ WSL2 側の最新コミットは `b5fd369 fix: force icon index update via SHGet
 - タグ機能（各色での適用）
 - 保護機能（C:\Windows, C:\Program Files, ドライブルート等）
 - OneDrive 配下の警告ダイアログ
+- Explorer ウィンドウ開き直し設定の ON/OFF
 - 設定画面: 言語切替（即時反映）・履歴最大件数
 - アンインストール後に右クリックメニューが消える
 - 試用版バナー表示
