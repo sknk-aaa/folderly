@@ -107,7 +107,7 @@ public sealed class RevertService
             }
 
             // 5. Shell 通知
-            _shellNotifier.NotifyFolderChanged(normalized);
+            _shellNotifier.NotifyFolderReverted(normalized);
 
             // 6. 履歴削除
             _history.Delete(normalized);
@@ -381,7 +381,7 @@ public sealed class RevertService
 
         TryClearFolderCustomizationAttributes(folderPath);
         _history.Delete(folderPath);
-        _shellNotifier.NotifyFolderChanged(folderPath);
+        _shellNotifier.NotifyFolderReverted(folderPath);
         _logger.LogInformation("Cleaned orphaned Folderly artifacts in {FolderPath}", folderPath);
         return true;
     }

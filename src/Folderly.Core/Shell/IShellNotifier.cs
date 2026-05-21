@@ -10,4 +10,5 @@ public interface IShellNotifier
     /// 指定フォルダのシェルアイコンキャッシュを更新する通知を送る。
     /// </summary>
     void NotifyFolderChanged(string folderPath);
+    void NotifyFolderReverted(string folderPath);
 }

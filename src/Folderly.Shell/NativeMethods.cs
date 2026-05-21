@@ -5,6 +5,7 @@ namespace Folderly.Shell;
 internal static partial class NativeMethods
 {
     internal const uint SHCNE_MKDIR        = 0x00000008;
+    internal const uint SHCNE_DELETE       = 0x00000004;
     internal const uint SHCNE_RMDIR        = 0x00000010;
     internal const uint SHCNE_UPDATEIMAGE  = 0x00008000;
     internal const uint SHCNE_UPDATEITEM   = 0x00002000;

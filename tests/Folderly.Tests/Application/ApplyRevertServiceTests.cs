@@ -14,8 +14,11 @@ namespace Folderly.Tests.Application;
 internal sealed class NoOpShellNotifier : IShellNotifier
 {
     public List<string> NotifiedPaths { get; } = new();
+    public List<string> RevertedPaths { get; } = new();
     public void NotifyFolderChanged(string folderPath)
         => NotifiedPaths.Add(folderPath);
+    public void NotifyFolderReverted(string folderPath)
+        => RevertedPaths.Add(folderPath);
 }
 
 public class ApplyRevertServiceTests : IDisposable
@@ -68,13 +71,14 @@ public class ApplyRevertServiceTests : IDisposable
         Stream? sourceImageStream = null,
         string sourceImagePath = "/test/image.png",
         string? tagName = null,
-        bool showTagNameOnIcon = false)
+        bool showTagNameOnIcon = false,
+        ImageAdjustParams? adjustParams = null)
     {
         return new ApplyRequest(
             FolderPath:       folderPath ?? _tempDir,
             SourceImageStream: sourceImageStream ?? CreateTestImageStream(),
             SourceImagePath:  sourceImagePath,
-            AdjustParams:     new ImageAdjustParams(),
+            AdjustParams:     adjustParams ?? new ImageAdjustParams(),
             TagColor:         tagColor ?? TagColors.None,
             ForceApply:       forceApply,
             TagName:          tagName,
@@ -255,6 +259,16 @@ public class ApplyRevertServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task ApplyAsync_FitHeightMode_SavesCropModeInHistory()
+    {
+        await _applyService.ApplyAsync(MakeRequest(
+            adjustParams: new ImageAdjustParams(Mode: CropMode.FitHeight)));
+
+        var entry = _repo.GetByPath(Path.GetFullPath(_tempDir));
+        Assert.Equal("fit_height", entry!.CropMode);
+    }
+
+    [Fact]
     public async Task RevertAsync_RestoresDesktopIni_WhenOriginallyAbsent()
     {
         // 元々 desktop.ini がない状態で適用→復元
@@ -366,10 +380,12 @@ public class ApplyRevertServiceTests : IDisposable
     {
         await _applyService.ApplyAsync(MakeRequest());
         _notifier.NotifiedPaths.Clear();
+        _notifier.RevertedPaths.Clear();
 
         await _revertService.RevertAsync(_tempDir);
 
-        Assert.True(_notifier.NotifiedPaths.Count > 0);
+        Assert.Empty(_notifier.NotifiedPaths);
+        Assert.True(_notifier.RevertedPaths.Count > 0);
     }
 
     [Fact]

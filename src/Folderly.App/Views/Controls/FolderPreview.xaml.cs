@@ -224,9 +224,12 @@ public partial class FolderPreview : UserControl
         double regionH = ImageRegionPx.Height;
 
         // CropMode に応じたベーススケール（ImageRegion をちょうど埋める or 収める）
-        double baseScale = CropMode == CoreCropMode.Center
-            ? Math.Max(regionW / imgW, regionH / imgH)
-            : regionW / imgW;
+        double baseScale = CropMode switch
+        {
+            CoreCropMode.FitWidth => regionW / imgW,
+            CoreCropMode.FitHeight => regionH / imgH,
+            _ => Math.Max(regionW / imgW, regionH / imgH),
+        };
 
         double totalScale = baseScale * Scale;
 

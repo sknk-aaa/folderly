@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace Folderly.Core.Composition;
 
-public enum CropMode { Center, FitWidth }
+public enum CropMode { Center, FitWidth, FitHeight }
 
 public record ImageAdjustParams(
     float Scale = 1.0f,
@@ -27,9 +27,12 @@ public static class ImageAdjuster
         ImageAdjustParams? parameters = null)
     {
         var p = parameters ?? new ImageAdjustParams();
-        return p.Mode == CropMode.Center
-            ? ApplyCenterCrop(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY)
-            : ApplyFitWidthMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY);
+        return p.Mode switch
+        {
+            CropMode.FitWidth => ApplyFitWidthMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY),
+            CropMode.FitHeight => ApplyFitHeightMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY),
+            _ => ApplyCenterCrop(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY),
+        };
     }
 
     private static Image<Rgba32> ApplyCenterCrop(
@@ -103,6 +106,55 @@ public static class ImageAdjuster
         try
         {
             // target 外へのはみ出しを防ぐクリッピング
+            int srcX = 0, srcY = 0;
+            int destX = pasteX, destY = pasteY;
+            int drawW = resizedW, drawH = resizedH;
+
+            if (destX < 0) { srcX = -destX; drawW += destX; destX = 0; }
+            if (destY < 0) { srcY = -destY; drawH += destY; destY = 0; }
+            if (destX + drawW > target.Width) drawW = target.Width - destX;
+            if (destY + drawH > target.Height) drawH = target.Height - destY;
+
+            if (drawW > 0 && drawH > 0)
+            {
+                var visible = resized.Clone(ctx => ctx.Crop(
+                    new Rectangle(srcX, srcY, drawW, drawH)));
+                try
+                {
+                    result.Mutate(ctx => ctx.DrawImage(visible, new Point(destX, destY), 1f));
+                }
+                finally
+                {
+                    visible.Dispose();
+                }
+            }
+        }
+        finally
+        {
+            resized.Dispose();
+        }
+
+        return result;
+    }
+
+    private static Image<Rgba32> ApplyFitHeightMode(
+        Image source, Size target, float scale, float offsetX, float offsetY)
+    {
+        float fitScale = (float)target.Height / source.Height;
+        float effectiveScale = fitScale * scale;
+        effectiveScale = Math.Max(effectiveScale, 0.001f);
+
+        int resizedW = Math.Max(1, (int)Math.Round(source.Width * effectiveScale));
+        int resizedH = Math.Max(1, (int)Math.Round(source.Height * effectiveScale));
+
+        int pasteX = (target.Width - resizedW) / 2 + (int)offsetX;
+        int pasteY = (target.Height - resizedH) / 2 + (int)offsetY;
+
+        var result = new Image<Rgba32>(target.Width, target.Height);
+
+        var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
+        try
+        {
             int srcX = 0, srcY = 0;
             int destX = pasteX, destY = pasteY;
             int drawW = resizedW, drawH = resizedH;

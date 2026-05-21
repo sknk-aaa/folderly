@@ -60,6 +60,8 @@ public sealed class ApplyViewModel : ViewModelBase
             Notify();
             Notify(nameof(IsCropCenter));
             Notify(nameof(IsCropFitWidth));
+            Notify(nameof(IsCropFitHeight));
+            ResetPosition();
         }
     }
 
@@ -72,13 +74,13 @@ public sealed class ApplyViewModel : ViewModelBase
     public bool IsCropFitWidth
     {
         get => CropMode == CoreCropMode.FitWidth;
-        set
-        {
-            if (!value) return;
-            CropMode = CoreCropMode.FitWidth;
-            Scale = 1.0;
-            OffsetX = 0.0;
-        }
+        set { if (value) CropMode = CoreCropMode.FitWidth; }
+    }
+
+    public bool IsCropFitHeight
+    {
+        get => CropMode == CoreCropMode.FitHeight;
+        set { if (value) CropMode = CoreCropMode.FitHeight; }
     }
 
     // ─── タグ色 ───────────────────────────────────────────────────────────────

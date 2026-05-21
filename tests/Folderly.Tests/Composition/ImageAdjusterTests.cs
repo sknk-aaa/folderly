@@ -115,6 +115,36 @@ public class ImageAdjusterTests
     }
 
     [Fact]
+    public void Adjust_FitHeightMode_WideImage_FillsHeight()
+    {
+        using var src = CreateSolidImage(400, 100, r: 255, g: 0, b: 0);
+        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.FitHeight));
+
+        Assert.Equal(Target.Width, result.Width);
+        Assert.Equal(Target.Height, result.Height);
+
+        var topPx = result[Target.Width / 2, 0];
+        var bottomPx = result[Target.Width / 2, Target.Height - 1];
+        Assert.Equal(255, topPx.A);
+        Assert.Equal(255, bottomPx.A);
+    }
+
+    [Fact]
+    public void Adjust_FitHeightMode_TallImage_HasHorizontalTransparentPixels()
+    {
+        using var src = CreateSolidImage(100, 400);
+        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Mode: CropMode.FitHeight));
+
+        Assert.Equal(Target.Width, result.Width);
+        Assert.Equal(Target.Height, result.Height);
+
+        var leftPx = result[0, Target.Height / 2];
+        var centerPx = result[Target.Width / 2, Target.Height / 2];
+        Assert.Equal(0, leftPx.A);
+        Assert.Equal(255, centerPx.A);
+    }
+
+    [Fact]
     public void Adjust_ExtremelyLargeImage_DoesNotThrow()
     {
         using var src = new Image<Rgba32>(8192, 8192);

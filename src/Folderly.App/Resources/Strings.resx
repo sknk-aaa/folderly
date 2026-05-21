@@ -36,8 +36,9 @@
   <data name="PreviewPlaceholder" xml:space="preserve"><value>Select an image to preview</value></data>
   <data name="ScaleLabel" xml:space="preserve"><value>Scale</value></data>
   <data name="ResetPosition" xml:space="preserve"><value>Reset Position</value></data>
-  <data name="CropCenter" xml:space="preserve"><value>Crop to Center</value></data>
+  <data name="CropCenter" xml:space="preserve"><value>No Margins</value></data>
   <data name="CropFitWidth" xml:space="preserve"><value>Fit Width</value></data>
+  <data name="CropFitHeight" xml:space="preserve"><value>Fit Height</value></data>
   <data name="TagLabel" xml:space="preserve"><value>Tag</value></data>
   <data name="TagNone" xml:space="preserve"><value>None</value></data>
   <data name="TagBlue" xml:space="preserve"><value>Blue&#x0a;Development</value></data>

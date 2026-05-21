@@ -98,6 +98,9 @@
                          GroupName="CropMode" Margin="0,0,20,0"/>
             <RadioButton Content="{Binding L[CropFitWidth]}"
                          IsChecked="{Binding IsCropFitWidth, Mode=TwoWay}"
+                         GroupName="CropMode" Margin="0,0,20,0"/>
+            <RadioButton Content="{Binding L[CropFitHeight]}"
+                         IsChecked="{Binding IsCropFitHeight, Mode=TwoWay}"
                          GroupName="CropMode"/>
         </StackPanel>
 
