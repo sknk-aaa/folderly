@@ -52,12 +52,24 @@ public sealed class RevertService
                     TryClearAttributes(iniPath);
 
                 var originalContent = Encoding.Unicode.GetString(entry.OriginalDesktopIniContent);
-                DesktopIniManager.WriteRaw(normalized, originalContent);
+                var cleanedOriginalContent = RemoveFolderlyIconKeys(originalContent);
+                var originalWasFolderlyState = !string.Equals(
+                    cleanedOriginalContent, originalContent, StringComparison.Ordinal);
 
-                if (entry.OriginalDesktopIniAttrs is int attrs)
+                if (string.IsNullOrWhiteSpace(cleanedOriginalContent))
                 {
-                    try { File.SetAttributes(iniPath, (FileAttributes)attrs); }
-                    catch (Exception ex) { _logger.LogWarning(ex, "Failed to restore desktop.ini attributes"); }
+                    if (File.Exists(iniPath))
+                        DeleteFileWithRetry(iniPath, ct);
+                }
+                else
+                {
+                    DesktopIniManager.WriteRaw(normalized, cleanedOriginalContent);
+
+                    if (!originalWasFolderlyState && entry.OriginalDesktopIniAttrs is int attrs)
+                    {
+                        try { File.SetAttributes(iniPath, (FileAttributes)attrs); }
+                        catch (Exception ex) { _logger.LogWarning(ex, "Failed to restore desktop.ini attributes"); }
+                    }
                 }
             }
             else if (!entry.HadDesktopIni)
@@ -70,8 +82,17 @@ public sealed class RevertService
             }
 
             // 3. フォルダ属性を元に戻す
+            var folderAttributes = (FileAttributes)entry.OriginalAttributes;
+            if (entry.HadDesktopIni &&
+                entry.OriginalDesktopIniContent is not null &&
+                IsFolderlyManagedDesktopIni(Encoding.Unicode.GetString(entry.OriginalDesktopIniContent)))
+            {
+                folderAttributes &= ~FileAttributes.System;
+                folderAttributes &= ~FileAttributes.ReadOnly;
+            }
+
             FolderAttributesService.RestoreAttributes(
-                normalized, (FileAttributes)entry.OriginalAttributes);
+                normalized, folderAttributes);
 
             // 4. _folderly ディレクトリを削除（旧 .folderly が残っていれば合わせて掃除）
             foreach (var dirName in new[] {
@@ -158,5 +179,100 @@ public sealed class RevertService
                 Thread.Sleep(100 * (i + 1));
             }
         }
+    }
+
+    private static bool IsFolderlyManagedDesktopIni(string content)
+        => !string.Equals(RemoveFolderlyIconKeys(content), content, StringComparison.Ordinal);
+
+    private static string RemoveFolderlyIconKeys(string content)
+    {
+        var lines = content.Split('\n');
+        var kept = new List<string>(lines.Length);
+        var removedFolderlyIconKey = false;
+
+        foreach (var rawLine in lines)
+        {
+            var line = rawLine.TrimEnd('\r');
+            var eq = line.IndexOf('=');
+            if (eq <= 0)
+            {
+                kept.Add(line);
+                continue;
+            }
+
+            var key = line[..eq].Trim();
+            var value = line[(eq + 1)..].Trim();
+
+            var isIconPathKey =
+                string.Equals(key, "IconResource", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(key, "IconFile", StringComparison.OrdinalIgnoreCase);
+            if (isIconPathKey && IsFolderlyIconValue(value))
+            {
+                removedFolderlyIconKey = true;
+                continue;
+            }
+
+            if (removedFolderlyIconKey &&
+                string.Equals(key, "IconIndex", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            kept.Add(line);
+        }
+
+        if (!removedFolderlyIconKey)
+            return content;
+
+        return PruneEmptyShellClassInfo(string.Join("\r\n", kept));
+    }
+
+    private static bool IsFolderlyIconValue(string value)
+    {
+        var path = value;
+        var comma = path.LastIndexOf(',');
+        if (comma >= 0)
+            path = path[..comma];
+
+        path = path.Trim().Trim('"').Replace('/', '\\');
+        return path.Contains("\\Folderly\\icons\\", StringComparison.OrdinalIgnoreCase) ||
+               path.Contains("\\_folderly\\", StringComparison.OrdinalIgnoreCase) ||
+               path.Contains("\\.folderly\\", StringComparison.OrdinalIgnoreCase) ||
+               Path.GetFileName(path).StartsWith("cover_", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string PruneEmptyShellClassInfo(string content)
+    {
+        var lines = content.Split(
+            new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        var result = new List<string>(lines.Length);
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var line = lines[i];
+            if (!line.Trim().Equals("[.ShellClassInfo]", StringComparison.OrdinalIgnoreCase))
+            {
+                result.Add(line);
+                continue;
+            }
+
+            var sectionLines = new List<string>();
+            var j = i + 1;
+            while (j < lines.Length && !lines[j].TrimStart().StartsWith('['))
+            {
+                sectionLines.Add(lines[j]);
+                j++;
+            }
+
+            if (sectionLines.Any(l => !string.IsNullOrWhiteSpace(l)))
+            {
+                result.Add(line);
+                result.AddRange(sectionLines);
+            }
+
+            i = j - 1;
+        }
+
+        return string.Join("\r\n", result).Trim();
     }
 }

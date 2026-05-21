@@ -83,10 +83,6 @@ public sealed class HistoryRepository : IDisposable
                 $tag, $applied_at, $schema_ver
             )
             ON CONFLICT(folder_path) DO UPDATE SET
-                original_attributes     = excluded.original_attributes,
-                had_desktop_ini         = excluded.had_desktop_ini,
-                original_desktop_ini    = excluded.original_desktop_ini,
-                original_desktop_ini_attrs = excluded.original_desktop_ini_attrs,
                 source_image_path       = excluded.source_image_path,
                 icon_hash               = excluded.icon_hash,
                 icon_storage_path       = excluded.icon_storage_path,

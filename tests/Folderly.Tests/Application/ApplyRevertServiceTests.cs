@@ -259,6 +259,58 @@ public class ApplyRevertServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task RevertAsync_AfterReapply_WhenOriginallyAbsent_DeletesDesktopIni()
+    {
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
+
+        var iniPath = Path.Combine(_tempDir, "desktop.ini");
+        Assert.True(File.Exists(iniPath));
+
+        await _revertService.RevertAsync(_tempDir);
+
+        Assert.False(File.Exists(iniPath));
+    }
+
+    [Fact]
+    public async Task RevertAsync_WithCorruptedFolderlyBackup_RemovesFolderlyDesktopIni()
+    {
+        var iniPath = Path.Combine(_tempDir, "desktop.ini");
+        var folderlyContent =
+            "[.ShellClassInfo]\r\n" +
+            @"IconResource=C:\Users\tester\AppData\Local\Folderly\icons\abc.ico,0" + "\r\n" +
+            @"IconFile=C:\Users\tester\AppData\Local\Folderly\icons\abc.ico" + "\r\n" +
+            "IconIndex=0\r\n";
+
+        File.WriteAllText(iniPath, folderlyContent, new System.Text.UnicodeEncoding(false, true));
+        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
+        Directory.CreateDirectory(folderlyDir);
+        File.WriteAllText(Path.Combine(folderlyDir, "cover_abc.ico"), "fake");
+
+        _repo.Upsert(new HistoryEntry(
+            Id: null,
+            FolderPath: Path.GetFullPath(_tempDir),
+            OriginalAttributes: (int)(FileAttributes.Directory | FileAttributes.System | FileAttributes.ReadOnly),
+            HadDesktopIni: true,
+            OriginalDesktopIniContent: System.Text.Encoding.Unicode.GetBytes(folderlyContent),
+            OriginalDesktopIniAttrs: (int)(FileAttributes.Hidden | FileAttributes.System),
+            SourceImagePath: "image.png",
+            IconHash: "abc",
+            IconStoragePath: @"C:\Users\tester\AppData\Local\Folderly\icons\abc.ico",
+            CropMode: "center",
+            ImageScale: 1,
+            ImageOffsetX: 0,
+            ImageOffsetY: 0,
+            TagColor: null,
+            AppliedAt: DateTime.UtcNow));
+
+        await _revertService.RevertAsync(_tempDir);
+
+        Assert.False(File.Exists(iniPath));
+        Assert.False(Directory.Exists(folderlyDir));
+    }
+
+    [Fact]
     public async Task RevertAsync_DeletesFolderlyDirectory()
     {
         await _applyService.ApplyAsync(MakeRequest());
@@ -319,5 +371,24 @@ public class ApplyRevertServiceTests : IDisposable
         Assert.True(File.Exists(iniPath));
         var restoredContent = File.ReadAllText(iniPath, new System.Text.UnicodeEncoding(false, true));
         Assert.Contains("InfoTip=OriginalTip", restoredContent);
+    }
+
+    [Fact]
+    public async Task ApplyAsync_ExistingDesktopIni_Reapply_RestoresOriginalOnRevert()
+    {
+        var originalContent = "[.ShellClassInfo]\r\nInfoTip=OriginalTip\r\n";
+        File.WriteAllText(Path.Combine(_tempDir, "desktop.ini"), originalContent,
+            new System.Text.UnicodeEncoding(false, true));
+
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
+        await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
+        await _revertService.RevertAsync(_tempDir);
+
+        var restoredContent = File.ReadAllText(
+            Path.Combine(_tempDir, "desktop.ini"),
+            new System.Text.UnicodeEncoding(false, true));
+        Assert.Contains("InfoTip=OriginalTip", restoredContent);
+        Assert.DoesNotContain("IconResource", restoredContent);
+        Assert.DoesNotContain("IconFile", restoredContent);
     }
 }

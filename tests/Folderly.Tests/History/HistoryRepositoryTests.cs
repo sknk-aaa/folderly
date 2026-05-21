@@ -16,15 +16,19 @@ public class HistoryRepositoryTests : IDisposable
     private static HistoryEntry MakeEntry(
         string path = @"C:\Test\Folder",
         string? tagColor = null,
-        DateTime? appliedAt = null)
+        DateTime? appliedAt = null,
+        int? originalAttributes = null,
+        bool hadDesktopIni = false,
+        byte[]? originalDesktopIniContent = null,
+        int? originalDesktopIniAttrs = null)
     {
         return new HistoryEntry(
             Id:                         null,
             FolderPath:                 path,
-            OriginalAttributes:         (int)FileAttributes.Directory,
-            HadDesktopIni:              false,
-            OriginalDesktopIniContent:  null,
-            OriginalDesktopIniAttrs:    null,
+            OriginalAttributes:         originalAttributes ?? (int)FileAttributes.Directory,
+            HadDesktopIni:              hadDesktopIni,
+            OriginalDesktopIniContent:  originalDesktopIniContent,
+            OriginalDesktopIniAttrs:    originalDesktopIniAttrs,
             SourceImagePath:            @"C:\Images\cover.jpg",
             IconHash:                   "abc123",
             IconStoragePath:            @"C:\AppData\Folderly\icons\abc123.ico",
@@ -66,6 +70,33 @@ public class HistoryRepositoryTests : IDisposable
         var all = _repo.GetAll();
         Assert.Single(all);
         Assert.Equal("#0078D4", all[0].TagColor);
+    }
+
+    [Fact]
+    public void Upsert_SamePath_PreservesOriginalBackupFields()
+    {
+        var originalIni = new byte[] { 0x41, 0x00 };
+        _repo.Upsert(MakeEntry(
+            @"C:\Folder",
+            originalAttributes: (int)FileAttributes.Directory,
+            hadDesktopIni: false,
+            originalDesktopIniContent: null,
+            originalDesktopIniAttrs: null));
+
+        _repo.Upsert(MakeEntry(
+            @"C:\Folder",
+            tagColor: "#0078D4",
+            originalAttributes: (int)(FileAttributes.Directory | FileAttributes.System | FileAttributes.ReadOnly),
+            hadDesktopIni: true,
+            originalDesktopIniContent: originalIni,
+            originalDesktopIniAttrs: (int)(FileAttributes.Hidden | FileAttributes.System)));
+
+        var result = _repo.GetByPath(@"C:\Folder")!;
+        Assert.Equal("#0078D4", result.TagColor);
+        Assert.Equal((int)FileAttributes.Directory, result.OriginalAttributes);
+        Assert.False(result.HadDesktopIni);
+        Assert.Null(result.OriginalDesktopIniContent);
+        Assert.Null(result.OriginalDesktopIniAttrs);
     }
 
     [Fact]
