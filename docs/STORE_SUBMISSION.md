@@ -19,6 +19,7 @@ Folderly を Microsoft Store に出す前に確認する項目です。
 - `src/Folderly.Package/Package.appxmanifest`
   - `Identity Publisher="CN=Folderly"` を Partner Center の正式な Publisher に変更する
   - `PublisherDisplayName` を実際の公開者名に合わせる
+  - `DisplayName` はインストール後の表示名なので、基本は `Folderly` のままにする
   - `Version` を提出用バージョンに確定する
 - `src/Folderly.Package/Images/`
   - `FolderlyContext.ico`
@@ -44,6 +45,9 @@ Folderly を Microsoft Store に出す前に確認する項目です。
 ## Partner Center 側で必要なもの
 
 - アプリ名の予約
+  - 日本語: `Folderly - フォルダのサムネイル変更`
+  - 英語: `Folderly - Folder Thumbnail Changer`
+  - インストール後のアプリ表示名は `Folderly` にして、Store掲載名だけ機能説明付きにする方針
 - 価格
 - 試用版の有無と期間
 - 対象市場
