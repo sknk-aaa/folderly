@@ -61,6 +61,33 @@ public sealed class ShellNotifier : IShellNotifier
             NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
             nint.Zero,
             nint.Zero);
+
+        // 中身があるフォルダ向けサムネイルキャッシュ強制無効化。
+        // RMDIR→MKDIR の連続通知で Explorer にフォルダの再評価を強制し、
+        // desktop.ini のカスタムアイコンを content-preview サムネイルより優先させる。
+        ForceThumbnailCacheRefresh(folderPath);
+    }
+
+    private static void ForceThumbnailCacheRefresh(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
+        var pidl = NativeMethods.ILCreateFromPath(folderPath);
+        if (pidl == nint.Zero) return;
+        try
+        {
+            NativeMethods.SHChangeNotify(
+                NativeMethods.SHCNE_RMDIR,
+                NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                pidl, nint.Zero);
+            NativeMethods.SHChangeNotify(
+                NativeMethods.SHCNE_MKDIR,
+                NativeMethods.SHCNF_IDLIST | NativeMethods.SHCNF_FLUSH,
+                pidl, nint.Zero);
+        }
+        finally
+        {
+            NativeMethods.ILFree(pidl);
+        }
     }
 
     private static void ForceIconIndexUpdate(string path)
