@@ -58,6 +58,17 @@ public class FolderTemplateTests
     }
 
     [Fact]
+    public void GetFrontTemplateBytes_HasPngSignature()
+    {
+        var bytes = FolderTemplate.GetFrontTemplateBytes();
+        Assert.True(bytes.Length > 0);
+        Assert.Equal(0x89, bytes[0]);
+        Assert.Equal(0x50, bytes[1]);
+        Assert.Equal(0x4E, bytes[2]);
+        Assert.Equal(0x47, bytes[3]);
+    }
+
+    [Fact]
     public void TagColors_AllContains7Items()
     {
         Assert.Equal(7, TagColors.All.Count);

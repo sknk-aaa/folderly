@@ -137,7 +137,12 @@ public partial class FolderPreview : UserControl
 
     private void LoadTemplateImage()
     {
-        var bytes = FolderTemplate.GetTemplateBytes();
+        TemplateImage.Source = LoadPng(FolderTemplate.GetBackTemplateBytes());
+        FrontTemplateImage.Source = LoadPng(FolderTemplate.GetFrontTemplateBytes());
+    }
+
+    private static BitmapImage LoadPng(byte[] bytes)
+    {
         var bitmap = new BitmapImage();
         using var ms = new MemoryStream(bytes);
         bitmap.BeginInit();
@@ -145,7 +150,7 @@ public partial class FolderPreview : UserControl
         bitmap.CacheOption = BitmapCacheOption.OnLoad;
         bitmap.EndInit();
         bitmap.Freeze();
-        TemplateImage.Source = bitmap;
+        return bitmap;
     }
 
     // ─── Rendering ───────────────────────────────────────────────────────────
@@ -213,12 +218,15 @@ public partial class FolderPreview : UserControl
     private static Geometry CreateTabGeometry()
     {
         var points = FolderTemplate.GetTabShapePoints((float)PreviewSize);
+        var radius = Math.Min(PreviewSize * 0.035, points[2].Y * 0.45);
         var geometry = new StreamGeometry();
         using (var ctx = geometry.Open())
         {
-            ctx.BeginFigure(new Point(points[0].X, points[0].Y), isFilled: true, isClosed: true);
-            for (var i = 1; i < points.Length; i++)
-                ctx.LineTo(new Point(points[i].X, points[i].Y), isStroked: true, isSmoothJoin: true);
+            ctx.BeginFigure(new Point(0, points[2].Y), isFilled: true, isClosed: true);
+            ctx.LineTo(new Point(0, radius), isStroked: true, isSmoothJoin: true);
+            ctx.QuadraticBezierTo(new Point(0, 0), new Point(radius, 0), isStroked: true, isSmoothJoin: true);
+            ctx.LineTo(new Point(points[1].X, points[1].Y), isStroked: true, isSmoothJoin: true);
+            ctx.LineTo(new Point(points[2].X, points[2].Y), isStroked: true, isSmoothJoin: true);
         }
 
         geometry.Freeze();

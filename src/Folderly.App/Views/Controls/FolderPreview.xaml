@@ -49,6 +49,13 @@
               IsHitTestVisible="False"
               Visibility="Collapsed"/>
 
+        <Image x:Name="FrontTemplateImage"
+               Width="320" Height="320"
+               Stretch="Fill"
+               Canvas.Left="0" Canvas.Top="0"
+               IsHitTestVisible="False"
+               RenderOptions.BitmapScalingMode="HighQuality"/>
+
         <!-- 画像未選択時のプレースホルダー -->
         <Border x:Name="Placeholder"
                 Width="320" Height="320"

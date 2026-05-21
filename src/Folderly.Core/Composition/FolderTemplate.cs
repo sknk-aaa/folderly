@@ -3,11 +3,12 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Numerics;
 
 namespace Folderly.Core.Composition;
 
 /// <summary>
-/// フォルダテンプレートの領域定義（256x256px 基準座標）。
+/// Defines the 256x256 folder icon geometry and provides the embedded template layers.
 /// </summary>
 public static class FolderTemplate
 {
@@ -16,93 +17,85 @@ public static class FolderTemplate
     public const float TabSlopeEndRatio = 0.48f;
     public const float TagHeightRatio = 0.18f;
 
-    // タグ領域: フォルダ左上のタブ部分。矩形ではなく TabShapePoints の外接領域として扱う。
     public static readonly RectangleF TagRegion = new(
         x: 0f,
         y: 0f,
         width: BaseSize * TabSlopeEndRatio,
         height: BaseSize * TagHeightRatio);
 
-    // フォルダ本体: タグタブより下の全体
     public static readonly RectangleF FolderBodyRegion = new(
         x: 0f,
         y: BaseSize * 0.18f,
         width: BaseSize,
-        height: BaseSize * 0.82f);
+        height: BaseSize * 0.78f);
 
-    // 画像表示領域: フォルダ本体内の内側マージン付きエリア
     public static readonly RectangleF ImageRegion = new(
-        x: BaseSize * 0.02f,
+        x: BaseSize * 0.025f,
         y: BaseSize * 0.205f,
-        width: BaseSize * 0.96f,
+        width: BaseSize * 0.95f,
         height: BaseSize * 0.715f);
 
-    private static byte[]? _templateCache;
+    public static readonly RectangleF FrontPocketRegion = new(
+        x: 0f,
+        y: BaseSize * 0.58f,
+        width: BaseSize,
+        height: BaseSize * 0.38f);
+
+    private static byte[]? _backTemplateCache;
+    private static byte[]? _frontTemplateCache;
     private static readonly object _lock = new();
 
     /// <summary>
-    /// フォルダテンプレート PNG バイト列を返す。
-    /// EmbeddedResource があればそれを使用し、なければプログラム生成する。
+    /// Returns the back folder layer. Kept as the historical API used by tests and previews.
     /// </summary>
     public static byte[] GetTemplateBytes()
+        => GetBackTemplateBytes();
+
+    public static byte[] GetBackTemplateBytes()
     {
         lock (_lock)
         {
-            if (_templateCache is not null)
-                return _templateCache;
-
-            var asm = typeof(FolderTemplate).Assembly;
-            const string resourceName = "Folderly.Core.Resources.FolderTemplate.png";
-            using var stream = asm.GetManifestResourceStream(resourceName);
-
-            if (stream is not null)
-            {
-                using var ms = new MemoryStream();
-                stream.CopyTo(ms);
-                _templateCache = ms.ToArray();
-            }
-            else
-            {
-                _templateCache = GenerateTemplatePng();
-            }
-
-            return _templateCache;
+            _backTemplateCache ??= LoadEmbeddedPng(
+                "Folderly.Core.Resources.FolderTemplate.png",
+                () => GenerateTemplatePng());
+            return _backTemplateCache;
         }
     }
 
-    /// <summary>
-    /// ImageSharp でフォルダ形状の PNG を生成する。
-    /// テンプレート PNG が EmbeddedResource にない環境（テスト等）で使用。
-    /// </summary>
+    public static byte[] GetFrontTemplateBytes()
+    {
+        lock (_lock)
+        {
+            _frontTemplateCache ??= LoadEmbeddedPng(
+                "Folderly.Core.Resources.FolderFrontTemplate.png",
+                () => GenerateFrontTemplatePng());
+            return _frontTemplateCache;
+        }
+    }
+
     public static byte[] GenerateTemplatePng(int size = BaseSize)
     {
         using var image = new Image<Rgba32>(size, size);
-
         float scale = (float)size / BaseSize;
-
-        // フォルダ色定義
-        var tagColor = Color.ParseHex("#E8A030");       // タグタブ（少し暗めの黄色）
-        var bodyColor = Color.ParseHex("#F5C842");      // フォルダ本体（黄色）
-        var shadowColor = Color.ParseHex("#D4A020");    // 影
 
         image.Mutate(ctx =>
         {
             ctx.Fill(Color.Transparent);
+            ctx.Fill(Color.ParseHex("#F8C53A"), CreateTabPath(size));
 
-            float bodyY = FolderBodyRegion.Y * scale;
-            float bodyH = BaseSize * 0.75f * scale;
-            float bodyW = size;
+            var rearBody = new RectangularPolygon(
+                0f,
+                FolderBodyRegion.Y * scale,
+                size,
+                FolderBodyRegion.Height * scale);
+            ctx.Fill(Color.ParseHex("#FFE18A"), rearBody);
 
-            // タグタブ（左上のタブ形状）
-            ctx.Fill(tagColor, CreateTabPath(size));
-
-            // フォルダ本体（全幅の矩形）
-            var bodyRect = new RectangularPolygon(0f, bodyY, bodyW, bodyH);
-            ctx.Fill(bodyColor, bodyRect);
-
-            // 本体上部の影線（タブとの境界）
-            var shadowRect = new RectangularPolygon(0f, bodyY, bodyW, 3f * scale);
-            ctx.Fill(shadowColor, shadowRect);
+            var topHighlight = new RectangularPolygon(
+                4f * scale,
+                FolderBodyRegion.Y * scale,
+                size - 8f * scale,
+                4f * scale);
+            ctx.Fill(Color.ParseHex("#FFF3BE"), topHighlight);
         });
 
         using var ms = new MemoryStream();
@@ -110,7 +103,42 @@ public static class FolderTemplate
         return ms.ToArray();
     }
 
-    /// <summary>スケール係数を適用した領域を返す。</summary>
+    public static byte[] GenerateFrontTemplatePng(int size = BaseSize)
+    {
+        using var image = new Image<Rgba32>(size, size);
+        float scale = (float)size / BaseSize;
+
+        image.Mutate(ctx =>
+        {
+            ctx.Fill(Color.Transparent);
+
+            var pocket = new RectangularPolygon(
+                FrontPocketRegion.X * scale,
+                FrontPocketRegion.Y * scale,
+                FrontPocketRegion.Width * scale,
+                FrontPocketRegion.Height * scale);
+            ctx.Fill(Color.ParseHex("#FFD45A"), pocket);
+
+            var topLip = new RectangularPolygon(
+                0f,
+                FrontPocketRegion.Y * scale,
+                size,
+                4f * scale);
+            ctx.Fill(Color.ParseHex("#FFF0A8"), topLip);
+
+            var bottomShadow = new RectangularPolygon(
+                0f,
+                (BaseSize * 0.94f) * scale,
+                size,
+                4f * scale);
+            ctx.Fill(Color.ParseHex("#D9A11E"), bottomShadow);
+        });
+
+        using var ms = new MemoryStream();
+        image.SaveAsPng(ms);
+        return ms.ToArray();
+    }
+
     public static RectangleF ScaleRegion(RectangleF region, float targetSize)
     {
         float scale = targetSize / BaseSize;
@@ -138,5 +166,30 @@ public static class FolderTemplate
     }
 
     public static IPath CreateTabPath(float targetSize)
-        => new Polygon(GetTabShapePoints(targetSize));
+    {
+        var points = GetTabShapePoints(targetSize);
+        float radius = Math.Min(targetSize * 0.035f, points[2].Y * 0.45f);
+
+        var builder = new PathBuilder();
+        builder.MoveTo(new PointF(0f, points[2].Y));
+        builder.LineTo(new PointF(0f, radius));
+        builder.QuadraticBezierTo(Vector2.Zero, new Vector2(radius, 0f));
+        builder.LineTo(points[1]);
+        builder.LineTo(points[2]);
+        builder.CloseFigure();
+        return builder.Build();
+    }
+
+    private static byte[] LoadEmbeddedPng(string resourceName, Func<byte[]> fallback)
+    {
+        var asm = typeof(FolderTemplate).Assembly;
+        using var stream = asm.GetManifestResourceStream(resourceName);
+
+        if (stream is null)
+            return fallback();
+
+        using var ms = new MemoryStream();
+        stream.CopyTo(ms);
+        return ms.ToArray();
+    }
 }
