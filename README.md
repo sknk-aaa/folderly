@@ -89,9 +89,27 @@ $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurs
 Get-AppxPackage *Folderly* | Remove-AppxPackage
 Stop-Process -Name dllhost -Force -ErrorAction SilentlyContinue
 Add-AppxPackage $out
-Stop-Process -Name explorer -Force
+
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public static class ShellWindowApi {
+  [DllImport("user32.dll")] public static extern IntPtr GetShellWindow();
+  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+}
+"@
+$shellWindow = [ShellWindowApi]::GetShellWindow()
+[uint32]$shellProcessId = 0
+[void][ShellWindowApi]::GetWindowThreadProcessId($shellWindow, [ref]$shellProcessId)
+if ($shellProcessId -ne 0) {
+  Stop-Process -Id $shellProcessId -Force -ErrorAction SilentlyContinue
+} else {
+  Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
+}
 Start-Process explorer.exe
 ```
+
+`Stop-Process -Name explorer -Force` だけを単独で実行すると、開いている Explorer もまとめて終了して PC 操作が重く止まりやすいため、上記のようにシェル本体の Explorer だけを再起動します。
 
 > **注意**: 右クリックメニューは MSIX インストール後にのみ機能します。  
 > `Folderly.App` を直接起動しても COM ハンドラは登録されません。
