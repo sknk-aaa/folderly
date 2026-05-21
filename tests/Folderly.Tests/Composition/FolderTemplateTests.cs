@@ -1,4 +1,6 @@
 using Folderly.Core.Composition;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Folderly.Tests.Composition;
 
@@ -55,6 +57,26 @@ public class FolderTemplateTests
         Assert.Equal(0x50, bytes[1]); // 'P'
         Assert.Equal(0x4E, bytes[2]); // 'N'
         Assert.Equal(0x47, bytes[3]); // 'G'
+    }
+
+    [Fact]
+    public void GenerateTemplatePng_TabTopIsTrimmed()
+    {
+        using var img = Image.Load<Rgba32>(FolderTemplate.GenerateTemplatePng());
+        int x = (int)(FolderTemplate.BaseSize * FolderTemplate.TabXRatio + 12);
+        int y = (int)(FolderTemplate.BaseSize * FolderTemplate.TabYRatio + 4);
+
+        Assert.Equal(0, img[x, y].A);
+    }
+
+    [Fact]
+    public void GenerateTemplatePng_TabStillReachesImageTop()
+    {
+        using var img = Image.Load<Rgba32>(FolderTemplate.GenerateTemplatePng());
+        int x = (int)(FolderTemplate.BaseSize * FolderTemplate.TabXRatio + 12);
+        int y = (int)(FolderTemplate.ImageRegion.Y - 2);
+
+        Assert.True(img[x, y].A > 0);
     }
 
     [Fact]

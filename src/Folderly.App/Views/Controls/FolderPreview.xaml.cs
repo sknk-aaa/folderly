@@ -218,14 +218,18 @@ public partial class FolderPreview : UserControl
 
     private static Geometry CreateTabGeometry()
     {
-        var points = FolderTemplate.GetTabShapePoints((float)PreviewSize);
-        var radius = Math.Min(PreviewSize * 0.035, (points[3].Y - points[0].Y) * 0.45);
+        var points = FolderTemplate.GetVisibleTagShapePoints((float)PreviewSize);
+        var height = points[3].Y - points[0].Y;
+        var radius = Math.Min(PreviewSize * 0.025, height * 0.45);
         var geometry = new StreamGeometry();
         using (var ctx = geometry.Open())
         {
             var slope = new Vector(points[2].X - points[1].X, points[2].Y - points[1].Y);
             slope.Normalize();
-            var rightRadius = PreviewSize * 0.09;
+            var slopeLength = Math.Sqrt(
+                Math.Pow(points[2].X - points[1].X, 2) +
+                Math.Pow(points[2].Y - points[1].Y, 2));
+            var rightRadius = Math.Min(PreviewSize * 0.055, slopeLength * 0.45);
             var topCurveStart = new Point(points[1].X - rightRadius, points[1].Y);
             var slopeCurveEnd = new Point(
                 points[1].X + slope.X * rightRadius,

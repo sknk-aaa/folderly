@@ -32,7 +32,7 @@ public static class TemplateRenderer
                 (int)scaledImageRegion.Y);
 
             if (tagColor is not null && !tagColor.IsNone)
-                ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateTabPath(outputSize));
+                ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateVisibleTagPath(outputSize));
 
             ctx.Fill(Color.ParseHex("#FFC72C"), FolderTemplate.CreateImagePath(outputSize));
 

@@ -17,7 +17,8 @@ public static class FolderTemplate
     public const float TabYRatio = 0.094f;
     public const float TabTopWidthRatio = 0.335f;
     public const float TabSlopeEndRatio = 0.49f;
-    public const float TagHeightRatio = 0.16f;
+    public const float TagHeightRatio = 0.226f;
+    public const float TagTopTrimRatio = 0.066f;
     public const float ImageCornerRadiusRatio = 0.031f;
 
     public static readonly RectangleF TagRegion = new(
@@ -77,7 +78,7 @@ public static class FolderTemplate
 
             var folderColor = Color.ParseHex("#FFC72C");
             ctx.Fill(folderColor, CreateFolderBackPath(size));
-            ctx.Fill(folderColor, CreateTabPath(size));
+            ctx.Fill(folderColor, CreateVisibleTagPath(size));
             ctx.Fill(folderColor, CreateImagePath(size));
         });
 
@@ -153,6 +154,64 @@ public static class FolderTemplate
         builder.LineTo(points[2]);
         builder.CloseFigure();
         return builder.Build();
+    }
+
+    public static IPath CreateVisibleTagPath(float targetSize)
+    {
+        var points = GetVisibleTagShapePoints(targetSize);
+        float height = points[3].Y - points[0].Y;
+        float radius = Math.Min(targetSize * 0.025f, height * 0.45f);
+
+        var slope = points[2] - points[1];
+        var slopeLength = MathF.Sqrt(slope.X * slope.X + slope.Y * slope.Y);
+        var slopeUnit = slopeLength > 0f
+            ? new PointF(slope.X / slopeLength, slope.Y / slopeLength)
+            : new PointF(0f, 1f);
+        float rightRadius = Math.Min(targetSize * 0.055f, slopeLength * 0.45f);
+        var topCurveStart = new PointF(points[1].X - rightRadius, points[1].Y);
+        var slopeCurveEnd = new PointF(
+            points[1].X + slopeUnit.X * rightRadius,
+            points[1].Y + slopeUnit.Y * rightRadius);
+
+        var builder = new PathBuilder();
+        builder.MoveTo(points[3]);
+        builder.LineTo(new PointF(points[0].X, points[0].Y + radius));
+        builder.QuadraticBezierTo(
+            new Vector2(points[0].X, points[0].Y),
+            new Vector2(points[0].X + radius, points[0].Y));
+        builder.LineTo(topCurveStart);
+        builder.QuadraticBezierTo(
+            new Vector2(points[1].X, points[1].Y),
+            new Vector2(slopeCurveEnd.X, slopeCurveEnd.Y));
+        builder.LineTo(points[2]);
+        builder.CloseFigure();
+        return builder.Build();
+    }
+
+    public static PointF[] GetVisibleTagShapePoints(float targetSize)
+    {
+        var points = GetTabShapePoints(targetSize);
+        float scale = targetSize / BaseSize;
+        float topY = points[0].Y + BaseSize * TagTopTrimRatio * scale;
+        topY = Math.Clamp(topY, points[0].Y, points[3].Y);
+
+        float slopeHeight = points[2].Y - points[1].Y;
+        float t = slopeHeight == 0f
+            ? 0f
+            : (topY - points[1].Y) / slopeHeight;
+        t = Math.Clamp(t, 0f, 1f);
+
+        var slopePoint = new PointF(
+            points[1].X + (points[2].X - points[1].X) * t,
+            topY);
+
+        return
+        [
+            new PointF(points[0].X, topY),
+            slopePoint,
+            points[2],
+            points[3],
+        ];
     }
 
     public static IPath CreateImagePath(float targetSize)
