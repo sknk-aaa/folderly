@@ -151,9 +151,15 @@ public sealed class ApplyService
         var iconsDir = Path.Combine(localAppData, "Folderly", "icons");
         Directory.CreateDirectory(iconsDir);
 
-        var centralPath = Path.Combine(iconsDir, $"{iconHash}.ico");
-        if (!File.Exists(centralPath))
-            await File.WriteAllBytesAsync(centralPath, icoBytes, ct);
+        var folderIconDir = Path.Combine(iconsDir, ComputeFolderKey(folderPath));
+        Directory.CreateDirectory(folderIconDir);
+
+        var centralPath = Path.Combine(folderIconDir, "cover.ico");
+        await File.WriteAllBytesAsync(centralPath, icoBytes, ct);
+
+        var archivePath = Path.Combine(iconsDir, $"{iconHash}.ico");
+        if (!File.Exists(archivePath))
+            await File.WriteAllBytesAsync(archivePath, icoBytes, ct);
 
         var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
         Directory.CreateDirectory(folderlyDir);
@@ -176,5 +182,14 @@ public sealed class ApplyService
         await File.WriteAllBytesAsync(localPath, icoBytes, ct);
 
         return (centralPath, localPath);
+    }
+
+    private static string ComputeFolderKey(string folderPath)
+    {
+        var normalized = Path.GetFullPath(folderPath).TrimEnd(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar).ToUpperInvariant();
+        return Convert.ToHexString(
+            SHA256.HashData(Encoding.UTF8.GetBytes(normalized)))[..16].ToLowerInvariant();
     }
 }
