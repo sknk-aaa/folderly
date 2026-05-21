@@ -104,4 +104,19 @@
       SkipUnchangedFiles="true"
       Condition=" '@(NativeSqliteFiles)' != '' " />
   </Target>
+
+  <Target Name="CopyWebView2Loader" AfterTargets="Build">
+    <PropertyGroup>
+      <WebViewRuntimeIdentifier Condition=" '$(Platform)' == 'x64' ">win-x64</WebViewRuntimeIdentifier>
+      <WebViewRuntimeIdentifier Condition=" '$(Platform)' == 'ARM64' ">win-arm64</WebViewRuntimeIdentifier>
+      <AppOutputRoot>..\Folderly.App\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.17763.0\</AppOutputRoot>
+      <WebViewLoaderPath>$(AppOutputRoot)$(WebViewRuntimeIdentifier)\WebView2Loader.dll</WebViewLoaderPath>
+      <WebViewLoaderPath Condition=" !Exists('$(WebViewLoaderPath)') ">$(AppOutputRoot)$(WebViewRuntimeIdentifier)\runtimes\$(WebViewRuntimeIdentifier)\native\WebView2Loader.dll</WebViewLoaderPath>
+    </PropertyGroup>
+    <Copy
+      SourceFiles="$(WebViewLoaderPath)"
+      DestinationFolder="$(OutputPath)"
+      SkipUnchangedFiles="true"
+      Condition=" Exists('$(WebViewLoaderPath)') " />
+  </Target>
 </Project>
