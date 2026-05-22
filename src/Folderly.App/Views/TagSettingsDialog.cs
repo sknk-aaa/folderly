@@ -131,20 +131,6 @@ public sealed class TagSettingsDialog : Window
         Grid.SetRow(leftScroll, 0);
         leftOuter.Children.Add(leftScroll);
 
-        // 「新規タグを追加」（非機能 UI）
-        var addTagBtn = new Button
-        {
-            Content    = L["NewTagBtn"],
-            Margin     = new Thickness(12, 8, 12, 12),
-            Padding    = new Thickness(12, 7, 12, 7),
-            FontSize   = 12,
-            IsEnabled  = false,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            Style      = (Style?)Application.Current.TryFindResource("SecondaryButton"),
-        };
-        Grid.SetRow(addTagBtn, 1);
-        leftOuter.Children.Add(addTagBtn);
-
         Grid.SetColumn(leftBorder, 0);
         contentGrid.Children.Add(leftBorder);
 

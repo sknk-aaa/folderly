@@ -43,15 +43,21 @@ public sealed class ApplyService
     private readonly HistoryRepository _history;
     private readonly IShellNotifier _shellNotifier;
     private readonly ILogger<ApplyService> _logger;
+    private readonly string _folderlyDataDir;
 
     public ApplyService(
         HistoryRepository historyRepository,
         IShellNotifier shellNotifier,
-        ILogger<ApplyService>? logger = null)
+        ILogger<ApplyService>? logger = null,
+        string? folderlyDataDir = null)
     {
         _history = historyRepository;
         _shellNotifier = shellNotifier;
         _logger = logger ?? NullLogger<ApplyService>.Instance;
+        _folderlyDataDir = folderlyDataDir
+            ?? Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Folderly");
     }
 
     public async Task<ApplyResult> ApplyAsync(
@@ -78,11 +84,12 @@ public sealed class ApplyService
             originalIniAttrs = (int)FolderAttributesService.GetAttributes(iniPath);
 
         // 3. 画像調整
-        request.SourceImageStream.Position = 0;
-        using var sourceImage = await Image.LoadAsync(request.SourceImageStream, ct);
-        var imageRegionSize = new SixLabors.ImageSharp.Size(
-            (int)FolderTemplate.ImageRegion.Width,
-            (int)FolderTemplate.ImageRegion.Height);
+        var previousEntry = _history.GetByPath(folderPath);
+        var sourceImageBytes = await ReadAllBytesAsync(request.SourceImageStream, ct);
+        using var sourceImageStream = new MemoryStream(sourceImageBytes);
+        using var sourceImage = await Image.LoadAsync(sourceImageStream, ct);
+        var managedSourceImagePath = await SaveSourceImageAsync(sourceImageBytes, ct);
+        var imageRegionSize = FolderTemplate.GetImageRegionPixelSize();
         using var adjustedImage = ImageAdjuster.Adjust(
             sourceImage, imageRegionSize, request.AdjustParams);
 
@@ -140,7 +147,7 @@ public sealed class ApplyService
             OriginalDesktopIniContent:  existingIniContent is not null
                                             ? Encoding.Unicode.GetBytes(existingIniContent) : null,
             OriginalDesktopIniAttrs:    originalIniAttrs,
-            SourceImagePath:            request.SourceImagePath,
+            SourceImagePath:            managedSourceImagePath,
             IconHash:                   iconHash,
             IconStoragePath:            centralIcoPath,
             CropMode:                   mode,
@@ -153,6 +160,10 @@ public sealed class ApplyService
             TagName:                    request.TagColor.IsNone ? null : request.TagName,
             TagLabelVisible:            !request.TagColor.IsNone && request.ShowTagNameOnIcon);
         _history.Upsert(entry);
+        ManagedSourceImageStore.TryDeleteIfUnreferenced(
+            previousEntry?.SourceImagePath,
+            _history.GetAll(),
+            _logger);
 
         _logger.LogInformation("Applied successfully to {FolderPath}", folderPath);
         return ApplyResult.Success(centralIcoPath);
@@ -161,12 +172,37 @@ public sealed class ApplyService
     private static string ComputeHash(byte[] icoBytes)
         => Convert.ToHexString(SHA256.HashData(icoBytes)).ToLowerInvariant();
 
-    private static async Task<(string central, string local)> SaveIcoFilesAsync(
+    private static async Task<byte[]> ReadAllBytesAsync(Stream stream, CancellationToken ct)
+    {
+        if (stream.CanSeek)
+            stream.Position = 0;
+
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms, ct);
+
+        if (stream.CanSeek)
+            stream.Position = 0;
+
+        return ms.ToArray();
+    }
+
+    private async Task<string> SaveSourceImageAsync(byte[] sourceImageBytes, CancellationToken ct)
+    {
+        var sourceHash = ComputeHash(sourceImageBytes);
+        var sourceImagesDir = Path.Combine(_folderlyDataDir, ManagedSourceImageStore.DirectoryName);
+        Directory.CreateDirectory(sourceImagesDir);
+
+        var sourceImagePath = Path.Combine(sourceImagesDir, $"{sourceHash}.png");
+        if (!File.Exists(sourceImagePath))
+            await File.WriteAllBytesAsync(sourceImagePath, sourceImageBytes, ct);
+
+        return sourceImagePath;
+    }
+
+    private async Task<(string central, string local)> SaveIcoFilesAsync(
         string folderPath, string iconHash, string localFileName, byte[] icoBytes, CancellationToken ct)
     {
-        var localAppData = Environment.GetFolderPath(
-            Environment.SpecialFolder.LocalApplicationData);
-        var iconsDir = Path.Combine(localAppData, "Folderly", "icons");
+        var iconsDir = Path.Combine(_folderlyDataDir, "icons");
         Directory.CreateDirectory(iconsDir);
 
         var centralPath = Path.Combine(iconsDir, $"{iconHash}.ico");

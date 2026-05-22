@@ -111,6 +111,10 @@ public sealed class RevertService
 
             // 6. 履歴削除
             _history.Delete(normalized);
+            ManagedSourceImageStore.TryDeleteIfUnreferenced(
+                entry.SourceImagePath,
+                _history.GetAll(),
+                _logger);
 
             _logger.LogInformation("Reverted {FolderPath} successfully", normalized);
         }
@@ -139,7 +143,15 @@ public sealed class RevertService
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Failed to revert history entry {FolderPath}", entry.FolderPath);
-                try { _history.Delete(entry.FolderPath); } catch { }
+                try
+                {
+                    _history.Delete(entry.FolderPath);
+                    ManagedSourceImageStore.TryDeleteIfUnreferenced(
+                        entry.SourceImagePath,
+                        _history.GetAll(),
+                        _logger);
+                }
+                catch { }
                 failCount++;
             }
         }
@@ -380,7 +392,12 @@ public sealed class RevertService
         }
 
         TryClearFolderCustomizationAttributes(folderPath);
+        var historyEntry = _history.GetByPath(folderPath);
         _history.Delete(folderPath);
+        ManagedSourceImageStore.TryDeleteIfUnreferenced(
+            historyEntry?.SourceImagePath,
+            _history.GetAll(),
+            _logger);
         _shellNotifier.NotifyFolderReverted(folderPath);
         _logger.LogInformation("Cleaned orphaned Folderly artifacts in {FolderPath}", folderPath);
         return true;

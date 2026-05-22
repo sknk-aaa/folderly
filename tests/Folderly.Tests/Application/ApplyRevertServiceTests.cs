@@ -24,6 +24,7 @@ internal sealed class NoOpShellNotifier : IShellNotifier
 public class ApplyRevertServiceTests : IDisposable
 {
     private readonly string _tempDir;
+    private readonly string _folderlyDataDir;
     private readonly HistoryRepository _repo;
     private readonly NoOpShellNotifier _notifier;
     private readonly ApplyService _applyService;
@@ -32,9 +33,10 @@ public class ApplyRevertServiceTests : IDisposable
     public ApplyRevertServiceTests()
     {
         _tempDir = Directory.CreateTempSubdirectory("folderly_apply_test_").FullName;
+        _folderlyDataDir = Path.Combine(_tempDir, "appdata");
         _repo = new HistoryRepository(":memory:");
         _notifier = new NoOpShellNotifier();
-        _applyService = new ApplyService(_repo, _notifier);
+        _applyService = new ApplyService(_repo, _notifier, folderlyDataDir: _folderlyDataDir);
         _revertService = new RevertService(_repo, _notifier);
     }
 
@@ -171,6 +173,59 @@ public class ApplyRevertServiceTests : IDisposable
 
         var entry = _repo.GetByPath(Path.GetFullPath(_tempDir));
         Assert.NotNull(entry);
+    }
+
+    [Fact]
+    public async Task ApplyAsync_SavesManagedSourceImageInHistory()
+    {
+        await _applyService.ApplyAsync(MakeRequest(sourceImagePath: @"C:\original\image.png"));
+
+        var entry = _repo.GetByPath(Path.GetFullPath(_tempDir));
+
+        Assert.NotNull(entry);
+        Assert.NotEqual(@"C:\original\image.png", entry!.SourceImagePath);
+        Assert.Contains("source-images", entry.SourceImagePath);
+        Assert.EndsWith(".png", entry.SourceImagePath);
+        Assert.True(File.Exists(entry.SourceImagePath));
+    }
+
+    [Fact]
+    public async Task ApplyAsync_EmptySourceImagePath_SavesManagedSourceImageInHistory()
+    {
+        await _applyService.ApplyAsync(MakeRequest(sourceImagePath: string.Empty));
+
+        var entry = _repo.GetByPath(Path.GetFullPath(_tempDir));
+
+        Assert.NotNull(entry);
+        Assert.False(string.IsNullOrWhiteSpace(entry!.SourceImagePath));
+        Assert.True(File.Exists(entry.SourceImagePath));
+    }
+
+    [Fact]
+    public async Task ApplyAsync_Reapply_DeletesPreviousManagedSourceImageWhenUnused()
+    {
+        await _applyService.ApplyAsync(MakeRequest(
+            sourceImageStream: CreateTestImageStream(0, 120, 212)));
+        var firstSourceImage = _repo.GetByPath(Path.GetFullPath(_tempDir))!.SourceImagePath;
+
+        await _applyService.ApplyAsync(MakeRequest(
+            sourceImageStream: CreateTestImageStream(196, 43, 28)));
+        var secondSourceImage = _repo.GetByPath(Path.GetFullPath(_tempDir))!.SourceImagePath;
+
+        Assert.NotEqual(firstSourceImage, secondSourceImage);
+        Assert.False(File.Exists(firstSourceImage));
+        Assert.True(File.Exists(secondSourceImage));
+    }
+
+    [Fact]
+    public async Task RevertAsync_DeletesManagedSourceImageWhenUnused()
+    {
+        await _applyService.ApplyAsync(MakeRequest());
+        var sourceImagePath = _repo.GetByPath(Path.GetFullPath(_tempDir))!.SourceImagePath;
+
+        await _revertService.RevertAsync(_tempDir);
+
+        Assert.False(File.Exists(sourceImagePath));
     }
 
     [Fact]

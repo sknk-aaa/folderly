@@ -24,18 +24,14 @@ public static class TemplateRenderer
         using var backTemplate = Image.Load<Rgba32>(FolderTemplate.GetBackTemplateBytes());
         backTemplate.Mutate(ctx => ctx.Resize(outputSize, outputSize));
 
-        var scaledImageRegion = FolderTemplate.ScaleRegion(
-            FolderTemplate.ImageRegion, outputSize);
-
         var result = backTemplate.Clone();
 
         result.Mutate(ctx =>
         {
-            var imageW = (int)scaledImageRegion.Width;
-            var imageH = (int)scaledImageRegion.Height;
-            var destPoint = new Point(
-                (int)scaledImageRegion.X,
-                (int)scaledImageRegion.Y);
+            var imageRegionSize = FolderTemplate.GetImageRegionPixelSize(outputSize);
+            var imageW = imageRegionSize.Width;
+            var imageH = imageRegionSize.Height;
+            var destPoint = FolderTemplate.GetImageRegionPixelOrigin(outputSize);
 
             if (tagColor is not null && !tagColor.IsNone)
             {
@@ -43,13 +39,13 @@ public static class TemplateRenderer
                 DrawTagContent(ctx, tagColor, tagName, tagIconIndex, showTagIcon, outputSize);
             }
 
-            ctx.Fill(Color.ParseHex("#FFC72C"), FolderTemplate.CreateImagePath(outputSize));
+            ctx.Fill(Color.White, FolderTemplate.CreateImagePath(outputSize));
 
             using var resizedAdjusted = adjustedImage.Clone(
-                c => c.Resize(imageW, imageH));
+                c => c.Resize(imageW + 2, imageH + 2));
             ctx.Clip(
                 FolderTemplate.CreateImagePath(outputSize),
-                clipped => clipped.DrawImage(resizedAdjusted, destPoint, 1f));
+                clipped => clipped.DrawImage(resizedAdjusted, new Point(destPoint.X - 1, destPoint.Y - 1), 1f));
         });
 
         return result;

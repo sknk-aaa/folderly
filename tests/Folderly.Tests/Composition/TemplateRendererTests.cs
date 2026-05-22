@@ -84,7 +84,7 @@ public class TemplateRendererTests
     }
 
     [Fact]
-    public void Render_TransparentPadding_RevealsYellowImageBaseNotTag()
+    public void Render_TransparentPadding_RevealsWhiteImageBaseNotTag()
     {
         var tag = new TagColor("#0078D4", "test");
         var region = FolderTemplate.ImageRegion;
@@ -104,7 +104,7 @@ public class TemplateRendererTests
         int sampleY = (int)(imageRegion.Y + imageRegion.Height * 0.03f);
         var px = result[sampleX, sampleY];
 
-        Assert.True(px.R > 230 && px.G > 170 && px.B < 80, "Transparent padding should reveal the yellow image base");
+        Assert.True(px.R > 245 && px.G > 245 && px.B > 245, "Transparent padding should reveal the white image base");
     }
 
     [Fact]

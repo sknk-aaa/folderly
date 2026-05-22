@@ -41,6 +41,24 @@ public class FolderTemplateTests
     }
 
     [Fact]
+    public void GetImageRegionPixelSize_RoundsTemplateRegion()
+    {
+        var size = FolderTemplate.GetImageRegionPixelSize();
+
+        Assert.Equal((int)Math.Round(FolderTemplate.ImageRegion.Width), size.Width);
+        Assert.Equal((int)Math.Round(FolderTemplate.ImageRegion.Height), size.Height);
+    }
+
+    [Fact]
+    public void GetImageRegionPixelOrigin_RoundsTemplateRegion()
+    {
+        var origin = FolderTemplate.GetImageRegionPixelOrigin();
+
+        Assert.Equal((int)Math.Round(FolderTemplate.ImageRegion.X), origin.X);
+        Assert.Equal((int)Math.Round(FolderTemplate.ImageRegion.Y), origin.Y);
+    }
+
+    [Fact]
     public void GetTemplateBytes_ReturnsNonEmptyBytes()
     {
         var bytes = FolderTemplate.GetTemplateBytes();

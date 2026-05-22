@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Folderly.ContextMenu;
@@ -60,8 +61,7 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
 
     public int GetIcon(IShellItemArray? _, out string ppszIcon)
     {
-        var iconPath = Path.Combine(AppContext.BaseDirectory, "Images", "FolderlyContext.ico");
-        ppszIcon = File.Exists(iconPath) ? iconPath : $"{GetFolderlyExePath()},0";
+        ppszIcon = $"{GetFolderlyIconPath()},0";
         return S_OK;
     }
 
@@ -129,5 +129,26 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
         return colocatedExe is not null && File.Exists(colocatedExe)
             ? colocatedExe
             : "Folderly.exe";
+    }
+
+    private static string GetFolderlyIconPath()
+    {
+        foreach (var baseDir in GetPackageBaseDirectoryCandidates())
+        {
+            var iconPath = Path.Combine(baseDir, "Images", "FolderlyContext.ico");
+            if (File.Exists(iconPath))
+                return iconPath;
+        }
+
+        return GetFolderlyExePath();
+    }
+
+    private static IEnumerable<string> GetPackageBaseDirectoryCandidates()
+    {
+        yield return AppContext.BaseDirectory;
+
+        var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (!string.IsNullOrWhiteSpace(assemblyDir))
+            yield return assemblyDir;
     }
 }

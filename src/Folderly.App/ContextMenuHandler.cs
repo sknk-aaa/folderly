@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -83,8 +84,8 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
 
     public int GetIcon(IShellItemArray? _, out string ppszIcon)
     {
-        ppszIcon = string.Empty;
-        return E_NOTIMPL;
+        ppszIcon = $"{ComServer.GetFolderlyIconPath()},0";
+        return S_OK;
     }
 
     public int GetToolTip(IShellItemArray? _, out string ppszInfotip)
@@ -197,6 +198,27 @@ internal static class ComServer
     {
         var packagedExe = Path.Combine(AppContext.BaseDirectory, "Folderly.exe");
         return File.Exists(packagedExe) ? packagedExe : Environment.ProcessPath!;
+    }
+
+    internal static string GetFolderlyIconPath()
+    {
+        foreach (var baseDir in GetPackageBaseDirectoryCandidates())
+        {
+            var iconPath = Path.Combine(baseDir, "Images", "FolderlyContext.ico");
+            if (File.Exists(iconPath))
+                return iconPath;
+        }
+
+        return GetFolderlyExePath();
+    }
+
+    private static IEnumerable<string> GetPackageBaseDirectoryCandidates()
+    {
+        yield return AppContext.BaseDirectory;
+
+        var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (!string.IsNullOrWhiteSpace(assemblyDir))
+            yield return assemblyDir;
     }
 
     public static void Stop() =>

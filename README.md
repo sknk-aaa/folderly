@@ -1,135 +1,113 @@
 # Folderly
 
-Windows フォルダの見た目を「表紙画像 + 色タグ」で変えられる軽量ツール。
+Folderly is a Windows desktop app that customizes folder icons with a cover image and a color tag. It is built with C#/.NET 8, WPF, WebView2, ImageSharp, SQLite, and an MSIX packaged context-menu extension.
 
-## 開発環境セットアップ
+Current local package version: `1.0.0.13`
 
-### 必要なもの
+## What It Does
 
-- .NET 8 SDK (8.0.421+)
-- Visual Studio 2022 (17.10+) / Visual Studio 2026  
-  必須ワークロード: **Windows アプリケーション開発**（MSIX パッケージングツール含む）
-- Windows 10 1809 (build 17763) 以上（実行・テスト環境）
+- Adds a File Explorer context menu item: `Folderlyでカスタマイズ`.
+- Opens an editor for the selected folder.
+- Lets the user choose or drag and drop an image.
+- Shows a folder-shaped preview that matches the generated icon.
+- Supports scale, X/Y position, crop mode, and reset.
+- Supports color tags, editable tag names, tag icons, and optional tag label/icon rendering on the folder icon.
+- Applies the generated `.ico` through `desktop.ini`.
+- Can revert a folder to its previous state.
 
-### Core 層のビルド・テスト（クロスプラットフォーム）
+## Project Layout
 
-```bash
-dotnet restore
-dotnet build src/Folderly.Core/Folderly.Core.csproj
-dotnet test tests/Folderly.Tests/Folderly.Tests.csproj --logger "console;verbosity=normal"
-```
+| Project | Purpose |
+|---|---|
+| `Folderly.Core` | Image composition, ICO conversion, history, apply/revert logic |
+| `Folderly.App` | WPF app, WebView2 editor, settings, history UI |
+| `Folderly.Shell` | `SHChangeNotify` and shell helpers |
+| `Folderly.ContextMenu` | Packaged COM `IExplorerCommand` context-menu handler |
+| `Folderly.Package` | MSIX packaging project |
+| `Folderly.Tests` | xUnit tests for core behavior |
 
-### VS2022 で WPF アプリをビルドする（Windows 必須）
+## Key Runtime Data
 
-1. `Folderly.sln` を Visual Studio 2022 で開く
-2. スタートアッププロジェクトを `Folderly.App` に設定
-3. `Debug | x64` を選択して **F5** で起動
+- Generated central icons: `%LOCALAPPDATA%\Folderly\icons\`
+- Managed source-image copies: `%LOCALAPPDATA%\Folderly\source-images\`
+- Logs: `%LOCALAPPDATA%\Folderly\logs\`
+- Context menu log: `%LOCALAPPDATA%\Folderly\context-menu.log`
+- Per-folder local files: `<target folder>\_folderly\cover_<hash8>.ico`
 
-### MSIX パッケージのビルド（サイドロードテスト用）
+The history DB stores the managed source-image path, not the original user-selected path. This allows future preview restoration even if the original image is deleted or moved.
 
-Visual Studio の WAP ビルドで `.msix` が生成されない環境があるため、現時点では
-`Folderly.Package` の Release 出力を `makeappx` で手動パックします。
+## Build And Test
 
-```powershell
-cd $env:USERPROFILE\dev\folderly
-
-$msbuild = "${env:ProgramFiles}\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
-
-& $msbuild .\src\Folderly.App\Folderly.App.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false
-& $msbuild .\src\Folderly.ContextMenu\Folderly.ContextMenu.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false
-& $msbuild .\src\Folderly.Package\Folderly.Package.wapproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=false
-
-$stage = ".\src\Folderly.Package\obj\x64\Release\MsixStage"
-$out = ".\src\Folderly.Package\AppPackages\Folderly_1.0.0.1_x64.msix"
-
-Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force $stage | Out-Null
-New-Item -ItemType Directory -Force ".\src\Folderly.Package\AppPackages" | Out-Null
-
-Copy-Item ".\src\Folderly.Package\bin\x64\Release\*" $stage -Recurse -Force
-Copy-Item ".\src\Folderly.Package\Package.appxmanifest" "$stage\AppxManifest.xml" -Force
-Copy-Item ".\src\Folderly.Package\Images" "$stage\Images" -Recurse -Force
-
-$makeappx = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter makeappx.exe |
-  Where-Object { $_.FullName -like "*\x64\makeappx.exe" } |
-  Sort-Object FullName -Descending |
-  Select-Object -First 1 -ExpandProperty FullName
-
-& $makeappx pack /d $stage /p $out /overwrite
-```
-
-**ローカルサイドロード手順（開発者テスト）**:
-
-初回のみ、`CN=Folderly` のテスト証明書を作成して `LocalMachine\Root` に信頼登録します。
-証明書登録は管理者 PowerShell で実行してください。
+Run core tests:
 
 ```powershell
-$cert = New-SelfSignedCertificate `
-  -Type Custom `
-  -Subject "CN=Folderly" `
-  -KeyUsage DigitalSignature `
-  -FriendlyName "Folderly Temporary MSIX Certificate" `
-  -CertStoreLocation "Cert:\CurrentUser\My" `
-  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3")
-
-Export-Certificate -Cert $cert -FilePath "$env:TEMP\FolderlyTemporary.cer"
-Import-Certificate -FilePath "$env:TEMP\FolderlyTemporary.cer" -CertStoreLocation Cert:\LocalMachine\Root
+dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"
 ```
 
-署名とインストール:
+The excluded test depends on Windows filesystem permission behavior and is intentionally skipped in this local flow.
+
+Build the Release x64 package output:
 
 ```powershell
-$signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
-  Where-Object { $_.FullName -like "*\x64\signtool.exe" } |
-  Sort-Object FullName -Descending |
-  Select-Object -First 1 -ExpandProperty FullName
-
-& $signtool sign /fd SHA256 /sha1 <証明書のThumbprint> $out
-
-Get-AppxPackage *Folderly* | Remove-AppxPackage
-Stop-Process -Name dllhost -Force -ErrorAction SilentlyContinue
-Add-AppxPackage $out
-
-Add-Type @"
-using System;
-using System.Runtime.InteropServices;
-public static class ShellWindowApi {
-  [DllImport("user32.dll")] public static extern IntPtr GetShellWindow();
-  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
-}
-"@
-$shellWindow = [ShellWindowApi]::GetShellWindow()
-[uint32]$shellProcessId = 0
-[void][ShellWindowApi]::GetWindowThreadProcessId($shellWindow, [ref]$shellProcessId)
-if ($shellProcessId -ne 0) {
-  Stop-Process -Id $shellProcessId -Force -ErrorAction SilentlyContinue
-} else {
-  Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
-}
-Start-Process explorer.exe
+& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" `
+  .\src\Folderly.Package\Folderly.Package.wapproj `
+  /t:Restore,Build `
+  /p:Configuration=Release `
+  /p:Platform=x64 `
+  /p:RuntimeIdentifier=win-x64 `
+  /p:SelfContained=false
 ```
 
-`Stop-Process -Name explorer -Force` だけを単独で実行すると、開いている Explorer もまとめて終了して PC 操作が重く止まりやすいため、上記のようにシェル本体の Explorer だけを再起動します。
+## Create, Sign, And Install MSIX
 
-> **注意**: 右クリックメニューは MSIX インストール後にのみ機能します。  
-> `Folderly.App` を直接起動しても COM ハンドラは登録されません。
+This repo currently uses a local development certificate with subject `CN=Folderly`.
 
-### プロジェクト構成
+```powershell
+$ErrorActionPreference = 'Stop'
+$version = '1.0.0.13'
+$root = (Resolve-Path .).Path
+$outDir = Join-Path $root '_out'
+$stage = Join-Path $outDir "msix_stage_$version"
+$msix = Join-Path $outDir "Folderly_$($version)_x64.msix"
 
-| プロジェクト | TFM | 用途 |
-|---|---|---|
-| `Folderly.Core` | net8.0 | ビジネスロジック（OS 非依存） |
-| `Folderly.Shell` | net8.0-windows | Windows API ラッパー（P/Invoke） |
-| `Folderly.ContextMenu` | net8.0-windows | File Explorer 右クリックメニュー COM ハンドラ |
-| `Folderly.App` | net8.0-windows | WPF GUI（Windows 専用） |
-| `Folderly.Package` | — | MSIX パッケージング（WAP プロジェクト） |
-| `Folderly.Tests` | net8.0 | xUnit テスト（Core 層対象） |
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force -Path $stage | Out-Null
 
-### 手動テスト
+Copy-Item -Path (Join-Path $root 'src\Folderly.Package\bin\x64\Release\*') -Destination $stage -Recurse -Force
+Copy-Item -Path (Join-Path $root 'src\Folderly.Package\Package.appxmanifest') -Destination (Join-Path $stage 'AppxManifest.xml') -Force
+Copy-Item -Path (Join-Path $root 'src\Folderly.Package\Images') -Destination (Join-Path $stage 'Images') -Recurse -Force
 
-`docs/TESTING.md` の手動テストチェックリストを参照してください。  
-MSIX インストール後に Windows 実機でのみ実施可能です。
+$makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe'
+& $makeappx pack /d $stage /p $msix /overwrite
 
-## ライセンス
+$signtool = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe'
+$cert = Get-ChildItem Cert:\CurrentUser\My |
+  Where-Object { $_.Subject -eq 'CN=Folderly' -and $_.HasPrivateKey } |
+  Sort-Object NotAfter -Descending |
+  Select-Object -First 1
 
-Copyright (c) 2026 Folderly. All rights reserved.
+& $signtool sign /fd SHA256 /sha1 $cert.Thumbprint $msix
+
+Stop-Process -Name Folderly -Force -ErrorAction SilentlyContinue
+Add-AppxPackage -Path $msix
+Get-AppxPackage -Name Folderly.FolderlyApp | Select-Object Name,Version,InstallLocation
+```
+
+Do not kill `explorer.exe` as a normal install step. Folderly refreshes affected Explorer windows after apply/revert when the setting is enabled.
+
+## Important Notes For Future Agents
+
+- The WebView2 editor is in `src/Folderly.App/Resources/ApplyWindow.html`.
+- Keep preview drag/wheel operations lightweight. Pointer movement should send throttled `transformPreview` updates and commit exact rendering only on mouseup or delayed settle.
+- Do not update X/Y sliders during preview drag. The drag state and slider state are intentionally independent to avoid layout churn and jank.
+- The lower duplicate image-select button was removed. The remaining image entry point is the drag/drop area; image reset is handled by `resetImage`.
+- The tag editor intentionally does not support creating new tags. Do not re-add the disabled `新規タグを追加` UI unless the feature itself is implemented.
+- `WebView2Loader.dll` must be present at the package output root as well as under `runtimes\win-x64\native`; otherwise WebView2 can fail with `0x8007007E`.
+
+## Documentation
+
+- Current handover for agents: [HANDOVER.md](HANDOVER.md)
+- Implementation notes and contracts: [CLAUDE.md](CLAUDE.md)
+- Manual verification checklist: [docs/TESTING.md](docs/TESTING.md)
+- Current product/technical spec: [SPEC.md](SPEC.md)

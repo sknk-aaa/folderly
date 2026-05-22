@@ -1,335 +1,222 @@
-# Folderly 引き継ぎドキュメント（WSL2 → Windows）
+# Folderly Handover
 
-このドキュメントは WSL2 で実装したコードを、**Windows 環境の Claude Code**が継続実装・検証するための引き継ぎ書です。
+This is the main handover document for Claude Code, Codex, or any future agent continuing Folderly development.
 
----
+Current local state:
 
-## プロジェクト概要
+- Installed package: `Folderly.FolderlyApp 1.0.0.13`
+- Latest local MSIX: `_out\Folderly_1.0.0.13_x64.msix`
+- Tests last run: `131` passed with filter `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`
+- Package manifest version: `src/Folderly.Package/Package.appxmanifest`
 
-**Folderly v1.0** — Windows フォルダのアイコンを「表紙画像 + 色タグ」でカスタマイズする C#/.NET 8 デスクトップアプリ（WPF + MSIX）。
+## What Matters Most
 
-- 仕様: [SPEC.md](SPEC.md)
-- 実装判断ログ: [CLAUDE.md](CLAUDE.md)（21項目）
-- 手動テストチェックリスト: [docs/TESTING.md](docs/TESTING.md)
-- Microsoft Store 提出準備: [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md)
-- Store 掲載文下書き: [docs/STORE_LISTING_DRAFT.md](docs/STORE_LISTING_DRAFT.md)
-- プライバシーポリシー下書き: [docs/PRIVACY_POLICY_DRAFT.md](docs/PRIVACY_POLICY_DRAFT.md)
-- ビルド手順: [README.md](README.md)
+Folderly is no longer just a basic icon generator. The current UX depends on four things staying in sync:
 
----
+1. WebView2 editor preview
+2. WPF/offscreen exact icon renderer
+3. `ApplyService` history/source-image storage
+4. Explorer refresh behavior
 
-## 完了済み Step
+Most regressions so far happened when one of those was changed without the others.
 
-| Step | 名前 | 状態 |
-|------|------|------|
-| 1  | プロジェクトスケルトン | 完了 |
-| 2  | Core - FolderTemplate + TagColors | 完了 |
-| 3  | Core - ImageAdjuster | 完了 |
-| 4  | Core - TemplateRenderer | 完了 |
-| 5  | Core - IcoConverter | 完了 |
-| 6  | Core - DesktopIniManager + FolderAttributesService | 完了 |
-| 7  | Shell - ShellNotifier + IShellNotifier | 完了（通知だけでは不安定なため、最終的に対象 Explorer ウィンドウ開き直しで安定化） |
-| 8  | Core - HistoryRepository | 完了 |
-| 9  | Core - FolderProtection | 完了 |
-| 10 | Core - ApplyService + RevertService | 完了 |
-| 11 | WPF App スケルトン + DI（AppServices） | 完了 |
-| 12 | LocalizationService + 言語切替 | 完了 |
-| 13 | MainWindow / ApplyWindow / SettingsWindow | 完了 |
-| 14 | FileLogger + Mutex/NamedPipe 単一インスタンス | 完了 |
-| 15 | StoreLicenseService（試用版フォールバック） | 完了 |
-| 16 | Resources/Brand.xaml + タグボタン動的生成 | 完了 |
-| 17 | COM IExplorerCommand 右クリックメニュー | 実装完了・MSIX 動作確認済 |
-| 18 | docs/TESTING.md + README.md 整備 | 完了（手動テストは継続中） |
+## Current Apply Flow
 
-Core テスト 125 件は Windows で全 pass 確認済み。
+Main files:
 
----
-
-## 最新状態（2026-05-22）
-
-- Release x64 build / MSIX 作成 / テスト証明書署名 / サイドロード再インストールまで確認済み。
-- インストール済みパッケージは `Folderly.FolderlyApp` / `1.0.0.1` / `X64` / `Status: Ok`。
-- 同一フォルダへの A→B→C 再適用は、対象 Explorer ウィンドウの開き直しにより数秒以内に反映する仕様で安定化。
-- 「全フォルダを元に戻す」は成功。解除後、画像やファイル入りフォルダの通常プレビューも復元される。点滅は `e27fa6a` で抑制済み。
-- 右クリック起動は `81efc8c` で軽量化済み。ただし初回起動は 2〜3 秒程度かかることがあり、現状許容とする。
-- 表示モードは `余白なし` / `横幅最大` / `縦幅最大` の 3 種。切替時は `Scale=1.0`, `OffsetX=0`, `OffsetY=0` に戻す。
-- タグ名編集を実装済み。設定画面と適用画面から編集でき、履歴・タグボタンにタグ名を表示する。アイコン上のタグ名表示は全体設定で ON/OFF、初期値は OFF。
-- プレビューでは、タグ名表示 ON の場合だけタグ名を描画し、画像表示可能範囲を薄い白の点線で表示する。
-- 右クリックメニュー用アイコンとアプリ表示用アイコンは透過版を使用。Store 用ロゴだけ非透過の Store 用画像を使う。
-- WebView2 を使う適用画面のため、MSIX には `WebView2Loader.dll` をアプリ直下にも含める必要がある。`runtimes\win-x64\native\WebView2Loader.dll` だけだと起動時に `0x8007007E` で失敗する。
-- 現在の生成物として `src/Folderly.Package/AppPackages/Folderly_1.0.0.1_x64.msix` が更新されることがある。これはビルド成果物なので、コミット対象にするかは都度判断する。
-
----
-
-## 実装済みファイル一覧
-
-### Core 層（net8.0）
-- [src/Folderly.Core/Folderly.Core.csproj](src/Folderly.Core/Folderly.Core.csproj)
-- [src/Folderly.Core/Composition/FolderTemplate.cs](src/Folderly.Core/Composition/FolderTemplate.cs)
-- [src/Folderly.Core/Composition/TagColors.cs](src/Folderly.Core/Composition/TagColors.cs)
-- [src/Folderly.Core/Composition/ImageAdjuster.cs](src/Folderly.Core/Composition/ImageAdjuster.cs)
-- [src/Folderly.Core/Composition/TemplateRenderer.cs](src/Folderly.Core/Composition/TemplateRenderer.cs)
-- [src/Folderly.Core/Conversion/IcoConverter.cs](src/Folderly.Core/Conversion/IcoConverter.cs)
-- [src/Folderly.Core/Folder/DesktopIniManager.cs](src/Folderly.Core/Folder/DesktopIniManager.cs)
-- [src/Folderly.Core/Folder/FolderAttributesService.cs](src/Folderly.Core/Folder/FolderAttributesService.cs)
-- [src/Folderly.Core/Folder/FolderProtection.cs](src/Folderly.Core/Folder/FolderProtection.cs)
-- [src/Folderly.Core/History/HistoryEntry.cs](src/Folderly.Core/History/HistoryEntry.cs)
-- [src/Folderly.Core/History/HistoryRepository.cs](src/Folderly.Core/History/HistoryRepository.cs)
-- [src/Folderly.Core/Shell/IShellNotifier.cs](src/Folderly.Core/Shell/IShellNotifier.cs)
-- [src/Folderly.Core/Application/ApplyService.cs](src/Folderly.Core/Application/ApplyService.cs)
-- [src/Folderly.Core/Application/RevertService.cs](src/Folderly.Core/Application/RevertService.cs)
-- `src/Folderly.Core/Resources/FolderTemplate.png`（EmbeddedResource）
-
-### Shell 層（net8.0-windows）
-- [src/Folderly.Shell/Folderly.Shell.csproj](src/Folderly.Shell/Folderly.Shell.csproj)
-- [src/Folderly.Shell/NativeMethods.cs](src/Folderly.Shell/NativeMethods.cs)
-- [src/Folderly.Shell/ShellNotifier.cs](src/Folderly.Shell/ShellNotifier.cs)
-
-### App 層（net8.0-windows10.0.17763.0、WPF）
-- [src/Folderly.App/Folderly.App.csproj](src/Folderly.App/Folderly.App.csproj)
-- [src/Folderly.App/App.xaml](src/Folderly.App/App.xaml) / [App.xaml.cs](src/Folderly.App/App.xaml.cs)
-- [src/Folderly.App/ContextMenuHandler.cs](src/Folderly.App/ContextMenuHandler.cs)（App 側に残置、現在は ContextMenu プロジェクトが本体）
-- [src/Folderly.App/Infrastructure/AppServices.cs](src/Folderly.App/Infrastructure/AppServices.cs)
-- [src/Folderly.App/Infrastructure/Converters.cs](src/Folderly.App/Infrastructure/Converters.cs)
-- [src/Folderly.App/Infrastructure/FileLogger.cs](src/Folderly.App/Infrastructure/FileLogger.cs)
-- [src/Folderly.App/Infrastructure/GlobalUsings.cs](src/Folderly.App/Infrastructure/GlobalUsings.cs)
-- [src/Folderly.App/Infrastructure/ViewModelBase.cs](src/Folderly.App/Infrastructure/ViewModelBase.cs)
-- [src/Folderly.App/MainWindow.xaml](src/Folderly.App/MainWindow.xaml) / [.cs](src/Folderly.App/MainWindow.xaml.cs)
-- [src/Folderly.App/Resources/Brand.xaml](src/Folderly.App/Resources/Brand.xaml)
-- [src/Folderly.App/Services/LocalizationService.cs](src/Folderly.App/Services/LocalizationService.cs)
-- [src/Folderly.App/Services/StoreLicenseService.cs](src/Folderly.App/Services/StoreLicenseService.cs)
-- [src/Folderly.App/ViewModels/ApplyViewModel.cs](src/Folderly.App/ViewModels/ApplyViewModel.cs)
-- [src/Folderly.App/ViewModels/MainViewModel.cs](src/Folderly.App/ViewModels/MainViewModel.cs)
-- [src/Folderly.App/ViewModels/SettingsViewModel.cs](src/Folderly.App/ViewModels/SettingsViewModel.cs)
-- [src/Folderly.App/Views/ApplyWindow.xaml](src/Folderly.App/Views/ApplyWindow.xaml) / [.cs](src/Folderly.App/Views/ApplyWindow.xaml.cs)
-- [src/Folderly.App/Views/Controls/FolderPreview.xaml](src/Folderly.App/Views/Controls/FolderPreview.xaml) / [.cs](src/Folderly.App/Views/Controls/FolderPreview.xaml.cs)
-- [src/Folderly.App/Views/SettingsWindow.xaml](src/Folderly.App/Views/SettingsWindow.xaml) / [.cs](src/Folderly.App/Views/SettingsWindow.xaml.cs)
-
-### ContextMenu 層（Packaged COM SurrogateServer）
-- [src/Folderly.ContextMenu/Folderly.ContextMenu.csproj](src/Folderly.ContextMenu/Folderly.ContextMenu.csproj)
-- [src/Folderly.ContextMenu/FolderlyContextMenuHandler.cs](src/Folderly.ContextMenu/FolderlyContextMenuHandler.cs)
-
-### Package（MSIX）
-- [src/Folderly.Package/Folderly.Package.wapproj](src/Folderly.Package/Folderly.Package.wapproj)
-- [src/Folderly.Package/Package.appxmanifest](src/Folderly.Package/Package.appxmanifest)
-
-### テスト
-- [tests/Folderly.Tests/](tests/Folderly.Tests/)（Core テスト 125 件、全 pass 確認済）
-
----
-
-## 仕様判断ログ（要約）
-
-詳細は [CLAUDE.md](CLAUDE.md) を参照。重要なものを抜粋:
-
-| # | 判断 | 補足 |
-|---|------|------|
-| 1 | `IShellNotifier` を Core に追加 | Core の OS 非依存性を維持（依存性逆転） |
-| 2 | FolderTemplate.png は EmbeddedResource | SVG は ImageSharp が非対応のため不採用 |
-| 3 | FolderAttributesService は .NET 標準 `FileAttributes` | P/Invoke 不要、WSL2 テスト可能 |
-| 5 | INI パーサーは自前実装 | 外部ライブラリ不要 |
-| 7 | ICO は全サイズ PNG 埋め込み | Windows Vista 以降対応 |
-| 11 | App TFM は `net8.0-windows10.0.17763.0` | WinRT `StoreContext` のため |
-| 13 | Localization は `{Binding L[Key]}` で即時切替 | `Binding.IndexerName` を発火 |
-| 15 | StoreContext は try-catch でフォールバック | 非 MSIX 環境でも起動可能に |
-| 17 | 単一インスタンス: Mutex + NamedPipe | パイプ名 `FolderlyIPC_v1` |
-| 19 | COM ハンドラは別 DLL の SurrogateServer | `Folderly.ContextMenu.comhost.dll` |
-| 19 | IExplorerCommand IID | `a08ce4d0-fa25-44ab-b57c-c7b1c323e0b9`（要注意：間違えやすい） |
-| 19 | Context menu CLSID | `2A7A05DA-70D8-4302-8B23-AE8D79D801B6` |
-| 20 | SQLite ネイティブ DLL は `e_sqlite3.dll` を package に同梱必須 | 起動時クラッシュ防止 |
-| 20 | WebView2 ネイティブ DLL は `WebView2Loader.dll` を package 直下に同梱必須 | 適用画面起動時の `0x8007007E` 防止 |
-| 21 | Shell 通知は folder / desktop.ini / dir 全部送る | Explorer への内部更新通知。通知だけでは再適用が遅れるため、対象 Explorer ウィンドウ開き直しを併用 |
-
-### テスト証明書（サイドロード用）
-- CN=Folderly
-- Thumbprint: `4A918D2D05D473471D912E7D12268D4768EA9249`
-
----
-
-## 現在の重要仕様・解決済み項目
-
-### Explorer 反映仕様（2026-05-21 現在・解決済み）
-
-**結論**:
-Folderly は適用成功後、対象フォルダまたは親フォルダを表示している Explorer ウィンドウだけを閉じて開き直す。`explorer.exe` 本体、タスクバー、スタートメニューは再起動しない。
-
-**理由**:
-Windows Explorer は `desktop.ini` と ICO が正しく更新されていても、フォルダアイコン/サムネイルキャッシュを保持して古い見た目を表示し続けることがある。特に同一フォルダへの A→B 再適用では、通知だけだと 30〜40 秒遅れるケースが実機で確認された。
-
-**ユーザー向け説明**:
-Store/説明文には「アイコン更新時に Explorer ウィンドウを開き直します。これは Windows のアイコンキャッシュ更新のための仕様です。」と記載する。
-
-**実機テスト結果**:
-- 画像A 初回適用: 数秒以内に反映 ✓
-- 画像B 再適用: 30〜40秒待ちなし、数秒以内に反映 ✓
-- 画像C 再適用: 数秒以内に反映 ✓
-- 対象 Explorer ウィンドウの開き直しは軽い ✓
-- タスクバー / スタートメニューの乱れなし ✓
-- 「全フォルダを元に戻す」成功 ✓
-- OneDrive 配下で A→B→C 成功 ✓
-
-**採用した実装**:
 - `src/Folderly.App/Views/ApplyWindow.xaml.cs`
-  - 適用成功後に `ReopenExplorerWindowsAsync(folderPath)` を実行
-  - `Shell.Application.Windows()` から対象フォルダ/親フォルダを表示している Explorer ウィンドウを探す
-  - 該当ウィンドウだけ `Quit()` し、同じパスを `explorer.exe "<path>"` で開き直す
-- `src/Folderly.App/Views/SettingsWindow.xaml`
-  - 設定名: 「フォルダアイコン適用後に Explorer ウィンドウを開き直す」
-  - 既定オン
+- `src/Folderly.App/Resources/ApplyWindow.html`
+- `src/Folderly.Core/Application/ApplyService.cs`
+- `src/Folderly.Core/Application/ManagedSourceImageStore.cs`
+- `src/Folderly.Core/Composition/TemplateRenderer.cs`
+- `src/Folderly.Core/Composition/FolderTemplate.cs`
 
-**試みた手法と結果**:
+Flow:
 
-| 手法 | 結果 | 判断 |
-|------|------|------|
-| `SHGetFileInfo + SHCNE_UPDATEIMAGE | SHCNF_DWORD` | 初回は効くが、再適用は 30〜40 秒遅れる場合あり | 補助通知として維持 |
-| PATH/PIDL の `SHChangeNotify` | 同上 | 補助通知として維持 |
-| `Shell.Application.Document.Refresh()` | 開いているウィンドウの再描画には効くが、古いアイコンキャッシュが残る場合あり | 補助処理として維持 |
-| `SHCNE_ASSOCCHANGED` | 初回適用まで 20 秒程度に悪化 | 削除済み |
-| `SHCNE_RMDIR + SHCNE_MKDIR` | 黄色フォルダへ戻る瞬間が出る | 廃棄 |
-| `ToggleSystemReadOnly` | OneDrive 同期を誘発し遅延悪化 | 廃棄 |
-| `IThumbnailCache::GetThumbnail(WTS_FORCEEXTRACTION)` | 15〜20 秒ブロック | 廃棄 |
-| `explorer.exe` 本体再起動 | 反映は確実だが Start/タスクバーが乱れる | 廃棄 |
-| 対象 Explorer ウィンドウだけ開き直し | A/B/C すべて数秒以内、再起も軽い | 採用 |
+1. User opens Folderly from the Explorer context menu or app UI.
+2. `ApplyWindow` initializes WebView2 and sends state to `ApplyWindow.html`.
+3. If the target folder already has history and `SourceImagePath` exists, `TryRestoreExistingCustomization()` loads that managed image into the preview and restores crop mode, scale, X/Y offset, and tag.
+4. On apply, `ApplyWindow` sends the current source image as a PNG stream to `ApplyService`.
+5. `ApplyService` copies the source image bytes to `%LOCALAPPDATA%\Folderly\source-images\<sha256>.png`.
+6. The composed ICO is written to `%LOCALAPPDATA%\Folderly\icons\<sha256>.ico`.
+7. A local copy is also written to `<folder>\_folderly\cover_<hash8>.ico`.
+8. `desktop.ini` points to the central AppData ICO path.
+9. History is upserted with the managed source-image path.
+10. Shell notifications are sent.
+11. If enabled, the target Explorer window is reopened to force cache refresh.
 
-### 修正済みバグ（2026-05-21）
+## Managed Source Images
 
-以下はコードと MSIX 実機で確認済み:
+This was added so drag-and-drop images can be restored later.
 
-| バグ | 修正コミット | 概要 |
-|------|------------|------|
-| Revert が OneDrive 配下で失敗 | `d5aa336` 以降 | 属性クリア → 操作 → 最大 5 回リトライに変更 |
-| 再適用時に画像が更新されない / 30〜40 秒待ち | `0453fc2` | 対象 Explorer ウィンドウだけを開き直し、Explorer キャッシュを最新化 |
-| Explorer 本体再起動で Start/タスクバーが乱れる | `0453fc2` | `explorer.exe` 本体 kill を廃止し、対象ウィンドウだけ `Quit()` |
-| OneDrive 配下の ICO 参照が不安定 | `2770a81` 以降 | `desktop.ini` の参照先を `%LOCALAPPDATA%\Folderly\icons\cover_<hash>.ico` に変更 |
-| 再適用時に Revert 用バックアップが壊れる | `78d3464` | History upsert 時に元状態バックアップを保持 |
-| 「全フォルダを元に戻す」が実フォルダを戻さない/残骸が残る | `c9460d2` | 履歴 entries の Revert と、Desktop/Documents/OneDrive 周辺の orphan Folderly 残骸掃除を追加 |
-| `SHCNE_ASSOCCHANGED` で初回適用まで遅くなる | `c8a1108` | 重い関連付け更新通知を削除 |
-| MSIX後の手動 Explorer 再起動が重い | `a412b8c` | README の手順を軽量化。通常はインストール後に Explorer 本体再起動しない |
-| 解除後に通常フォルダの中身プレビューが戻らない | `d15c457` | Revert 時の属性復元と解除専用通知を強化 |
-| 解除後の中身プレビュー復元時に数回ちらつく | `e27fa6a` | 遅延通知をやめ、過剰な再通知を抑制 |
+- Stored in: `%LOCALAPPDATA%\Folderly\source-images\`
+- Filename: SHA256 of the PNG bytes, `.png`
+- History field: `HistoryEntry.SourceImagePath`
+- Cleanup: unreferenced managed source images are deleted on reapply/revert.
 
-### 最近追加した UI / 画像機能（2026-05-22）
+Important caveat:
 
-| 機能 | コミット | 概要 |
-|------|----------|------|
-| タグ名編集 | `9e8a728` | タグ色ごとの表示名を settings に保存。設定画面と適用画面から編集可能 |
-| アイコン上のタグ名表示 ON/OFF | `9e8a728` | 全体設定。ON の場合だけテンプレートのタグ部分にタグ名を描画 |
-| プレビュー上のタグ名と画像範囲表示 | `f14328d`, `0eed6e1` | タグ名表示 ON 時のプレビュー描画と、薄い白点線の画像表示範囲 |
-| 表示モード 3 種化 | `d15c457` | `余白なし` / `横幅最大` / `縦幅最大` をプレビューと ICO 生成で共通処理 |
-| 右クリック起動軽量化 | `81efc8c` | 起動時の不要な同期ログ・書き込みチェックを削減し、アプリを短時間常駐 |
-| Store / アプリ用アイコン反映 | `87926c1`, `fd9993d` | Store 用は非透過、右クリック・アプリ表示用は透過版に統一 |
-| WebView2Loader の MSIX 同梱 | 未コミット時点 | `WebView2Loader.dll` を package 出力直下へコピーし、WebView2 初期化失敗を防止 |
+Old history entries created before this feature may have an empty source path, especially if the image was added by drag and drop. Those cannot be restored retroactively. They become restorable after the user reapplies an image with the current version.
 
-### 手動テスト未完了項目（[docs/TESTING.md](docs/TESTING.md)）
+## Preview And Performance Contracts
 
-- [ ] 日本語フォルダ名で文字化けなく適用できること
-- [ ] docs/TESTING.md 全項目を上から実施
+Main file: `src/Folderly.App/Resources/ApplyWindow.html`
 
----
+The editor preview has two update paths:
 
-## Windows 環境に移行後の注意点
+- `transformPreview`: fast, throttled preview update while dragging/sliding.
+- `transform`: exact WPF/offscreen render committed on mouseup or after a short delay.
 
-### 1. まず最初にやること
+Keep these rules:
+
+- Do not run exact render on every `mousemove`.
+- Preview drag should not call `sliders.offsetX.set()` or `sliders.offsetY.set()` continuously.
+- X/Y sliders are independent controls; moving the image by holding the preview should not move the slider thumbs live.
+- Preview drag should only update `appState.offsetX/Y` and send throttled preview messages.
+- Exact rendering happens on mouseup through `postTransformNow()`.
+- Wheel zoom updates the scale slider because the scale value itself is user-visible and cheap enough, but exact render is still delayed.
+
+Current timings:
+
+- Preview throttle: `50ms`
+- Delayed exact render after wheel scale: `180ms`
+
+If the editor becomes janky, inspect these functions first:
+
+- `scheduleTransformPreviewPost`
+- `scheduleTransformPost`
+- `postTransformNow`
+- `commitOffsetFromPreview`
+- `commitScaleFromPreview`
+- preview `mousemove` handler
+
+## Preview Position Accuracy
+
+The WebView preview and final icon must use the same template geometry.
+
+Relevant files:
+
+- `FolderTemplate.GetImageRegionPixelSize()`
+- `TemplateRenderer.Render(...)`
+- `FolderPreview.xaml/.cs`
+- `ApplyWindow.html`
+
+Past bug:
+
+- The image appeared shifted between preview and final output.
+- The final icon showed yellow folder background on the right/bottom edge.
+
+Current expectation:
+
+- Preview and generated ICO should match.
+- The user image should cover the image region without unwanted right/bottom gaps unless the selected crop mode intentionally leaves empty space.
+
+## Image Selection UI
+
+Current UI:
+
+- Main drop area can be clicked to select an image.
+- Drag and drop is supported.
+- Lower duplicate `画像を選択...` button was removed.
+- `画像をリセット` clears the image and returns the editor to the empty state.
+
+Do not reintroduce a second image-select button.
+
+## Tag Editor
+
+Current tag functionality:
+
+- Existing fixed tags can be renamed.
+- Tag colors can be changed from swatches.
+- Tag icons can be selected.
+- A setting controls whether tag names are rendered on folder icons.
+- A setting controls whether tag icons are rendered on folder icons.
+
+Not supported:
+
+- Creating new tags
+- Deleting fixed tags
+- Sorting folders by Folderly tag in Explorer
+- Explorer custom columns for Folderly tags
+
+The disabled `新規タグを追加` UI was removed because the feature does not exist.
+
+## Explorer Refresh
+
+Explorer aggressively caches folder icons. Shell notifications alone were not reliable, especially when applying image A then image B to the same folder.
+
+Current behavior:
+
+- Folderly sends shell notifications.
+- Then, if the setting is enabled, it finds Explorer windows showing the target folder or parent folder and reopens only those windows.
+- It does not kill the shell process or restart taskbar/start menu.
+
+Main file:
+
+- `src/Folderly.App/Views/ApplyWindow.xaml.cs`
+- Search for `ReopenExplorerWindowsAsync`.
+
+User-facing explanation:
+
+Explorer windows may briefly reopen after applying an icon. This is intentional to refresh Windows icon cache.
+
+## Context Menu
+
+Main files:
+
+- `src/Folderly.ContextMenu/FolderlyContextMenuHandler.cs`
+- `src/Folderly.Package/Package.appxmanifest`
+- `src/Folderly.Package/Images/FolderlyContext.ico`
+
+Important:
+
+- Context menu is a Packaged COM `IExplorerCommand`.
+- It uses `Folderly.ContextMenu.comhost.dll`.
+- Wrong `IExplorerCommand` IID can make the menu appear while `Invoke` does not run.
+- Context-menu icon should use the transparent app/context icon, not the Store-only icon.
+
+## Icons And Assets
+
+Current policy:
+
+- Store icon is separate and may be prepared manually.
+- App/window/context-menu icons use the transparent Folderly icon assets.
+- Do not overwrite Store-specific assets unless the user explicitly asks.
+
+## Build Notes
+
+Use Visual Studio MSBuild for the package project:
 
 ```powershell
-cd C:\path\to\folderly
-git pull
-git status
+& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" `
+  .\src\Folderly.Package\Folderly.Package.wapproj `
+  /t:Restore,Build `
+  /p:Configuration=Release `
+  /p:Platform=x64 `
+  /p:RuntimeIdentifier=win-x64 `
+  /p:SelfContained=false
 ```
 
-2026-05-21 時点の重要コミットは `0453fc2 fix: Explorer本体ではなく対象ウィンドウを開き直す`。これ以降の履歴を確認すること。
+Then package with `makeappx`, sign with the current `CN=Folderly` certificate, and install with `Add-AppxPackage`.
 
-### 2. ビルド & MSIX パック手順
+Do not manually restart Explorer as a normal packaging step.
 
-[README.md](README.md) の PowerShell スクリプトを使う。要点:
+## Tests
+
+Standard command:
 
 ```powershell
-# Folderly.App / Folderly.ContextMenu / Folderly.Package を Release/x64 でビルド
-# makeappx pack で .msix 生成
-# signtool sign でテスト証明書（Thumbprint: 4A918D2D05D473471D912E7D12268D4768EA9249）で署名
-# Add-AppxPackage でインストール
+dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"
 ```
 
-### 3. SQLite ネイティブ DLL
+The skipped test checks no-write-access behavior and can be environment-sensitive on Windows.
 
-`e_sqlite3.dll` が MSIX package 出力に含まれていないと起動時クラッシュ。`Folderly.App.csproj` で copy する設定が入っているはず。MSIX 内に存在するか確認すること。
+## Documentation Roles
 
-### 4. WSL2 では検証不可だった項目
+- `README.md`: build/run overview
+- `SPEC.md`: current product and technical spec
+- `HANDOVER.md`: practical implementation handover
+- `CLAUDE.md`: short implementation contracts for agent behavior
+- `docs/TESTING.md`: manual and automated verification checklist
 
-以下は **Windows でしか検証できない**:
-- `Folderly.Shell` のビルド（`net8.0-windows`）
-- `Folderly.App` のビルド・実行（WPF）
-- `Folderly.ContextMenu` のビルド・COM 登録
-- MSIX 全般（パック・署名・サイドロード）
-- `SHChangeNotify` の挙動
-- `StoreContext`（試用版・購入判定）
-- Explorer のアイコン更新挙動
-
-### 5. デバッグログの場所
-
-- アプリログ: `%LOCALAPPDATA%\Folderly\logs\`
-- 右クリックメニュー Invoke ログ: `%LOCALAPPDATA%\Folderly\context-menu.log`
-
-### 6. ハマりポイント
-
-- IExplorerCommand の IID は `a08ce4d0-fa25-44ab-b57c-c7b1c323e0b9`。間違えるとメニューは出るが Invoke が動かない。
-- COM の登録は Packaged COM SurrogateServer 方式（`com:SurrogateServer` + `Folderly.ContextMenu.comhost.dll`）。ExeServer 方式に戻すと不安定。
-- `Package.appxmanifest` の Publisher は Partner Center の `CN=...` に Store 申請前に変更すること。
-
-### 7. ユーザのルール（必ず守る）
-
-- 日本語で返答
-- コード変更したら commit まで実行（push はユーザが行う）
-- `git push --force` 禁止
-- コミットメッセージは日本語
-- `.env` / 秘密鍵はコミットしない
-
----
-
-## 次にやるべきこと
-
-### Step 17.5: Explorer 反映（2026-05-21 解決済み）
-
-- 初回適用 / 同フォルダ再適用 / A→B→C 連続適用 は数秒以内に反映 ✓
-- 通知だけではなく、対象 Explorer ウィンドウを開き直して Explorer キャッシュを最新化する仕様
-- Explorer 本体・タスクバー・スタートメニューは再起動しない
-- Store/説明文では「アイコン更新時に Explorer ウィンドウを開き直します。これは Windows のアイコンキャッシュ更新のための仕様です。」と明記する
-
-### Step 18 残作業: docs/TESTING.md 完走
-
-[docs/TESTING.md](docs/TESTING.md) を上から順に実施し、全てのチェックを埋める。残り優先項目:
-- 日本語フォルダ名で文字化けなく適用できること
-- 画像調整（余白なし/横幅最大/縦幅最大、拡大率スライダー、X/Y移動、ホイール拡大縮小、中央リセット）
-- WebP 画像で適用
-- 長いパス（260 文字超）で警告ダイアログ
-- 既存 desktop.ini ありフォルダで他キーが保持される
-- タグ機能（各色での適用、タグ名編集、アイコン上表示 ON/OFF）
-- 保護機能（C:\Windows, C:\Program Files, ドライブルート等）
-- OneDrive 配下の警告ダイアログ
-- Explorer ウィンドウ開き直し設定の ON/OFF
-- 設定画面: 言語切替（即時反映）・履歴最大件数
-- アンインストール後に右クリックメニューが消える
-- 試用版バナー表示
-- 新アイコン反映後の表示確認（StoreLogo は Store 用画像、それ以外は透過版）
-
-### Step 19 以降（Store 申請）
-
-- [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md) に沿って提出素材を準備
-- `Package.appxmanifest` の Publisher を Partner Center の正式な `CN=...` に変更
-- 製品アイコンを正式版に差し替え
-- Store 用スクリーンショット、説明文、Privacy Policy URL、サポートURLを準備
-- Store提出用パッケージ（`.msixupload` / `.appxupload` 推奨）を作成
-- Partner Center でパッケージをアップロード
-
----
-
-## 参考リンク
-
-- 実装計画: `/home/aaa/.claude/plans/folderly-windows-cheeky-cloud.md`（WSL2 側のみ）
-- SPEC: [SPEC.md](SPEC.md)
-- 実装判断ログ: [CLAUDE.md](CLAUDE.md)
-- ビルド手順: [README.md](README.md)
-- テストチェックリスト: [docs/TESTING.md](docs/TESTING.md)
-- Store提出準備: [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md)
-- Store掲載文下書き: [docs/STORE_LISTING_DRAFT.md](docs/STORE_LISTING_DRAFT.md)
-- プライバシーポリシー下書き: [docs/PRIVACY_POLICY_DRAFT.md](docs/PRIVACY_POLICY_DRAFT.md)
+Old commit-by-commit logs were removed because they made the docs harder to read and no longer helped implementation.

@@ -13,6 +13,8 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using CoreCropMode = Folderly.Core.Composition.CropMode;
 
 namespace Folderly.App.Views;
@@ -22,11 +24,16 @@ public partial class ApplyWindow : Window
     private readonly ApplyViewModel _vm;
     private bool _webViewReady;
     private static string? _cachedHtml;
+    private int _previewRenderVersion;
+    private bool _previewRenderActive;
+    private bool _previewRenderPending;
+    private bool _previewRenderPendingExact;
 
     public ApplyWindow(string folderPath)
     {
         InitializeComponent();
         _vm = new ApplyViewModel(folderPath);
+        TryRestoreExistingCustomization();
 
         Loaded += async (_, _) => await InitWebViewAsync();
     }
@@ -129,6 +136,28 @@ public partial class ApplyWindow : Window
                         await SendPreviewAsync();
                         break;
 
+                    case "offset":
+                        _vm.OffsetX = root.GetProperty("offsetX").GetDouble();
+                        _vm.OffsetY = root.GetProperty("offsetY").GetDouble();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "offsetPreview":
+                        _vm.OffsetX = root.GetProperty("offsetX").GetDouble();
+                        _vm.OffsetY = root.GetProperty("offsetY").GetDouble();
+                        await SendPreviewAsync(exact: false);
+                        break;
+
+                    case "transform":
+                        UpdateTransform(root);
+                        await SendPreviewAsync();
+                        break;
+
+                    case "transformPreview":
+                        UpdateTransform(root);
+                        await SendPreviewAsync(exact: false);
+                        break;
+
                     case "cropMode":
                         var modeStr = root.GetProperty("mode").GetString() ?? "Center";
                         _vm.CropMode = modeStr switch
@@ -141,6 +170,14 @@ public partial class ApplyWindow : Window
                         break;
 
                     case "resetPosition":
+                        _vm.ResetPosition();
+                        await SendStateAsync();
+                        await SendPreviewAsync();
+                        break;
+
+                    case "resetImage":
+                        _vm.SourceImage = null;
+                        _vm.SourceImagePath = string.Empty;
                         _vm.ResetPosition();
                         await SendStateAsync();
                         await SendPreviewAsync();
@@ -208,24 +245,76 @@ public partial class ApplyWindow : Window
         await ExecuteScriptSafeAsync($"window.folderlySetState({json})");
     }
 
-    private async Task SendPreviewAsync()
+    private async Task SendPreviewAsync(bool exact = true)
+    {
+        if (!_webViewReady) return;
+
+        _previewRenderVersion++;
+        _previewRenderPending = true;
+        _previewRenderPendingExact |= exact;
+
+        if (_previewRenderActive) return;
+
+        _previewRenderActive = true;
+
+        try
+        {
+            while (_previewRenderPending)
+            {
+                var renderVersion = _previewRenderVersion;
+                var renderExact = _previewRenderPendingExact;
+                _previewRenderPending = false;
+                _previewRenderPendingExact = false;
+
+                await RenderAndSendPreviewAsync(renderExact, renderVersion);
+            }
+        }
+        finally
+        {
+            _previewRenderActive = false;
+        }
+
+        if (_previewRenderPending)
+            await SendPreviewAsync(exact: false);
+    }
+
+    private async Task RenderAndSendPreviewAsync(bool exact, int renderVersion)
     {
         if (!_webViewReady) return;
 
         // OffscreenPreview プロパティを現在の ViewModel 状態に同期
-        OffscreenPreview.SourceImage      = _vm.SourceImage;
-        OffscreenPreview.SelectedTagColor = _vm.EffectiveSelectedTagColor;
-        OffscreenPreview.TagName          = TagSettingsService.GetDisplayName(_vm.SelectedTagColor);
-        OffscreenPreview.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
-        OffscreenPreview.TagIconIndex     = TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor);
-        OffscreenPreview.ShowTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
-        OffscreenPreview.Scale            = _vm.Scale;
-        OffscreenPreview.OffsetX          = _vm.OffsetX;
-        OffscreenPreview.OffsetY          = _vm.OffsetY;
-        OffscreenPreview.CropMode         = _vm.CropMode;
+        if (_vm.SourceImage is null)
+        {
+            await ExecuteScriptSafeAsync("window.folderlyClearPreview && window.folderlyClearPreview()");
+            return;
+        }
 
         // WPF レイアウトを強制更新してからレンダリング
-        OffscreenPreview.Measure(new Size(320, 320));
+        var pngBytes = exact
+            ? await RenderExactPreviewPngAsync()
+            : RenderFastPreviewPng();
+        if (renderVersion != _previewRenderVersion && _previewRenderPending) return;
+
+        var b64     = Convert.ToBase64String(pngBytes);
+        var dataUrl = $"data:image/png;base64,{b64}";
+
+        await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}')");
+    }
+
+    private byte[] RenderFastPreviewPng()
+    {
+        OffscreenPreview.SourceImage       = _vm.SourceImage;
+        OffscreenPreview.SelectedTagColor  = _vm.EffectiveSelectedTagColor;
+        OffscreenPreview.TagName           = TagSettingsService.GetDisplayName(_vm.SelectedTagColor);
+        OffscreenPreview.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+        OffscreenPreview.TagIconIndex      = TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor);
+        OffscreenPreview.ShowTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
+        OffscreenPreview.Scale             = _vm.Scale;
+        OffscreenPreview.OffsetX           = _vm.OffsetX;
+        OffscreenPreview.OffsetY           = _vm.OffsetY;
+        OffscreenPreview.CropMode          = _vm.CropMode;
+
+        OffscreenPreview.Measure(new System.Windows.Size(320, 320));
         OffscreenPreview.Arrange(new Rect(0, 0, 320, 320));
         OffscreenPreview.UpdateLayout();
 
@@ -233,14 +322,53 @@ public partial class ApplyWindow : Window
         rtb.Render(OffscreenPreview);
 
         using var ms = new MemoryStream();
-        var enc = new PngBitmapEncoder();
-        enc.Frames.Add(BitmapFrame.Create(rtb));
-        enc.Save(ms);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(rtb));
+        encoder.Save(ms);
+        return ms.ToArray();
+    }
 
-        var b64     = Convert.ToBase64String(ms.ToArray());
-        var dataUrl = $"data:image/png;base64,{b64}";
+    private async Task<byte[]> RenderExactPreviewPngAsync()
+    {
+        using var stream = new MemoryStream();
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(_vm.SourceImage!));
+        encoder.Save(stream);
+        stream.Position = 0;
 
-        await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}')");
+        using var sourceImage = await SixLabors.ImageSharp.Image.LoadAsync(stream);
+        using var adjustedImage = ImageAdjuster.Adjust(
+            sourceImage,
+            FolderTemplate.GetImageRegionPixelSize(),
+            _vm.GetAdjustParams());
+
+        var tagNameForIcon = TagSettingsService.GetShowTagNameOnIcon()
+            ? TagSettingsService.GetDisplayName(_vm.SelectedTagColor)
+            : null;
+
+        using var composed = TemplateRenderer.Render(
+            adjustedImage,
+            _vm.EffectiveSelectedTagColor,
+            FolderTemplate.BaseSize,
+            tagNameForIcon,
+            TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor),
+            TagSettingsService.GetShowTagIconOnIcon());
+
+        composed.Mutate(ctx => ctx.Resize(320, 320));
+
+        using var ms = new MemoryStream();
+        composed.SaveAsPng(ms);
+        return ms.ToArray();
+    }
+
+    private void UpdateTransform(JsonElement root)
+    {
+        if (root.TryGetProperty("scale", out var scale))
+            _vm.Scale = scale.GetDouble();
+        if (root.TryGetProperty("offsetX", out var offsetX))
+            _vm.OffsetX = offsetX.GetDouble();
+        if (root.TryGetProperty("offsetY", out var offsetY))
+            _vm.OffsetY = offsetY.GetDouble();
     }
 
     private async Task SendTagDataAsync()
@@ -272,6 +400,35 @@ public partial class ApplyWindow : Window
     }
 
     // ─── 画像選択・ロード ───────────────────────────────────────────────────
+
+    private void TryRestoreExistingCustomization()
+    {
+        try
+        {
+            var entry = AppServices.History.GetByPath(Path.GetFullPath(_vm.FolderPath));
+            if (entry is null) return;
+            if (string.IsNullOrWhiteSpace(entry.SourceImagePath)) return;
+            if (!File.Exists(entry.SourceImagePath)) return;
+            if (!LoadImage(entry.SourceImagePath, resetPosition: false, showError: false)) return;
+
+            _vm.CropMode = entry.CropMode switch
+            {
+                "fit_width"  => CoreCropMode.FitWidth,
+                "fit_height" => CoreCropMode.FitHeight,
+                _            => CoreCropMode.Center,
+            };
+            _vm.Scale   = entry.ImageScale;
+            _vm.OffsetX = entry.ImageOffsetX;
+            _vm.OffsetY = entry.ImageOffsetY;
+            _vm.SelectedTagColor = !string.IsNullOrWhiteSpace(entry.TagKey)
+                ? TagColors.All.FirstOrDefault(t => t.Key == entry.TagKey) ?? TagColors.None
+                : TagColors.None;
+        }
+        catch
+        {
+            // 履歴復元に失敗しても、通常の新規カスタマイズ画面として開ければよい。
+        }
+    }
 
     private void SelectImageFromDialog()
     {
@@ -316,7 +473,7 @@ public partial class ApplyWindow : Window
         }
     }
 
-    private void LoadImage(string path)
+    private bool LoadImage(string path, bool resetPosition = true, bool showError = true)
     {
         try
         {
@@ -330,14 +487,21 @@ public partial class ApplyWindow : Window
 
             _vm.SourceImage     = bitmap;
             _vm.SourceImagePath = path;
-            _vm.ResetPosition();
+            if (resetPosition)
+                _vm.ResetPosition();
 
             _ = SendPreviewAsync();
+            return true;
         }
         catch
         {
-            MessageBox.Show(AppServices.Localize["ImageLoadError"], "Folderly",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (showError)
+            {
+                MessageBox.Show(AppServices.Localize["ImageLoadError"], "Folderly",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            return false;
         }
     }
 

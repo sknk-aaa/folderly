@@ -107,6 +107,22 @@ public static class FolderTemplate
             region.Height * scale);
     }
 
+    public static Size GetImageRegionPixelSize(int outputSize = BaseSize)
+    {
+        var region = ScaleRegion(ImageRegion, outputSize);
+        return new Size(
+            Math.Max(1, (int)Math.Round(region.Width)),
+            Math.Max(1, (int)Math.Round(region.Height)));
+    }
+
+    public static Point GetImageRegionPixelOrigin(int outputSize = BaseSize)
+    {
+        var region = ScaleRegion(ImageRegion, outputSize);
+        return new Point(
+            (int)Math.Round(region.X),
+            (int)Math.Round(region.Y));
+    }
+
     public static PointF[] GetTabShapePoints(float targetSize)
     {
         float scale = targetSize / BaseSize;

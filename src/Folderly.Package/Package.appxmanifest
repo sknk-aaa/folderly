@@ -15,7 +15,7 @@
   <Identity
     Name="Folderly.FolderlyApp"
     Publisher="CN=Folderly"
-    Version="1.0.0.1"
+    Version="1.0.0.13"
     ProcessorArchitecture="x64" />
 
   <Properties>

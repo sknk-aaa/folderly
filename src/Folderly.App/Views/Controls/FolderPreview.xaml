@@ -40,7 +40,7 @@
         </Viewbox>
 
         <Path x:Name="ImageBasePath"
-              Fill="#FFC72C"
+              Fill="#FFFFFF"
               IsHitTestVisible="False"/>
 
         <Canvas x:Name="ImageCanvas"
