@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -9,13 +9,11 @@
   IgnorableNamespaces="rescap desktop4 desktop5 com">
 
   <!--
-    Publisher: Store 申請時に Partner Center のパブリッシャー ID（CN=...）に変更すること。
-    Version:   リリースごとに 1.0.x.0 形式でインクリメントする。
-  -->
+    Publisher: Store 逕ｳ隲区凾縺ｫ Partner Center 縺ｮ繝代ヶ繝ｪ繝・す繝｣繝ｼ ID・・N=...・峨↓螟画峩縺吶ｋ縺薙→縲・    Version:   繝ｪ繝ｪ繝ｼ繧ｹ縺斐→縺ｫ 1.0.x.0 蠖｢蠑上〒繧､繝ｳ繧ｯ繝ｪ繝｡繝ｳ繝医☆繧九・  -->
   <Identity
     Name="Folderly.FolderlyApp"
     Publisher="CN=Folderly"
-    Version="1.0.0.1"
+    Version="1.0.0.2"
     ProcessorArchitecture="x64" />
 
   <Properties>
@@ -43,7 +41,7 @@
 
       <uap:VisualElements
         DisplayName="Folderly"
-        Description="フォルダの見た目を表紙画像と色タグでカスタマイズ"
+        Description="繝輔か繝ｫ繝縺ｮ隕九◆逶ｮ繧定｡ｨ邏咏判蜒上→濶ｲ繧ｿ繧ｰ縺ｧ繧ｫ繧ｹ繧ｿ繝槭う繧ｺ"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
@@ -56,10 +54,8 @@
       <Extensions>
 
         <!--
-          COM SurrogateServer 登録。
-          Folderly.ContextMenu.comhost.dll が IExplorerCommand を公開し、Explorer から
-          DLL surrogate 経由で読み込まれる。
-          Clsid: {2A7A05DA-70D8-4302-8B23-AE8D79D801B6}
+          COM SurrogateServer 逋ｻ骭ｲ縲・          Folderly.ContextMenu.comhost.dll 縺・IExplorerCommand 繧貞・髢九＠縲・xplorer 縺九ｉ
+          DLL surrogate 邨檎罰縺ｧ隱ｭ縺ｿ霎ｼ縺ｾ繧後ｋ縲・          Clsid: {2A7A05DA-70D8-4302-8B23-AE8D79D801B6}
         -->
         <com:Extension Category="windows.comServer">
           <com:ComServer>
@@ -73,10 +69,7 @@
         </com:Extension>
 
         <!--
-          フォルダ右クリックメニュー登録（SPEC Section 10.1, F-01）。
-          Type="Directory" でフォルダのみに表示される。
-          Verb Id は Explorer のメニュー識別子（3〜32文字、英数字のみ）。
-        -->
+          繝輔か繝ｫ繝蜿ｳ繧ｯ繝ｪ繝・け繝｡繝九Η繝ｼ逋ｻ骭ｲ・・PEC Section 10.1, F-01・峨・          Type="Directory" 縺ｧ繝輔か繝ｫ繝縺ｮ縺ｿ縺ｫ陦ｨ遉ｺ縺輔ｌ繧九・          Verb Id 縺ｯ Explorer 縺ｮ繝｡繝九Η繝ｼ隴伜挨蟄撰ｼ・縲・2譁・ｭ励∬恭謨ｰ蟄励・縺ｿ・峨・        -->
         <desktop4:Extension Category="windows.fileExplorerContextMenus">
           <desktop4:FileExplorerContextMenus>
             <desktop5:ItemType Type="Directory">
@@ -92,8 +85,9 @@
   </Applications>
 
   <Capabilities>
-    <!-- デスクトップアプリとして完全信頼で実行するための制限付きケーパビリティ -->
+    <!-- 繝・せ繧ｯ繝医ャ繝励い繝励Μ縺ｨ縺励※螳悟・菫｡鬆ｼ縺ｧ螳溯｡後☆繧九◆繧√・蛻ｶ髯蝉ｻ倥″繧ｱ繝ｼ繝代ン繝ｪ繝・ぅ -->
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 
 </Package>
+

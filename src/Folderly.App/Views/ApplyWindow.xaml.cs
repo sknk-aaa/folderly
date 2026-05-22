@@ -21,6 +21,7 @@ public partial class ApplyWindow : Window
 {
     private readonly ApplyViewModel _vm;
     private bool _webViewReady;
+    private static string? _cachedHtml;
 
     public ApplyWindow(string folderPath)
     {
@@ -36,10 +37,11 @@ public partial class ApplyWindow : Window
     {
         try
         {
-            var userDataFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Folderly", "WebView2");
-            var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+            // AppServices.Initialize() で並列開始済みの Environment を使い回す
+            var env = await (AppServices.WebView2EnvTask
+                ?? CoreWebView2Environment.CreateAsync(null, Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Folderly", "WebView2")));
             await WebView.EnsureCoreWebView2Async(env);
 
             WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
@@ -61,13 +63,14 @@ public partial class ApplyWindow : Window
         }
     }
 
-    private string LoadHtml()
+    private static string LoadHtml()
     {
+        if (_cachedHtml is not null) return _cachedHtml;
         var asm = Assembly.GetExecutingAssembly();
         using var stream = asm.GetManifestResourceStream("Folderly.App.Resources.ApplyWindow.html");
         if (stream is null) throw new InvalidOperationException("ApplyWindow.html が見つかりません");
         using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
+        return _cachedHtml = reader.ReadToEnd();
     }
 
     private async void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)

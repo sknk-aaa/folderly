@@ -3,6 +3,7 @@ using Folderly.Core.History;
 using Folderly.App.Services;
 using Folderly.Shell;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
 
 namespace Folderly.App.Infrastructure;
 
@@ -19,6 +20,9 @@ public static class AppServices
     public static LocalizationService  Localize    { get; private set; } = null!;
     public static ILoggerFactory       LogFactory  { get; private set; } = null!;
 
+    // SQLite 初期化と並列でバックグラウンド作成し、ApplyWindow で使い回す
+    public static Task<CoreWebView2Environment>? WebView2EnvTask { get; private set; }
+
     public static void Initialize()
     {
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -32,6 +36,12 @@ public static class AppServices
             .AddProvider(new FileLoggerProvider(logPath)));
 
         var dbPath = Path.Combine(baseDir, "folderly.db");
+
+        // WebView2 Environment を SQLite 初期化と並列でバックグラウンド起動
+        // (UI スレッドから呼ぶため STA 要件を満たす)
+        var webView2DataFolder = Path.Combine(appData, "Folderly", "WebView2");
+        WebView2EnvTask = CoreWebView2Environment.CreateAsync(null, webView2DataFolder);
+
         History    = new HistoryRepository(dbPath, LogFactory.CreateLogger<HistoryRepository>());
 
         var notifier = new ShellNotifier();

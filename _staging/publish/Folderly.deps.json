@@ -12,6 +12,10 @@
           "Folderly.Core": "1.0.0",
           "Folderly.Shell": "1.0.0",
           "Microsoft.Extensions.Logging": "8.0.1",
+          "Microsoft.Web.WebView2": "1.0.2739.15",
+          "Microsoft.Web.WebView2.Core": "1.0.2739.15",
+          "Microsoft.Web.WebView2.WinForms": "1.0.2739.15",
+          "Microsoft.Web.WebView2.Wpf": "1.0.2739.15",
           "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.17763.57"
         },
         "runtime": {
@@ -115,6 +119,13 @@
           }
         }
       },
+      "Microsoft.Web.WebView2/1.0.2739.15": {
+        "native": {
+          "runtimes/win-x64/native/WebView2Loader.dll": {
+            "fileVersion": "1.0.2739.15"
+          }
+        }
+      },
       "SixLabors.Fonts/2.1.3": {
         "runtime": {
           "lib/net6.0/SixLabors.Fonts.dll": {
@@ -206,6 +217,30 @@
             "fileVersion": "1.0.0.0"
           }
         }
+      },
+      "Microsoft.Web.WebView2.Core/1.0.2739.15": {
+        "runtime": {
+          "Microsoft.Web.WebView2.Core.dll": {
+            "assemblyVersion": "1.0.2739.15",
+            "fileVersion": "1.0.2739.15"
+          }
+        }
+      },
+      "Microsoft.Web.WebView2.WinForms/1.0.2739.15": {
+        "runtime": {
+          "Microsoft.Web.WebView2.WinForms.dll": {
+            "assemblyVersion": "1.0.2739.15",
+            "fileVersion": "1.0.2739.15"
+          }
+        }
+      },
+      "Microsoft.Web.WebView2.Wpf/1.0.2739.15": {
+        "runtime": {
+          "Microsoft.Web.WebView2.Wpf.dll": {
+            "assemblyVersion": "1.0.2739.15",
+            "fileVersion": "1.0.2739.15"
+          }
+        }
       }
     }
   },
@@ -276,6 +311,13 @@
       "path": "microsoft.extensions.primitives/8.0.0",
       "hashPath": "microsoft.extensions.primitives.8.0.0.nupkg.sha512"
     },
+    "Microsoft.Web.WebView2/1.0.2739.15": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hZg7vHWBg4RIiK3rhkNqX3hcBqqoVXVrrO2BVrVOiSmEgfLa7lY64G1tWh2VY84MfHIFLCAQNwn3Rwvu+ICHyw==",
+      "path": "microsoft.web.webview2/1.0.2739.15",
+      "hashPath": "microsoft.web.webview2.1.0.2739.15.nupkg.sha512"
+    },
     "SixLabors.Fonts/2.1.3": {
       "type": "package",
       "serviceable": true,
@@ -332,6 +374,21 @@
     },
     "Folderly.Shell/1.0.0": {
       "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Web.WebView2.Core/1.0.2739.15": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Web.WebView2.WinForms/1.0.2739.15": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Web.WebView2.Wpf/1.0.2739.15": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     }
