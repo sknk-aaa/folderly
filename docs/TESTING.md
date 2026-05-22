@@ -4,12 +4,19 @@ Use this checklist when validating a new Folderly build on Windows.
 
 Current verified baseline:
 
-- Date: 2026-05-22
-- Package: `Folderly.FolderlyApp 1.0.0.16`
+- Date: 2026-05-23
+- Store package identity: `KanekoApps.Folderly`
+- Store package version: `1.0.16.0`
+- Store candidate package: `_out/Folderly_1.0.16.0_x64_store.msix`
+- Partner Center package upload: completed
 - Architecture: x64
 - Automated tests: `132` passed
-- MSIX signature: valid with local `CN=Folderly` certificate
 - Final manual QA: completed before Store submission prep
+
+Historical note:
+
+- Last sideload package before Store identity change: `Folderly.FolderlyApp 1.0.0.16`
+- Store rejected `1.0.0.16` because Store MSIX revisions must be `0`; use `1.0.16.0`.
 
 ## Automated Tests
 
@@ -27,15 +34,17 @@ Expected:
 ## Package Verification
 
 - [ ] Release x64 build succeeds.
-- [ ] MSIX is created with `makeappx`.
-- [ ] MSIX is signed successfully.
-- [ ] `Add-AppxPackage` installs the generated MSIX.
-- [ ] `Get-AppxPackage -Name Folderly.FolderlyApp` shows the expected version.
+- [ ] Store MSIX is created with `makeappx`.
+- [ ] MSIX payload includes `WebView2Loader.dll` at the package root.
+- [ ] `Package.appxmanifest` has Store identity `KanekoApps.Folderly`.
+- [ ] `Package.appxmanifest` has Publisher `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
+- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.0.16.0`.
+- [ ] Partner Center accepts the uploaded package.
+- [ ] If sideload testing locally, the signing certificate subject matches the active package publisher.
 - [ ] App launches from Start menu.
 - [ ] Explorer context menu shows the localized Folderly customize command.
 - [ ] Context menu has the Folderly icon.
 - [ ] Context menu opens the editor for the selected folder.
-- [ ] MSIX payload includes `WebView2Loader.dll` at the package root.
 
 ## Basic Apply
 
@@ -53,8 +62,8 @@ Expected:
 
 - [ ] Clicking the drop area opens the file picker.
 - [ ] Drag and drop accepts image files.
-- [ ] There is no second lower `画像を選択...` button.
-- [ ] `画像をリセット` clears the selected image and returns the editor to the empty state.
+- [ ] There is no second lower image-select button.
+- [ ] `Reset image` clears the selected image and returns the editor to the empty state.
 - [ ] Apply is disabled when no image is selected.
 
 ## Existing Customization Restore
@@ -84,7 +93,7 @@ This area has regressed before. Test it carefully.
 - [ ] Mouse wheel over the preview zooms in/out smoothly.
 - [ ] Scale slider updates when using mouse wheel zoom.
 - [ ] Scale percentage label does not overlap the slider bar.
-- [ ] `中央に戻す` resets scale and X/Y offset.
+- [ ] `Reset position` resets scale and X/Y offset.
 - [ ] After many mixed operations, the editor remains responsive.
 
 ## Preview/Final Icon Match
@@ -108,7 +117,15 @@ This area has regressed before. Test it carefully.
 - [ ] When tag label rendering is ON, preview and final icon show the tag label.
 - [ ] When tag label rendering is OFF, final icon does not show the tag label.
 - [ ] Long tag names do not spill outside the tag area.
-- [ ] The tag editor does not show a disabled `新規タグを追加` control.
+- [ ] The tag editor does not show a disabled `Add new tag` control.
+
+## Localization
+
+- [ ] English setting changes the context-menu label text.
+- [ ] English setting changes the image-selection screen text.
+- [ ] English setting changes the tag-editor screen text.
+- [ ] English setting changes the `Show tag name on folder icon` setting text.
+- [ ] Japanese setting still shows natural Japanese for the same screens.
 
 ## Revert
 
@@ -140,3 +157,14 @@ This area has regressed before. Test it carefully.
 User-facing behavior:
 
 Explorer windows may briefly reopen after applying. This is intentional and refreshes Windows icon cache.
+
+## Store Submission
+
+- [ ] GitHub Pages privacy/support URL is public: `https://sknk-aaa.github.io/folderly/`.
+- [ ] Support section is public: `https://sknk-aaa.github.io/folderly/#support`.
+- [ ] Partner Center category is set to `Utilities & tools`.
+- [ ] Device family is `Windows 10/11 Desktop` only.
+- [ ] Price/trial/market settings are completed.
+- [ ] Age rating questionnaire is completed.
+- [ ] `runFullTrust` justification is filled.
+- [ ] Submission is sent for certification.

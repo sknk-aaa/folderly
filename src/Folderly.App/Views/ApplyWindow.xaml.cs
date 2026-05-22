@@ -11,6 +11,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -160,18 +161,19 @@ public partial class ApplyWindow : Window
         if (AppServices.Localize.CurrentLang == "ja")
             return html;
 
-        html = html.Replace(
-            "<div class=\"editing\"><b id=\"editing-tag-name\">「—」</b> を編集中</div>",
+        html = Regex.Replace(
+            html,
+            @"<div class=""editing""><b id=""editing-tag-name"">.*?</b>\s*.*?</div>",
             $"<div class=\"editing\">{T("EditingSuffix")} <b id=\"editing-tag-name\">&quot;—&quot;</b></div>",
-            StringComparison.Ordinal);
-        html = html.Replace(
-            "headEl.textContent = '「' + data.name + '」';",
-            "headEl.textContent = '\"' + data.name + '\"';",
-            StringComparison.Ordinal);
-        html = html.Replace(
-            "headEl.textContent = '「' + nameInput.value + '」';",
-            "headEl.textContent = '\"' + nameInput.value + '\"';",
-            StringComparison.Ordinal);
+            RegexOptions.Singleline);
+        html = Regex.Replace(
+            html,
+            @"headEl\.textContent\s*=\s*'[^']*'\s*\+\s*data\.name\s*\+\s*'[^']*';",
+            "headEl.textContent = '\"' + data.name + '\"';");
+        html = Regex.Replace(
+            html,
+            @"headEl\.textContent\s*=\s*'[^']*'\s*\+\s*nameInput\.value\s*\+\s*'[^']*';",
+            "headEl.textContent = '\"' + nameInput.value + '\"';");
 
         var applyButtonHtml = "<span class=\"ico\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"4,12 10,18 20,6\"/></svg></span>"
             + Html(L["Apply"]);
@@ -655,7 +657,9 @@ public partial class ApplyWindow : Window
         if (protection.IsWarning)
         {
             var L   = AppServices.Localize;
-            var msg = string.Format(L["WarningGenericMessage"], protection.Reason);
+            var msg = IsOneDrivePath(_vm.FolderPath)
+                ? L["OneDriveWarningMessage"]
+                : string.Format(L["WarningGenericMessage"], protection.Reason);
             var res = MessageBox.Show(msg, L["WarningGenericTitle"],
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning);
             if (res != MessageBoxResult.OK) return;
@@ -723,6 +727,27 @@ public partial class ApplyWindow : Window
 
     private static bool ShouldReopenExplorer()
         => AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
+
+    private static bool IsOneDrivePath(string folderPath)
+    {
+        var normalized = Path.GetFullPath(folderPath)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            + Path.DirectorySeparatorChar;
+
+        return IsUnderRoot(normalized, Environment.GetEnvironmentVariable("OneDrive")) ||
+               IsUnderRoot(normalized, Environment.GetEnvironmentVariable("OneDriveCommercial"));
+
+        static bool IsUnderRoot(string normalizedPath, string? root)
+        {
+            if (string.IsNullOrWhiteSpace(root)) return false;
+
+            var normalizedRoot = Path.GetFullPath(root)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+
+            return normalizedPath.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     private static async Task ReopenExplorerWindowsAsync(string folderPath)
     {

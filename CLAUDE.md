@@ -4,7 +4,9 @@ This file is for implementation agents. Keep it short, current, and practical.
 
 ## Current State
 
-- Current local app/package version: `1.0.0.16`
+- Current Store package version: `1.0.16.0`
+- Current Store candidate: `_out\Folderly_1.0.16.0_x64_store.msix`
+- Partner Center package upload: completed
 - Main app: WPF + WebView2 editor
 - Context menu: MSIX Packaged COM `IExplorerCommand`
 - Core rendering: ImageSharp -> folder template -> ICO -> `desktop.ini`
@@ -56,9 +58,9 @@ Explorer may show stale folder icons even when `desktop.ini` is correct.
 ### UI Scope
 
 - There is one image entry point: the drag/drop area, which also opens the file picker.
-- `画像をリセット` clears the current image.
+- `Reset image` clears the current image.
 - Do not re-add the lower duplicate image-select button.
-- Do not show `新規タグを追加` until actual custom tag creation exists.
+- Do not show `Add new tag` until actual custom tag creation exists.
 - Folder sorting by Folderly tag in Explorer is out of scope.
 
 ## Important Files
@@ -76,8 +78,12 @@ Explorer may show stale folder icons even when `desktop.ini` is correct.
 ## Packaging Notes
 
 - `WebView2Loader.dll` must be copied to the package output root. `runtimes\win-x64\native` alone is not enough.
-- Local signing certificate subject: `CN=Folderly`.
-- Current output packages are under `_out\Folderly_<version>_x64.msix`.
+- Store package identity: `KanekoApps.Folderly`.
+- Store publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
+- Older local sideload builds used signing certificate subject `CN=Folderly`.
+- Visual Studio did not expose `Publish` / `Store` / `Create App Packages` for `Folderly.Package` in the current environment; the accepted Store candidate was created manually with `makeappx`.
+- Microsoft Store rejects non-zero MSIX revision numbers. Use versions like `1.0.16.0`, not `1.0.0.16`.
+- Current Store output package is `_out\Folderly_1.0.16.0_x64_store.msix`.
 - `_out` MSIX files are generated artifacts.
 
 ## Documentation
@@ -87,3 +93,4 @@ For fuller context, read:
 - `HANDOVER.md`
 - `SPEC.md`
 - `docs/TESTING.md`
+- `docs/STORE_SUBMISSION.md`

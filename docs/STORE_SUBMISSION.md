@@ -1,153 +1,129 @@
-# Microsoft Store 提出準備メモ
+# Microsoft Store Submission Notes
 
-Folderly を Microsoft Store に出す前に確認する項目です。
+Last updated: 2026-05-23
 
-## 現状
+This document is the handover for the current Microsoft Store submission state.
 
-- アプリ形式: MSIX / WPF / .NET 8 / x64
-- パッケージ名: `Folderly.FolderlyApp`
-- バージョン: `1.0.0.16`
-- 最小OS: Windows 10 1809 (`10.0.17763.0`)
-- 右クリックメニュー: Packaged COM SurrogateServer
-- 制限付き capability: `runFullTrust`
-- ローカルMSIXビルド: 確認済み
-- ローカルMSIX署名: テスト証明書で確認済み
-- サイドロードインストール: 確認済み
+## Current Store Package
 
-## Store提出前に必ず差し替えるもの
+- Product: `Folderly`
+- Package identity name: `KanekoApps.Folderly`
+- Publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+- Publisher display name: `Kaneko Apps`
+- Package family name: `KanekoApps.Folderly_q8156m1pgwn5a`
+- Store ID: `9N99JH5H91H8`
+- Store URL: `https://apps.microsoft.com/detail/9N99JH5H91H8`
+- Store protocol link: `ms-windows-store://pdp/?productid=9N99JH5H91H8`
+- Store package version: `1.0.16.0`
+- Architecture: `x64`
+- Minimum OS: Windows 10 1809 (`10.0.17763.0`)
+- Restricted capability: `runFullTrust`
+- Uploaded Store candidate package: `_out/Folderly_1.0.16.0_x64_store.msix`
 
-- `src/Folderly.Package/Package.appxmanifest`
-  - `Identity Publisher="CN=Folderly"` を Partner Center の正式な Publisher に変更する
-  - `PublisherDisplayName` を実際の公開者名に合わせる
-  - `DisplayName` はインストール後の表示名なので、基本は `Folderly` のままにする
-  - `Version` を提出用バージョンに確定する
-- Privacy Policy / Support
-  - GitHub Pages で `docs/index.html` を公開する
-  - Privacy Policy URL: `https://sknk-aaa.github.io/folderly/`
-  - Support URL: `https://sknk-aaa.github.io/folderly/#support`
-  - Partner Center の Properties / Support info にそれぞれ入力する
-- `src/Folderly.Package/Images/`
-  - `FolderlyContext.ico`
-  - `Square44x44Logo.png`
-  - `Square150x150Logo.png`
-  - `StoreLogo.png`
-  - `Wide310x150Logo.png`
-  - `SplashScreen.png`
+## Version Rule
 
-## 現在の画像サイズ
+Microsoft Store rejects MSIX packages with a non-zero revision number.
 
-| ファイル | サイズ | 用途 |
-| --- | --- | --- |
-| `FolderlyContext.ico` | 16 / 20 / 24 / 32 / 48 / 64 / 128 / 256 を含むICO | 右クリックメニュー |
-| `Square44x44Logo.png` | 44 x 44 | アプリ小アイコン |
-| `Square150x150Logo.png` | 150 x 150 | スタートメニュー等 |
-| `StoreLogo.png` | 50 x 50 | Store/パッケージロゴ |
-| `Wide310x150Logo.png` | 310 x 150 | ワイドタイル |
-| `SplashScreen.png` | 620 x 300 | スプラッシュ |
+- Do not submit `1.0.0.16`.
+- Use `1.0.16.0`.
+- The rejected package was `_out/Folderly_1.0.0.16_x64_store.msix`.
 
-アイコンは、`icons/` 配下の元画像から各サイズへ書き出す運用にする。
+## Package Creation
 
-- `icons/ストア用アイコン.png`: Store 用ロゴのPNG生成元
-- `icons/透過アイコン.png`: 右クリックメニュー用ICOとアプリ表示用PNGの生成元
+Visual Studio 2022 and 2026 did not show `Publish`, `Store`, or `Create App Packages` for `Folderly.Package` in this environment.
 
-現方針:
+Use the manual MakeAppx flow when needed:
 
-- `StoreLogo.png` は `icons/ストア用アイコン.png` 由来
-- `FolderlyContext.ico`, `Square44x44Logo.png`, `Square150x150Logo.png`, `Wide310x150Logo.png`, `SplashScreen.png` は `icons/透過アイコン.png` 由来
-- ストア提出用画像以外は、背景透過の見た目で統一する
+1. Build `src/Folderly.Package/Folderly.Package.wapproj` in `Release|x64`.
+2. Stage `src/Folderly.Package/bin/x64/Release`.
+3. Copy `src/Folderly.Package/Package.appxmanifest` as `AppxManifest.xml`.
+4. Copy `src/Folderly.Package/Images`.
+5. Run `makeappx pack`.
+6. Upload the resulting `.msix` to Partner Center.
 
-## Partner Center 側で必要なもの
+Partner Center accepted this package:
 
-- アプリ名の予約
-  - 日本語: `Folderly - フォルダのサムネイル変更`
-  - 英語: `Folderly - Folder Thumbnail Changer`
-  - インストール後のアプリ表示名は `Folderly` にして、Store掲載名だけ機能説明付きにする方針
-- 価格
-- 試用版の有無と期間
-- 対象市場
-- 年齢区分
-- カテゴリ
-- プライバシーポリシーURL
-- サポートURLまたは問い合わせ先
-- Store掲載文
-  - 短い説明
-  - 長い説明
-  - 主な機能
-  - 検索キーワード
-- スクリーンショット
-  - 最低1枚は必要
-  - 実運用では5枚程度用意する
-  - 日本語/英語を出すなら掲載文もスクショも両方準備する
+```text
+_out/Folderly_1.0.16.0_x64_store.msix
+```
 
-下書き:
+## Partner Center Properties
 
-- 掲載文: [STORE_LISTING_DRAFT.md](STORE_LISTING_DRAFT.md)
-- プライバシーポリシー: [PRIVACY_POLICY_DRAFT.md](PRIVACY_POLICY_DRAFT.md)
+Category:
 
-## 掲載文に入れるべき注意書き
+- Primary category: `Utilities & tools`
+- Subcategory: file manager, system tools, or other tools if available
+- Secondary category: none
 
-Folderly は Windows Explorer のアイコンキャッシュ仕様に合わせて、適用後に対象の Explorer ウィンドウを開き直します。
+Privacy:
 
-掲載文またはFAQには以下の趣旨を入れる:
+- The Store requires a privacy policy because of declared capabilities.
+- Privacy Policy URL: `https://sknk-aaa.github.io/folderly/`
+- Support URL: `https://sknk-aaa.github.io/folderly/#support`
 
-> アイコン更新時に Explorer ウィンドウを開き直す場合があります。これは Windows のアイコンキャッシュ更新のための仕様です。
+Support:
 
-## 提出用パッケージ
+- Website: `https://sknk-aaa.github.io/folderly/#support`
+- Support contact: support email address
+- Phone/address: Partner Center may show account contact info if these are blank.
 
-Store提出では、通常は `.msix` 単体より `.msixupload` / `.appxupload` の提出が推奨される。
+Device family:
 
-現在の手動 `makeappx` はサイドロード確認には使えるが、Store提出前には Visual Studio の「Create App Packages」または同等の手順で Store提出用パッケージを作る。
+- Select `Windows 10/11 Desktop` only.
+- Do not select Mobile, Xbox, Team, Mixed Reality, Windows 8/8.1, or Phone.
+- `Let Microsoft decide whether to make this app available to any future device families` can remain checked.
 
-## GitHub Pages 公開手順
+Pricing:
 
-このリポジトリでは Privacy Policy / Support ページを `docs/index.html` に置く。
+- Recommended launch price: 300 JPY buyout.
+- Store trial: 7 days.
+- No IAP/subscription for the initial release.
 
-GitHub 側で以下を設定する:
+Age ratings:
 
-1. Repository Settings を開く
-2. Pages を開く
-3. Source を `Deploy from a branch` にする
-4. Branch を `main`、folder を `/docs` にする
-5. Save する
+- Folderly is a local desktop utility.
+- It has no user-generated content sharing, web publishing, social features, gambling, or mature content.
+- Answer the age-rating questionnaire accordingly.
 
-公開後の想定URL:
+Mixed Reality:
 
-- Privacy Policy: `https://sknk-aaa.github.io/folderly/`
-- Support: `https://sknk-aaa.github.io/folderly/#support`
+- Folderly is not a Mixed Reality app.
+- Leave Mixed Reality-specific fields blank if possible.
+- If forced to choose a display mode, choose the seated/standing option.
 
-## ローカル確認済み
+## runFullTrust Justification
 
-- [x] Release x64 build
-- [x] MSIX作成
-- [x] テスト証明書で署名
-- [x] サイドロードインストール
-- [x] Store 用ロゴと透過版アプリ表示アイコンを反映
-- [x] 右クリックメニュー表示
-- [x] 右クリックから適用画面起動
-- [x] A -> B -> C の再適用反映
-- [x] 全フォルダを元に戻す
-- [x] 解除後の通常フォルダプレビュー復元
-- [x] 日本語/英語UIの主要表示確認
-- [x] プレビュー操作、拡大率、X/Y、ドラッグ操作の最終QA
-- [x] 新アイコン反映後の実機表示確認（右クリックメニュー、スタートメニュー、アプリ一覧）
+Paste this into the restricted capability explanation field:
 
-## Store提出で残っていること
+```text
+Folderly is a Windows desktop utility for customizing folder appearance. The app uses the runFullTrust capability because it needs to run as a full-trust desktop app in order to integrate with Windows Explorer, provide a folder context menu entry, apply folder icon customization, write desktop.ini/icon files inside user-selected folders, and refresh Explorer so the updated folder appearance is visible.
 
-ここから先は Partner Center または公開URLの確定が必要。ローカル作業だけでは完了できない。
+Folderly only operates on folders explicitly selected by the user. It does not collect, transmit, sell, or share personal information. Settings, customization history, selected local images, and generated icon files are stored locally on the user's device.
+```
 
-- [ ] Partner Center の正式 Publisher 値を確認
-- [ ] `Package.appxmanifest` の `Publisher` / `PublisherDisplayName` を正式値に差し替え
-- [ ] GitHub Pages を `/docs` から公開
-- [ ] Privacy Policy URL `https://sknk-aaa.github.io/folderly/` を Partner Center に入力
-- [ ] Support URL `https://sknk-aaa.github.io/folderly/#support` を Partner Center に入力
-- [ ] Store掲載文、検索キーワード、スクリーンショットを入力
-- [ ] 価格、試用期間、対象市場、年齢区分を入力
-- [ ] Store提出用パッケージ作成
-- [ ] Partner Center upload
-- [ ] 認証提出
+## Current Submission Status
 
-## 参考
+Done:
 
-- Microsoft Store配布のMSIXは、提出後にMicrosoft Store側で署名される
-- Partner Center の Packages ページで `.msix`, `.msixupload`, `.msixbundle`, `.appxupload` などをアップロードできる
-- Store認証は提出後に自動で行われる
+- Official Partner Center identity confirmed.
+- `Package.appxmanifest` identity updated.
+- Store package version fixed to `1.0.16.0`.
+- Store candidate MSIX generated.
+- Partner Center package upload completed successfully.
+- `Windows 10/11 Desktop` device family selected.
+
+Still required in Partner Center:
+
+- Confirm GitHub Pages privacy/support URLs are public.
+- Finish Store listing text and screenshots.
+- Finish price/trial/market settings.
+- Finish age rating.
+- Fill the `runFullTrust` justification.
+- Submit for certification.
+
+## Related Docs
+
+- Store listing draft: [STORE_LISTING_DRAFT.md](STORE_LISTING_DRAFT.md)
+- Privacy/support page: [index.html](index.html)
+- Privacy policy draft: [PRIVACY_POLICY_DRAFT.md](PRIVACY_POLICY_DRAFT.md)
+- Test checklist: [TESTING.md](TESTING.md)

@@ -2,7 +2,7 @@
 
 This document describes the current implemented behavior of Folderly. It intentionally omits old investigation logs and obsolete alternatives.
 
-Current package version: `1.0.0.16`
+Current Store package version: `1.0.16.0`
 
 ## Product Summary
 
@@ -13,7 +13,7 @@ Folderly customizes Windows folder icons by combining:
 - A color tag
 - Optional tag name/icon overlays
 
-The main entry point is the File Explorer context menu item `Folderlyでカスタマイズ`.
+The main entry point is the File Explorer context menu item `Customize with Folderly` in English and the localized Japanese equivalent in Japanese.
 
 ## Target Platform
 
@@ -21,6 +21,7 @@ The main entry point is the File Explorer context menu item `Folderlyでカス�
 - .NET 8 desktop runtime
 - MSIX packaged app
 - x64 currently verified
+- Microsoft Store distribution target: Windows 10/11 Desktop
 
 ## Tech Stack
 
@@ -38,7 +39,7 @@ The main entry point is the File Explorer context menu item `Folderlyでカス�
 
 ### Explorer Context Menu
 
-- Folder right-click shows `Folderlyでカスタマイズ`.
+- Folder right-click shows the localized Folderly customize command.
 - Selecting it launches Folderly for the selected folder.
 - The menu is implemented by `Folderly.ContextMenu` as a packaged COM handler.
 - The menu icon uses the transparent Folderly context/app icon.
@@ -71,6 +72,16 @@ The preview uses two update modes:
 - Exact render on commit
 
 Dragging the preview image must not continuously update slider thumbs. This keeps the editor responsive during long drag sessions.
+
+### Preview/Final Icon Position
+
+The WebView preview and final renderer must share the same folder template geometry. Scale, X/Y sliders, wheel zoom, and preview drag should all operate on the same coordinate model.
+
+Past regressions:
+
+- Image position differed between preview and final output.
+- Yellow folder background appeared on the right/bottom edge of the image region.
+- Changing scale could pin the image to the upper-left.
 
 ### Existing Customization Restore
 
@@ -120,6 +131,15 @@ Not supported:
 - Explorer sorting/grouping by Folderly tag
 - Explorer custom property columns
 
+### Localization
+
+The app supports Japanese and English UI. English mode should translate:
+
+- Explorer context-menu label
+- Image-selection screen
+- Tag-editor screen
+- Settings labels, including `Show tag name on folder icon`
+
 ### Apply Output
 
 Apply writes:
@@ -162,6 +182,17 @@ Explorer can keep stale icon thumbnails even after `desktop.ini` changes. Folder
 
 Folderly must not kill the whole Explorer shell during normal apply/revert behavior.
 
+## Store Submission State
+
+- Store identity: `KanekoApps.Folderly`
+- Publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+- Publisher display name: `Kaneko Apps`
+- Current Store package: `_out/Folderly_1.0.16.0_x64_store.msix`
+- Partner Center package upload: completed
+- Store MSIX versions must use revision `0`; `1.0.16.0` is valid, `1.0.0.16` is not.
+
+See `docs/STORE_SUBMISSION.md` for the current Partner Center checklist.
+
 ## Out Of Scope
 
 - Folder sorting/grouping by Folderly tag in Explorer
@@ -190,3 +221,4 @@ Folderly must not kill the whole Explorer shell during normal apply/revert behav
 ## Verification
 
 Use `docs/TESTING.md` for the current verification checklist.
+Use `docs/STORE_SUBMISSION.md` for the current Microsoft Store submission state.

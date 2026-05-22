@@ -2,11 +2,11 @@
 
 Folderly is a Windows desktop app that customizes folder icons with a cover image and a color tag. It is built with C#/.NET 8, WPF, WebView2, ImageSharp, SQLite, and an MSIX packaged context-menu extension.
 
-Current local package version: `1.0.0.16`
+Current Store package version: `1.0.16.0`
 
 ## What It Does
 
-- Adds a File Explorer context menu item: `Folderlyでカスタマイズ`.
+- Adds a File Explorer context menu item: `Customize with Folderly`.
 - Opens an editor for the selected folder.
 - Lets the user choose or drag and drop an image.
 - Shows a folder-shaped preview that matches the generated icon.
@@ -49,7 +49,7 @@ The excluded test depends on Windows filesystem permission behavior and is inten
 Build the Release x64 package output:
 
 ```powershell
-& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" `
+& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" `
   .\src\Folderly.Package\Folderly.Package.wapproj `
   /t:Restore,Build `
   /p:Configuration=Release `
@@ -58,17 +58,26 @@ Build the Release x64 package output:
   /p:SelfContained=false
 ```
 
-## Create, Sign, And Install MSIX
+## Store MSIX Creation
 
-This repo currently uses a local development certificate with subject `CN=Folderly`.
+Store identity is `KanekoApps.Folderly` / `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
+Older local sideload builds used a development certificate with subject `CN=Folderly`. Store MSIX versions must use revision `0` (for example, `1.0.16.0`, not `1.0.0.16`).
+
+Visual Studio did not expose `Publish`, `Store`, or `Create App Packages` for `Folderly.Package` in the current environment, so the accepted Store candidate was created with `makeappx` and uploaded directly to Partner Center:
+
+```text
+_out/Folderly_1.0.16.0_x64_store.msix
+```
+
+Manual Store package flow:
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$version = '1.0.0.16'
+$version = '1.0.16.0'
 $root = (Resolve-Path .).Path
 $outDir = Join-Path $root '_out'
-$stage = Join-Path $outDir "msix_stage_$version"
-$msix = Join-Path $outDir "Folderly_$($version)_x64.msix"
+$stage = Join-Path $outDir "store_msix_stage_$version"
+$msix = Join-Path $outDir "Folderly_$($version)_x64_store.msix"
 
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue
@@ -80,19 +89,9 @@ Copy-Item -Path (Join-Path $root 'src\Folderly.Package\Images') -Destination (Jo
 
 $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe'
 & $makeappx pack /d $stage /p $msix /overwrite
-
-$signtool = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe'
-$cert = Get-ChildItem Cert:\CurrentUser\My |
-  Where-Object { $_.Subject -eq 'CN=Folderly' -and $_.HasPrivateKey } |
-  Sort-Object NotAfter -Descending |
-  Select-Object -First 1
-
-& $signtool sign /fd SHA256 /sha1 $cert.Thumbprint $msix
-
-Stop-Process -Name Folderly -Force -ErrorAction SilentlyContinue
-Add-AppxPackage -Path $msix
-Get-AppxPackage -Name Folderly.FolderlyApp | Select-Object Name,Version,InstallLocation
 ```
+
+Upload the generated `.msix` in Partner Center. For local sideload testing, use a certificate whose subject matches the active package publisher.
 
 Do not kill `explorer.exe` as a normal install step. Folderly refreshes affected Explorer windows after apply/revert when the setting is enabled.
 
@@ -102,7 +101,7 @@ Do not kill `explorer.exe` as a normal install step. Folderly refreshes affected
 - Keep preview drag/wheel operations lightweight. Pointer movement should send throttled `transformPreview` updates and commit exact rendering only on mouseup or delayed settle.
 - Do not update X/Y sliders during preview drag. The drag state and slider state are intentionally independent to avoid layout churn and jank.
 - The lower duplicate image-select button was removed. The remaining image entry point is the drag/drop area; image reset is handled by `resetImage`.
-- The tag editor intentionally does not support creating new tags. Do not re-add the disabled `新規タグを追加` UI unless the feature itself is implemented.
+- The tag editor intentionally does not support creating new tags. Do not re-add the disabled `Add new tag` UI unless the feature itself is implemented.
 - `WebView2Loader.dll` must be present at the package output root as well as under `runtimes\win-x64\native`; otherwise WebView2 can fail with `0x8007007E`.
 
 ## Documentation
@@ -111,3 +110,4 @@ Do not kill `explorer.exe` as a normal install step. Folderly refreshes affected
 - Implementation notes and contracts: [CLAUDE.md](CLAUDE.md)
 - Manual verification checklist: [docs/TESTING.md](docs/TESTING.md)
 - Current product/technical spec: [SPEC.md](SPEC.md)
+- Microsoft Store submission notes: [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md)

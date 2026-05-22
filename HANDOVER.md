@@ -2,12 +2,17 @@
 
 This is the main handover document for Claude Code, Codex, or any future agent continuing Folderly development.
 
-Current local state:
+## Current Local State
 
-- Installed package: `Folderly.FolderlyApp 1.0.0.16`
-- Latest local MSIX: `_out\Folderly_1.0.0.16_x64.msix`
+- Last sideloaded package before Store identity change: `Folderly.FolderlyApp 1.0.0.16`
+- Store package identity: `KanekoApps.Folderly`
+- Store publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+- Publisher display name: `Kaneko Apps`
+- Current Store package version: `1.0.16.0`
+- Latest Store candidate MSIX: `_out\Folderly_1.0.16.0_x64_store.msix`
+- Partner Center package upload: completed
 - Tests last run: `132` passed with filter `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`
-- Package manifest version: `src/Folderly.Package/Package.appxmanifest`
+- Package manifest: `src/Folderly.Package/Package.appxmanifest`
 
 ## What Matters Most
 
@@ -101,15 +106,17 @@ Relevant files:
 - `FolderPreview.xaml/.cs`
 - `ApplyWindow.html`
 
-Past bug:
+Past bugs:
 
 - The image appeared shifted between preview and final output.
 - The final icon showed yellow folder background on the right/bottom edge.
+- Changing scale could pin the preview image to the upper-left.
 
 Current expectation:
 
 - Preview and generated ICO should match.
 - The user image should cover the image region without unwanted right/bottom gaps unless the selected crop mode intentionally leaves empty space.
+- Scale, X/Y sliders, wheel zoom, and preview drag should all operate on the same coordinate model.
 
 ## Image Selection UI
 
@@ -117,8 +124,8 @@ Current UI:
 
 - Main drop area can be clicked to select an image.
 - Drag and drop is supported.
-- Lower duplicate `画像を選択...` button was removed.
-- `画像をリセット` clears the image and returns the editor to the empty state.
+- The lower duplicate image-select button was removed.
+- `Reset image` clears the image and returns the editor to the empty state.
 
 Do not reintroduce a second image-select button.
 
@@ -139,7 +146,18 @@ Not supported:
 - Sorting folders by Folderly tag in Explorer
 - Explorer custom columns for Folderly tags
 
-The disabled `新規タグを追加` UI was removed because the feature does not exist.
+The disabled `Add new tag` UI was removed because the feature does not exist.
+
+## Localization
+
+English mode should translate the context menu, image selection screen, tag editor screen, and settings labels. Recent regressions included Japanese text remaining in these areas.
+
+Important English strings include:
+
+- `Customize with Folderly`
+- `Select image`
+- `Reset image`
+- `Show tag name on folder icon`
 
 ## Explorer Refresh
 
@@ -188,7 +206,7 @@ Current policy:
 Use Visual Studio MSBuild for the package project:
 
 ```powershell
-& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" `
+& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" `
   .\src\Folderly.Package\Folderly.Package.wapproj `
   /t:Restore,Build `
   /p:Configuration=Release `
@@ -197,7 +215,12 @@ Use Visual Studio MSBuild for the package project:
   /p:SelfContained=false
 ```
 
-Then package with `makeappx`, sign with the current `CN=Folderly` certificate, and install with `Add-AppxPackage`.
+For Store submission:
+
+- Visual Studio did not expose `Publish` / `Store` / `Create App Packages` for `Folderly.Package` in this environment.
+- The accepted package was created manually with `makeappx`.
+- Microsoft Store rejects non-zero MSIX revision numbers; use `1.0.16.0`, not `1.0.0.16`.
+- See [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md) for the exact Partner Center state and remaining submission steps.
 
 Do not manually restart Explorer as a normal packaging step.
 
@@ -218,5 +241,6 @@ The skipped test checks no-write-access behavior and can be environment-sensitiv
 - `HANDOVER.md`: practical implementation handover
 - `CLAUDE.md`: short implementation contracts for agent behavior
 - `docs/TESTING.md`: manual and automated verification checklist
+- `docs/STORE_SUBMISSION.md`: Store submission state and Partner Center handover
 
 Old commit-by-commit logs were removed because they made the docs harder to read and no longer helped implementation.
