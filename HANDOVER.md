@@ -10,8 +10,8 @@ This is the main handover document for Claude Code, Codex, or any future agent c
 - Publisher display name: `Kaneko Apps`
 - Current Store package version: `1.0.16.0`
 - Latest Store candidate MSIX: `_out\Folderly_1.0.16.0_x64_store.msix`
-- Partner Center package upload: completed
-- Tests last run: `132` passed with filter `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`
+- Partner Center package upload: previous candidate completed; upload the latest regenerated Store package after fixes
+- Tests last run: `133` passed with filter `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`
 - Package manifest: `src/Folderly.Package/Package.appxmanifest`
 
 ## What Matters Most
@@ -80,6 +80,7 @@ Keep these rules:
 - Preview drag should only update `appState.offsetX/Y` and send throttled preview messages.
 - Exact rendering happens on mouseup through `postTransformNow()`.
 - Wheel zoom updates the scale slider because the scale value itself is user-visible and cheap enough, but exact render is still delayed.
+- Treat `scale`, `offsetX`, `offsetY`, and `cropMode` as one transform state. `transform` and `transformPreview` messages must include all four values. A regression occurred when display mode was sent separately; after choosing Fit Width/Fit Height and dragging, the preview image shrank because the crop mode state was not preserved through the drag update.
 
 Current timings:
 
@@ -111,6 +112,8 @@ Past bugs:
 - The image appeared shifted between preview and final output.
 - The final icon showed yellow folder background on the right/bottom edge.
 - Changing scale could pin the preview image to the upper-left.
+- Selecting a display mode and then dragging the preview could make the image shrink because `cropMode` was not included in transform updates.
+- Transparent user-image padding showed the white folder body instead of the yellow folder base.
 
 Current expectation:
 
@@ -223,6 +226,26 @@ For Store submission:
 - See [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md) for the exact Partner Center state and remaining submission steps.
 
 Do not manually restart Explorer as a normal packaging step.
+
+## Local Sideload Notes
+
+Use this when validating the packaged context menu locally.
+
+Important distinctions:
+
+- Store upload file: `_out\Folderly_1.0.16.0_x64_store.msix`
+- Local install file: `_out\Folderly_1.0.16.0_x64_sideload.msix`
+- Store upload package should not be signed locally.
+- Local install package must be signed with a certificate whose subject exactly matches the manifest publisher:
+  `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
+
+The old package `Folderly.FolderlyApp 1.0.0.16` used publisher `CN=Folderly` and is a different package identity from `KanekoApps.Folderly`. Remove it before testing the Store identity, otherwise Explorer context menu tests can accidentally hit the old package.
+
+Sideload gotchas:
+
+- Stop all `Folderly.exe` processes before reinstalling. Folderly has single-instance IPC, so an old running instance can receive requests from a new launch.
+- Import the sideload certificate into `Cert:\LocalMachine\Root` and `Cert:\LocalMachine\TrustedPeople`. Current-user trust can allow `signtool verify` to pass while `Add-AppxPackage` still fails with `0x800B0109`.
+- If the context menu still looks stale after reinstalling, sign out/in or restart Explorer windows. Do not kill `explorer.exe` as a normal app workflow, but it is acceptable as a local development troubleshooting step when shell extension registration is stale.
 
 ## Tests
 

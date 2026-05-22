@@ -18,7 +18,7 @@ This document is the handover for the current Microsoft Store submission state.
 - Architecture: `x64`
 - Minimum OS: Windows 10 1809 (`10.0.17763.0`)
 - Restricted capability: `runFullTrust`
-- Uploaded Store candidate package: `_out/Folderly_1.0.16.0_x64_store.msix`
+- Latest Store candidate package: `_out/Folderly_1.0.16.0_x64_store.msix`
 
 ## Version Rule
 
@@ -41,10 +41,86 @@ Use the manual MakeAppx flow when needed:
 5. Run `makeappx pack`.
 6. Upload the resulting `.msix` to Partner Center.
 
-Partner Center accepted this package:
+Partner Center accepted this package format:
 
 ```text
 _out/Folderly_1.0.16.0_x64_store.msix
+```
+
+After any code fix, rebuild this file and replace the package in Partner Center. Do not upload `_out/Folderly_1.0.16.0_x64_sideload.msix`; that file is only for local testing.
+
+## Local Sideload Verification
+
+The Store package and local test package are intentionally different files:
+
+- Store upload: `_out/Folderly_1.0.16.0_x64_store.msix`
+- Local install: `_out/Folderly_1.0.16.0_x64_sideload.msix`
+
+Why:
+
+- Partner Center expects the Store package identity and signs the Store package during ingestion.
+- Local Windows installation requires a trusted signature before `Add-AppxPackage` can install the MSIX.
+- The signing certificate subject must match the manifest publisher exactly:
+  `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
+
+Known failure modes:
+
+- If `signtool verify` succeeds but `Add-AppxPackage` fails with `0x800B0109`, import the sideload certificate into `Cert:\LocalMachine\Root` and `Cert:\LocalMachine\TrustedPeople`. Current-user trust can be insufficient for AppX deployment.
+- If the UI still behaves like an older build, check `Get-AppxPackage *Folderly*` and `Get-Process Folderly`. The old package `Folderly.FolderlyApp_1.0.0.16_x64__n6y34gfnxsf8c` used publisher `CN=Folderly` and can remain installed/running separately from `KanekoApps.Folderly`.
+- Folderly has single-instance IPC. If an old process is still running, launching a new executable can forward the request to the old instance. Stop `Folderly.exe` before reinstalling.
+
+Reusable sideload script:
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$publisher = 'CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E'
+$root = (Resolve-Path .).Path
+$storeMsix = Join-Path $root '_out\Folderly_1.0.16.0_x64_store.msix'
+$sideloadMsix = Join-Path $root '_out\Folderly_1.0.16.0_x64_sideload.msix'
+$certPath = Join-Path $root '_out\Folderly_LocalSideload.cer'
+
+$cert = Get-ChildItem Cert:\CurrentUser\My |
+  Where-Object { $_.Subject -eq $publisher } |
+  Sort-Object NotAfter -Descending |
+  Select-Object -First 1
+
+if (-not $cert) {
+  $cert = New-SelfSignedCertificate `
+    -Type CodeSigningCert `
+    -Subject $publisher `
+    -CertStoreLocation Cert:\CurrentUser\My `
+    -KeyExportPolicy Exportable `
+    -KeyUsage DigitalSignature `
+    -HashAlgorithm SHA256
+}
+
+Export-Certificate -Cert $cert -FilePath $certPath -Force | Out-Null
+Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
+Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+
+$elevated = "Import-Certificate -FilePath '$certPath' -CertStoreLocation Cert:\LocalMachine\Root | Out-Null; " +
+            "Import-Certificate -FilePath '$certPath' -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null"
+$encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($elevated))
+Start-Process powershell.exe `
+  -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-EncodedCommand',$encoded) `
+  -Verb RunAs `
+  -Wait
+
+Copy-Item -LiteralPath $storeMsix -Destination $sideloadMsix -Force
+$signtool = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe'
+& $signtool sign /fd SHA256 /sha1 $cert.Thumbprint $sideloadMsix
+& $signtool verify /pa /v $sideloadMsix
+
+Get-Process Folderly -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-AppxPackage | Where-Object {
+  $_.Name -eq 'Folderly.FolderlyApp' -or
+  $_.Name -eq 'KanekoApps.Folderly'
+} | ForEach-Object {
+  Remove-AppxPackage -Package $_.PackageFullName
+}
+
+Add-AppxPackage -Path $sideloadMsix
+Get-AppxPackage -Name KanekoApps.Folderly
 ```
 
 ## Partner Center Properties
@@ -109,11 +185,13 @@ Done:
 - `Package.appxmanifest` identity updated.
 - Store package version fixed to `1.0.16.0`.
 - Store candidate MSIX generated.
-- Partner Center package upload completed successfully.
+- Partner Center package upload completed successfully for an earlier candidate.
 - `Windows 10/11 Desktop` device family selected.
+- Local sideload verification flow confirmed with the Store identity.
 
 Still required in Partner Center:
 
+- Replace the uploaded package with the latest regenerated `_out/Folderly_1.0.16.0_x64_store.msix` after the preview/crop-mode fix.
 - Confirm GitHub Pages privacy/support URLs are public.
 - Finish Store listing text and screenshots.
 - Finish price/trial/market settings.

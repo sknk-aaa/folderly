@@ -13,6 +13,7 @@ namespace Folderly.Core.Composition;
 public static class FolderTemplate
 {
     public const int BaseSize = 256;
+    public const string FolderColorHex = "#FFC72C";
     public const float TabXRatio = 0.047f;
     public const float TabYRatio = 0.094f;
     public const float TabTopWidthRatio = 0.335f;
@@ -76,7 +77,7 @@ public static class FolderTemplate
         {
             ctx.Fill(Color.Transparent);
 
-            var folderColor = Color.ParseHex("#FFC72C");
+            var folderColor = Color.ParseHex(FolderColorHex);
             ctx.Fill(folderColor, CreateFolderBackPath(size));
             ctx.Fill(folderColor, CreateVisibleTagPath(size));
             ctx.Fill(folderColor, CreateImagePath(size));

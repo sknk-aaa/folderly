@@ -33,13 +33,13 @@ public static class TemplateRenderer
             var imageH = imageRegionSize.Height;
             var destPoint = FolderTemplate.GetImageRegionPixelOrigin(outputSize);
 
+            ctx.Fill(Color.ParseHex(FolderTemplate.FolderColorHex), FolderTemplate.CreateImagePath(outputSize));
+
             if (tagColor is not null && !tagColor.IsNone)
             {
                 ctx.Fill(tagColor.ToImageSharpColor(), FolderTemplate.CreateVisibleTagPath(outputSize));
                 DrawTagContent(ctx, tagColor, tagName, tagIconIndex, showTagIcon, outputSize);
             }
-
-            ctx.Fill(Color.White, FolderTemplate.CreateImagePath(outputSize));
 
             using var resizedAdjusted = adjustedImage.Clone(
                 c => c.Resize(imageW + 2, imageH + 2));

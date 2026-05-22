@@ -8,9 +8,9 @@ Current verified baseline:
 - Store package identity: `KanekoApps.Folderly`
 - Store package version: `1.0.16.0`
 - Store candidate package: `_out/Folderly_1.0.16.0_x64_store.msix`
-- Partner Center package upload: completed
+- Partner Center package upload: previous candidate completed; upload the latest regenerated Store package after fixes
 - Architecture: x64
-- Automated tests: `132` passed
+- Automated tests: `133` passed
 - Final manual QA: completed before Store submission prep
 
 Historical note:
@@ -41,6 +41,9 @@ Expected:
 - [ ] `Package.appxmanifest` version uses revision `0`, for example `1.0.16.0`.
 - [ ] Partner Center accepts the uploaded package.
 - [ ] If sideload testing locally, the signing certificate subject matches the active package publisher.
+- [ ] If sideload testing locally, install `_out/Folderly_1.0.16.0_x64_sideload.msix`, not the unsigned Store package.
+- [ ] The sideload certificate is trusted in LocalMachine Root/TrustedPeople if `Add-AppxPackage` reports `0x800B0109`.
+- [ ] Old `Folderly.FolderlyApp 1.0.0.16` is uninstalled before testing the Store identity.
 - [ ] App launches from Start menu.
 - [ ] Explorer context menu shows the localized Folderly customize command.
 - [ ] Context menu has the Folderly icon.
@@ -93,6 +96,7 @@ This area has regressed before. Test it carefully.
 - [ ] Mouse wheel over the preview zooms in/out smoothly.
 - [ ] Scale slider updates when using mouse wheel zoom.
 - [ ] Scale percentage label does not overlap the slider bar.
+- [ ] Select each display mode, then drag the preview image. The image must keep that mode's sizing and must not shrink or jump.
 - [ ] `Reset position` resets scale and X/Y offset.
 - [ ] After many mixed operations, the editor remains responsive.
 
@@ -101,7 +105,8 @@ This area has regressed before. Test it carefully.
 - [ ] Center crop mode preview matches the generated folder icon.
 - [ ] Fit width mode preview matches the generated folder icon.
 - [ ] Fit height mode preview matches the generated folder icon.
-- [ ] No unintended yellow folder background appears at the right or bottom edge of the image region.
+- [ ] Transparent or empty areas in the user image reveal the yellow folder base, not a white panel.
+- [ ] No unintended right/bottom gaps appear unless the selected crop mode intentionally leaves empty space.
 - [ ] Long/tall images are clipped or fitted consistently between preview and actual ICO.
 - [ ] Small icon sizes still resemble the customized folder.
 

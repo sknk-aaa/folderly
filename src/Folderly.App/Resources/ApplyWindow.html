@@ -1164,14 +1164,26 @@
       clearTimeout(transformExactTimer);
       transformExactTimer = null;
     }
-    postMsg({type:'transform', scale:appState.scale, offsetX:appState.offsetX, offsetY:appState.offsetY});
+    postMsg({
+      type:'transform',
+      scale:appState.scale,
+      offsetX:appState.offsetX,
+      offsetY:appState.offsetY,
+      cropMode:appState.cropMode
+    });
   }
 
   function scheduleTransformPreviewPost() {
     if (transformPreviewTimer) return;
     transformPreviewTimer = setTimeout(function() {
       transformPreviewTimer = null;
-      postMsg({type:'transformPreview', scale:appState.scale, offsetX:appState.offsetX, offsetY:appState.offsetY});
+      postMsg({
+        type:'transformPreview',
+        scale:appState.scale,
+        offsetX:appState.offsetX,
+        offsetY:appState.offsetY,
+        cropMode:appState.cropMode
+      });
     }, 50);
   }
 
@@ -1418,7 +1430,7 @@
         var m = mode.dataset.mode;
         appState.cropMode = m;
         refreshModeCards(m);
-        postMsg({type:'cropMode', mode:m});
+        postTransformNow();
       });
     });
 

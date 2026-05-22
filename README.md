@@ -93,12 +93,74 @@ $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeapp
 
 Upload the generated `.msix` in Partner Center. For local sideload testing, use a certificate whose subject matches the active package publisher.
 
+## Local Sideload Verification
+
+Do not install `_out/Folderly_1.0.16.0_x64_store.msix` directly for local testing. Store packages are uploaded unsigned and Microsoft signs them during Store ingestion.
+
+For local confirmation, copy the Store package, sign the copy, and install the signed sideload package:
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$publisher = 'CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E'
+$root = (Resolve-Path .).Path
+$storeMsix = Join-Path $root '_out\Folderly_1.0.16.0_x64_store.msix'
+$sideloadMsix = Join-Path $root '_out\Folderly_1.0.16.0_x64_sideload.msix'
+$certPath = Join-Path $root '_out\Folderly_LocalSideload.cer'
+
+$cert = Get-ChildItem Cert:\CurrentUser\My |
+  Where-Object { $_.Subject -eq $publisher } |
+  Sort-Object NotAfter -Descending |
+  Select-Object -First 1
+
+if (-not $cert) {
+  $cert = New-SelfSignedCertificate `
+    -Type CodeSigningCert `
+    -Subject $publisher `
+    -CertStoreLocation Cert:\CurrentUser\My `
+    -KeyExportPolicy Exportable `
+    -KeyUsage DigitalSignature `
+    -HashAlgorithm SHA256
+}
+
+Export-Certificate -Cert $cert -FilePath $certPath -Force | Out-Null
+Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
+Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+
+$elevated = "Import-Certificate -FilePath '$certPath' -CertStoreLocation Cert:\LocalMachine\Root | Out-Null; " +
+            "Import-Certificate -FilePath '$certPath' -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null"
+$encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($elevated))
+Start-Process powershell.exe `
+  -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-EncodedCommand',$encoded) `
+  -Verb RunAs `
+  -Wait
+
+Copy-Item -LiteralPath $storeMsix -Destination $sideloadMsix -Force
+$signtool = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe'
+& $signtool sign /fd SHA256 /sha1 $cert.Thumbprint $sideloadMsix
+& $signtool verify /pa /v $sideloadMsix
+
+Get-Process Folderly -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-AppxPackage | Where-Object {
+  $_.Name -eq 'Folderly.FolderlyApp' -or
+  $_.Name -eq 'KanekoApps.Folderly'
+} | ForEach-Object {
+  Remove-AppxPackage -Package $_.PackageFullName
+}
+
+Add-AppxPackage -Path $sideloadMsix
+```
+
+If Windows shows a certificate trust warning or UAC prompt during the `LocalMachine` certificate import, approve it for local testing. Without LocalMachine trust, `signtool verify` may pass while `Add-AppxPackage` still fails with `0x800B0109`.
+
+Always remove the old `Folderly.FolderlyApp 1.0.0.16` package before testing the Store identity. It uses a different publisher (`CN=Folderly`), and its context-menu registration can make it look like the new build did not install.
+
 Do not kill `explorer.exe` as a normal install step. Folderly refreshes affected Explorer windows after apply/revert when the setting is enabled.
 
 ## Important Notes For Future Agents
 
 - The WebView2 editor is in `src/Folderly.App/Resources/ApplyWindow.html`.
 - Keep preview drag/wheel operations lightweight. Pointer movement should send throttled `transformPreview` updates and commit exact rendering only on mouseup or delayed settle.
+- Transform messages must include `scale`, `offsetX`, `offsetY`, and `cropMode` together. Sending crop mode separately can make the image shrink or jump after choosing Fit Width/Fit Height and then dragging.
 - Do not update X/Y sliders during preview drag. The drag state and slider state are intentionally independent to avoid layout churn and jank.
 - The lower duplicate image-select button was removed. The remaining image entry point is the drag/drop area; image reset is handled by `resetImage`.
 - The tag editor intentionally does not support creating new tags. Do not re-add the disabled `Add new tag` UI unless the feature itself is implemented.

@@ -195,6 +195,7 @@ public partial class FolderPreview : UserControl
 
         TagPath.Data = CreateTabGeometry();
         ImageBasePath.Data = CreateImageBaseGeometry();
+        ImageBasePath.Fill = new SolidColorBrush(ParseHexColor(FolderTemplate.FolderColorHex));
     }
 
     private void LoadTemplateImage()

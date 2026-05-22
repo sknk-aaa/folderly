@@ -84,7 +84,7 @@ public class TemplateRendererTests
     }
 
     [Fact]
-    public void Render_TransparentPadding_RevealsWhiteImageBaseNotTag()
+    public void Render_TransparentPadding_RevealsYellowFolderBase()
     {
         var tag = new TagColor("#0078D4", "test");
         var region = FolderTemplate.ImageRegion;
@@ -104,7 +104,26 @@ public class TemplateRendererTests
         int sampleY = (int)(imageRegion.Y + imageRegion.Height * 0.03f);
         var px = result[sampleX, sampleY];
 
-        Assert.True(px.R > 245 && px.G > 245 && px.B > 245, "Transparent padding should reveal the white image base");
+        Assert.True(px.R > 235 && px.G > 170 && px.G < 220 && px.B < 80,
+            "Transparent padding should reveal the yellow folder base");
+    }
+
+    [Fact]
+    public void Render_TransparentImageArea_RevealsYellowFolderBase()
+    {
+        var region = FolderTemplate.ImageRegion;
+        using var adj = new Image<Rgba32>((int)region.Width, (int)region.Height);
+        adj.Mutate(ctx => ctx.Clear(Color.Transparent));
+        using var result = TemplateRenderer.Render(adj, TagColors.None);
+
+        var imageRegion = FolderTemplate.ScaleRegion(
+            FolderTemplate.ImageRegion, FolderTemplate.BaseSize);
+        int sampleX = (int)(imageRegion.X + imageRegion.Width * 0.5f);
+        int sampleY = (int)(imageRegion.Y + imageRegion.Height * 0.5f);
+        var px = result[sampleX, sampleY];
+
+        Assert.True(px.R > 235 && px.G > 170 && px.G < 220 && px.B < 80,
+            "Transparent image area should reveal the yellow folder base");
     }
 
     [Fact]

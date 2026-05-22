@@ -269,12 +269,7 @@ public partial class ApplyWindow : Window
 
                     case "cropMode":
                         var modeStr = root.GetProperty("mode").GetString() ?? "Center";
-                        _vm.CropMode = modeStr switch
-                        {
-                            "FitWidth"  => CoreCropMode.FitWidth,
-                            "FitHeight" => CoreCropMode.FitHeight,
-                            _           => CoreCropMode.Center,
-                        };
+                        _vm.CropMode = ParseCropMode(modeStr);
                         await SendPreviewAsync();
                         break;
 
@@ -478,7 +473,19 @@ public partial class ApplyWindow : Window
             _vm.OffsetX = offsetX.GetDouble();
         if (root.TryGetProperty("offsetY", out var offsetY))
             _vm.OffsetY = offsetY.GetDouble();
+        if (root.TryGetProperty("cropMode", out var cropMode))
+            _vm.CropMode = ParseCropMode(cropMode.GetString());
+        else if (root.TryGetProperty("mode", out var mode))
+            _vm.CropMode = ParseCropMode(mode.GetString());
     }
+
+    private static CoreCropMode ParseCropMode(string? mode)
+        => mode switch
+        {
+            "FitWidth"  => CoreCropMode.FitWidth,
+            "FitHeight" => CoreCropMode.FitHeight,
+            _           => CoreCropMode.Center,
+        };
 
     private async Task SendTagDataAsync()
     {
