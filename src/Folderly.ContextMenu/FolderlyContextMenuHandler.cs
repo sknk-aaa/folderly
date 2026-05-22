@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Folderly.Core.History;
 
 namespace Folderly.ContextMenu;
 
@@ -55,7 +57,7 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
 
     public int GetTitle(IShellItemArray? _, out string ppszName)
     {
-        ppszName = "Folderly でカスタマイズ";
+        ppszName = GetMenuTitle();
         return S_OK;
     }
 
@@ -141,6 +143,42 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
         }
 
         return GetFolderlyExePath();
+    }
+
+    private static string GetMenuTitle()
+        => UseJapaneseMenuTitle()
+            ? "Folderly でカスタマイズ"
+            : "Customize with Folderly";
+
+    private static bool UseJapaneseMenuTitle()
+    {
+        var language = ReadSavedLanguage();
+        return language switch
+        {
+            "ja" => true,
+            "en" => false,
+            _ => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja",
+        };
+    }
+
+    private static string? ReadSavedLanguage()
+    {
+        try
+        {
+            var dbPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Folderly",
+                "folderly.db");
+            if (!File.Exists(dbPath))
+                return null;
+
+            using var history = new HistoryRepository(dbPath);
+            return history.GetSetting("language");
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static IEnumerable<string> GetPackageBaseDirectoryCandidates()

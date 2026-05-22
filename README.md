@@ -2,7 +2,7 @@
 
 Folderly is a Windows desktop app that customizes folder icons with a cover image and a color tag. It is built with C#/.NET 8, WPF, WebView2, ImageSharp, SQLite, and an MSIX packaged context-menu extension.
 
-Current local package version: `1.0.0.13`
+Current local package version: `1.0.0.16`
 
 ## What It Does
 
@@ -64,7 +64,7 @@ This repo currently uses a local development certificate with subject `CN=Folder
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$version = '1.0.0.13'
+$version = '1.0.0.16'
 $root = (Resolve-Path .).Path
 $outDir = Join-Path $root '_out'
 $stage = Join-Path $outDir "msix_stage_$version"

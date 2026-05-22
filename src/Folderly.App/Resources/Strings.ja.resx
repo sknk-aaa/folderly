@@ -92,6 +92,41 @@
   <data name="TagIconLabel" xml:space="preserve"><value>アイコン</value></data>
   <data name="TagDeleteBtn" xml:space="preserve"><value>削除</value></data>
   <data name="NewTagBtn" xml:space="preserve"><value>新規タグを追加</value></data>
+  <data name="FolderPreviewTitle" xml:space="preserve"><value>フォルダプレビュー</value></data>
+  <data name="FolderPreviewAlt" xml:space="preserve"><value>フォルダプレビュー</value></data>
+  <data name="PreviewSubtext" xml:space="preserve"><value>画像を選択するとここに表示されます</value></data>
+  <data name="ResetImage" xml:space="preserve"><value>画像をリセット</value></data>
+  <data name="PositionAdjustment" xml:space="preserve"><value>位置調整</value></data>
+  <data name="XPosition" xml:space="preserve"><value>X 位置</value></data>
+  <data name="YPosition" xml:space="preserve"><value>Y 位置</value></data>
+  <data name="MoveLeft" xml:space="preserve"><value>左に移動</value></data>
+  <data name="MoveRight" xml:space="preserve"><value>右に移動</value></data>
+  <data name="MoveUp" xml:space="preserve"><value>上に移動</value></data>
+  <data name="MoveDown" xml:space="preserve"><value>下に移動</value></data>
+  <data name="TagSelectTitle" xml:space="preserve"><value>タグの選択</value></data>
+  <data name="TagSelectDesc" xml:space="preserve"><value>フォルダの種類を色で識別できます</value></data>
+  <data name="TagListTitle" xml:space="preserve"><value>タグ一覧</value></data>
+  <data name="ClickToEdit" xml:space="preserve"><value>クリックして編集</value></data>
+  <data name="Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="EditingSuffix" xml:space="preserve"><value>編集中</value></data>
+  <data name="PreviewOnFolderTab" xml:space="preserve"><value>プレビュー — フォルダの左上タブに表示されます</value></data>
+  <data name="TagNamePlaceholder" xml:space="preserve"><value>タグ名を入力</value></data>
+  <data name="ShowTagNameOffNote" xml:space="preserve"><value>オフにすると、左上タブにアイコンと色のみが表示されます</value></data>
+  <data name="SaveChangesHint" xml:space="preserve"><value>変更は「保存」を押すまで反映されません</value></data>
+  <data name="ApplyCompleted" xml:space="preserve"><value>適用完了</value></data>
+  <data name="IconEdit" xml:space="preserve"><value>編集</value></data>
+  <data name="IconMedia" xml:space="preserve"><value>メディア</value></data>
+  <data name="IconWork" xml:space="preserve"><value>仕事</value></data>
+  <data name="IconDocument" xml:space="preserve"><value>ドキュメント</value></data>
+  <data name="IconDownload" xml:space="preserve"><value>ダウンロード</value></data>
+  <data name="IconOther" xml:space="preserve"><value>その他</value></data>
+  <data name="IconPhoto" xml:space="preserve"><value>写真</value></data>
+  <data name="IconMusic" xml:space="preserve"><value>音楽</value></data>
+  <data name="IconGame" xml:space="preserve"><value>ゲーム</value></data>
+  <data name="IconStudy" xml:space="preserve"><value>学習</value></data>
+  <data name="IconDesign" xml:space="preserve"><value>デザイン</value></data>
+  <data name="IconImportant" xml:space="preserve"><value>重要</value></data>
+  <data name="IconPrivate" xml:space="preserve"><value>プライベート</value></data>
 
   <!-- MainWindow -->
   <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>

@@ -2,7 +2,7 @@
 
 This document describes the current implemented behavior of Folderly. It intentionally omits old investigation logs and obsolete alternatives.
 
-Current package version: `1.0.0.13`
+Current package version: `1.0.0.16`
 
 ## Product Summary
 

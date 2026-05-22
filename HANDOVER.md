@@ -4,9 +4,9 @@ This is the main handover document for Claude Code, Codex, or any future agent c
 
 Current local state:
 
-- Installed package: `Folderly.FolderlyApp 1.0.0.13`
-- Latest local MSIX: `_out\Folderly_1.0.0.13_x64.msix`
-- Tests last run: `131` passed with filter `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`
+- Installed package: `Folderly.FolderlyApp 1.0.0.16`
+- Latest local MSIX: `_out\Folderly_1.0.0.16_x64.msix`
+- Tests last run: `132` passed with filter `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`
 - Package manifest version: `src/Folderly.Package/Package.appxmanifest`
 
 ## What Matters Most

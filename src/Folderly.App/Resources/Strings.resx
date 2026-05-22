@@ -92,6 +92,41 @@
   <data name="TagIconLabel" xml:space="preserve"><value>Icon</value></data>
   <data name="TagDeleteBtn" xml:space="preserve"><value>Delete tag</value></data>
   <data name="NewTagBtn" xml:space="preserve"><value>Add new tag</value></data>
+  <data name="FolderPreviewTitle" xml:space="preserve"><value>Folder preview</value></data>
+  <data name="FolderPreviewAlt" xml:space="preserve"><value>Folder preview</value></data>
+  <data name="PreviewSubtext" xml:space="preserve"><value>Your selected image will appear here</value></data>
+  <data name="ResetImage" xml:space="preserve"><value>Reset image</value></data>
+  <data name="PositionAdjustment" xml:space="preserve"><value>Position</value></data>
+  <data name="XPosition" xml:space="preserve"><value>X position</value></data>
+  <data name="YPosition" xml:space="preserve"><value>Y position</value></data>
+  <data name="MoveLeft" xml:space="preserve"><value>Move left</value></data>
+  <data name="MoveRight" xml:space="preserve"><value>Move right</value></data>
+  <data name="MoveUp" xml:space="preserve"><value>Move up</value></data>
+  <data name="MoveDown" xml:space="preserve"><value>Move down</value></data>
+  <data name="TagSelectTitle" xml:space="preserve"><value>Select tag</value></data>
+  <data name="TagSelectDesc" xml:space="preserve"><value>Use colors to identify folder types</value></data>
+  <data name="TagListTitle" xml:space="preserve"><value>Tags</value></data>
+  <data name="ClickToEdit" xml:space="preserve"><value>Click to edit</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="EditingSuffix" xml:space="preserve"><value>Editing</value></data>
+  <data name="PreviewOnFolderTab" xml:space="preserve"><value>Preview - shown on the folder tab</value></data>
+  <data name="TagNamePlaceholder" xml:space="preserve"><value>Enter tag name</value></data>
+  <data name="ShowTagNameOffNote" xml:space="preserve"><value>When off, only the icon and color are shown on the tab.</value></data>
+  <data name="SaveChangesHint" xml:space="preserve"><value>Changes are not applied until you press Save</value></data>
+  <data name="ApplyCompleted" xml:space="preserve"><value>Applied</value></data>
+  <data name="IconEdit" xml:space="preserve"><value>Edit</value></data>
+  <data name="IconMedia" xml:space="preserve"><value>Media</value></data>
+  <data name="IconWork" xml:space="preserve"><value>Work</value></data>
+  <data name="IconDocument" xml:space="preserve"><value>Document</value></data>
+  <data name="IconDownload" xml:space="preserve"><value>Download</value></data>
+  <data name="IconOther" xml:space="preserve"><value>Other</value></data>
+  <data name="IconPhoto" xml:space="preserve"><value>Photo</value></data>
+  <data name="IconMusic" xml:space="preserve"><value>Music</value></data>
+  <data name="IconGame" xml:space="preserve"><value>Game</value></data>
+  <data name="IconStudy" xml:space="preserve"><value>Study</value></data>
+  <data name="IconDesign" xml:space="preserve"><value>Design</value></data>
+  <data name="IconImportant" xml:space="preserve"><value>Important</value></data>
+  <data name="IconPrivate" xml:space="preserve"><value>Private</value></data>
 
   <!-- MainWindow -->
   <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>

@@ -6,7 +6,7 @@ Folderly を Microsoft Store に出す前に確認する項目です。
 
 - アプリ形式: MSIX / WPF / .NET 8 / x64
 - パッケージ名: `Folderly.FolderlyApp`
-- バージョン: `1.0.0.1`
+- バージョン: `1.0.0.16`
 - 最小OS: Windows 10 1809 (`10.0.17763.0`)
 - 右クリックメニュー: Packaged COM SurrogateServer
 - 制限付き capability: `runFullTrust`
@@ -21,6 +21,11 @@ Folderly を Microsoft Store に出す前に確認する項目です。
   - `PublisherDisplayName` を実際の公開者名に合わせる
   - `DisplayName` はインストール後の表示名なので、基本は `Folderly` のままにする
   - `Version` を提出用バージョンに確定する
+- Privacy Policy / Support
+  - GitHub Pages で `docs/index.html` を公開する
+  - Privacy Policy URL: `https://sknk-aaa.github.io/folderly/`
+  - Support URL: `https://sknk-aaa.github.io/folderly/#support`
+  - Partner Center の Properties / Support info にそれぞれ入力する
 - `src/Folderly.Package/Images/`
   - `FolderlyContext.ico`
   - `Square44x44Logo.png`
@@ -93,7 +98,24 @@ Store提出では、通常は `.msix` 単体より `.msixupload` / `.appxupload`
 
 現在の手動 `makeappx` はサイドロード確認には使えるが、Store提出前には Visual Studio の「Create App Packages」または同等の手順で Store提出用パッケージを作る。
 
-## ローカル確認
+## GitHub Pages 公開手順
+
+このリポジトリでは Privacy Policy / Support ページを `docs/index.html` に置く。
+
+GitHub 側で以下を設定する:
+
+1. Repository Settings を開く
+2. Pages を開く
+3. Source を `Deploy from a branch` にする
+4. Branch を `main`、folder を `/docs` にする
+5. Save する
+
+公開後の想定URL:
+
+- Privacy Policy: `https://sknk-aaa.github.io/folderly/`
+- Support: `https://sknk-aaa.github.io/folderly/#support`
+
+## ローカル確認済み
 
 - [x] Release x64 build
 - [x] MSIX作成
@@ -105,11 +127,24 @@ Store提出では、通常は `.msix` 単体より `.msixupload` / `.appxupload`
 - [x] A -> B -> C の再適用反映
 - [x] 全フォルダを元に戻す
 - [x] 解除後の通常フォルダプレビュー復元
-- [ ] 日本語フォルダ名
-- [ ] 長いパス
-- [ ] 新アイコン反映後の実機表示確認（右クリックメニュー、スタートメニュー、アプリ一覧）
+- [x] 日本語/英語UIの主要表示確認
+- [x] プレビュー操作、拡大率、X/Y、ドラッグ操作の最終QA
+- [x] 新アイコン反映後の実機表示確認（右クリックメニュー、スタートメニュー、アプリ一覧）
+
+## Store提出で残っていること
+
+ここから先は Partner Center または公開URLの確定が必要。ローカル作業だけでは完了できない。
+
+- [ ] Partner Center の正式 Publisher 値を確認
+- [ ] `Package.appxmanifest` の `Publisher` / `PublisherDisplayName` を正式値に差し替え
+- [ ] GitHub Pages を `/docs` から公開
+- [ ] Privacy Policy URL `https://sknk-aaa.github.io/folderly/` を Partner Center に入力
+- [ ] Support URL `https://sknk-aaa.github.io/folderly/#support` を Partner Center に入力
+- [ ] Store掲載文、検索キーワード、スクリーンショットを入力
+- [ ] 価格、試用期間、対象市場、年齢区分を入力
 - [ ] Store提出用パッケージ作成
 - [ ] Partner Center upload
+- [ ] 認証提出
 
 ## 参考
 

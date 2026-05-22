@@ -5,10 +5,11 @@ Use this checklist when validating a new Folderly build on Windows.
 Current verified baseline:
 
 - Date: 2026-05-22
-- Package: `Folderly.FolderlyApp 1.0.0.13`
+- Package: `Folderly.FolderlyApp 1.0.0.16`
 - Architecture: x64
-- Automated tests: `131` passed
+- Automated tests: `132` passed
 - MSIX signature: valid with local `CN=Folderly` certificate
+- Final manual QA: completed before Store submission prep
 
 ## Automated Tests
 
@@ -31,7 +32,7 @@ Expected:
 - [ ] `Add-AppxPackage` installs the generated MSIX.
 - [ ] `Get-AppxPackage -Name Folderly.FolderlyApp` shows the expected version.
 - [ ] App launches from Start menu.
-- [ ] Explorer context menu shows `Folderlyでカスタマイズ`.
+- [ ] Explorer context menu shows the localized Folderly customize command.
 - [ ] Context menu has the Folderly icon.
 - [ ] Context menu opens the editor for the selected folder.
 - [ ] MSIX payload includes `WebView2Loader.dll` at the package root.
@@ -60,7 +61,7 @@ Expected:
 
 - [ ] Apply an image to a folder.
 - [ ] Close the editor.
-- [ ] Open `Folderlyでカスタマイズ` again for the same folder.
+- [ ] Open the Folderly customize command again for the same folder.
 - [ ] The previously applied image appears in the preview.
 - [ ] Scale, X/Y position, crop mode, and selected tag are restored.
 - [ ] Delete or move the original user-selected image.

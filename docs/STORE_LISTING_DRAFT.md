@@ -14,7 +14,7 @@ Folderly - フォルダのサムネイル変更
 
 Folderly は、Windows のフォルダアイコンを好きな画像でカスタマイズできるアプリです。
 
-写真、イラスト、ロゴ、スクリーンショットなどを選んで、フォルダの表紙のように表示できます。色タグも付けられるので、仕事、学習、制作、保管用など、フォルダの用途を見た目で分けやすくなります。
+写真、イラスト、ロゴ、スクリーンショットなどを選んで、フォルダの表紙のように表示できます。色タグも選べるので、仕事、学習、制作、保管用など、フォルダの用途を見た目で分けやすくなります。
 
 主な機能:
 
@@ -22,8 +22,9 @@ Folderly は、Windows のフォルダアイコンを好きな画像でカスタ
 - 好きな画像をフォルダアイコンに適用
 - 余白なし / 横幅最大 / 縦幅最大の表示モード
 - 拡大縮小、X/Y位置調整
-- 色タグの追加
+- 色タグの選択
 - タグ名の編集
+- タグアイコンの選択
 - アイコン上のタグ名表示ON/OFF
 - 適用履歴の確認
 - 適用したフォルダを元に戻す
@@ -50,7 +51,7 @@ Customize Windows folders with your own images and color tags.
 
 Folderly lets you customize Windows folder icons with your own images.
 
-Choose a photo, illustration, logo, or screenshot and use it like a visual cover for a folder. You can also add color tags, making it easier to visually separate folders for work, study, creative projects, archives, and more.
+Choose a photo, illustration, logo, or screenshot and use it like a visual cover for a folder. You can also choose color tags, making it easier to visually separate folders for work, study, creative projects, archives, and more.
 
 Key features:
 
@@ -58,8 +59,9 @@ Key features:
 - Apply your own image to a folder icon
 - Choose from no-margin, fit-width, and fit-height display modes
 - Adjust zoom and X/Y position
-- Add color tags
+- Choose color tags
 - Edit tag names
+- Choose tag icons
 - Show or hide tag names on icons
 - View application history
 - Revert customized folders back to normal
@@ -74,7 +76,7 @@ folder, icon, customize, folder icon, organization, productivity, windows, tag, 
 
 ## スクリーンショット案
 
-1. 右クリックメニューから「Folderlyでカスタム」を選ぶ画面
+1. 右クリックメニューから「Folderlyでカスタマイズ」を選ぶ画面
 2. 画像選択画面とフォルダプレビュー
 3. タグ付きフォルダが並んでいるExplorer画面
 4. タグ名編集画面

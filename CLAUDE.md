@@ -4,7 +4,7 @@ This file is for implementation agents. Keep it short, current, and practical.
 
 ## Current State
 
-- Current local app/package version: `1.0.0.13`
+- Current local app/package version: `1.0.0.16`
 - Main app: WPF + WebView2 editor
 - Context menu: MSIX Packaged COM `IExplorerCommand`
 - Core rendering: ImageSharp -> folder template -> ICO -> `desktop.ini`

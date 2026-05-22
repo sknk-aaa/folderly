@@ -8,6 +8,7 @@ using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows;
@@ -23,7 +24,7 @@ public partial class ApplyWindow : Window
 {
     private readonly ApplyViewModel _vm;
     private bool _webViewReady;
-    private static string? _cachedHtml;
+    private static readonly Dictionary<string, string> CachedHtmlByLanguage = new(StringComparer.OrdinalIgnoreCase);
     private int _previewRenderVersion;
     private bool _previewRenderActive;
     private bool _previewRenderPending;
@@ -72,12 +73,118 @@ public partial class ApplyWindow : Window
 
     private static string LoadHtml()
     {
-        if (_cachedHtml is not null) return _cachedHtml;
+        var language = AppServices.Localize.CurrentLang;
+        if (CachedHtmlByLanguage.TryGetValue(language, out var cachedHtml))
+            return cachedHtml;
+
         var asm = Assembly.GetExecutingAssembly();
         using var stream = asm.GetManifestResourceStream("Folderly.App.Resources.ApplyWindow.html");
         if (stream is null) throw new InvalidOperationException("ApplyWindow.html が見つかりません");
         using var reader = new StreamReader(stream);
-        return _cachedHtml = reader.ReadToEnd();
+        var html = LocalizeHtml(reader.ReadToEnd());
+        CachedHtmlByLanguage[language] = html;
+        return html;
+    }
+
+    private static string LocalizeHtml(string html)
+    {
+        var L = AppServices.Localize;
+        static string Html(string value) => WebUtility.HtmlEncode(value);
+        string T(string key) => Html(L[key]);
+
+        var replacements = new (string From, string To)[]
+        {
+            ("対象フォルダ", T("TargetFolder")),
+            ("フォルダプレビュー", T("FolderPreviewTitle")),
+            ("画像を選択するとここに表示されます", T("PreviewSubtext")),
+            ("画像をドラッグ&ドロップ", T("DndSubtext")),
+            ("画像を選択してください", T("SelectImageTitle")),
+            ("または画像をここにドラッグ&amp;ドロップ", T("DndSubtext")),
+            ("画像をリセット", T("ResetImage")),
+            ("画像の調整", T("ImageAdjustSection")),
+            ("拡大率", T("ScaleLabel")),
+            ("中央に戻す", T("ResetPosition")),
+            ("表示モード", T("DisplayModeLabel")),
+            ("余白なし", T("CropCenter")),
+            ("横幅最大", T("CropFitWidth")),
+            ("縦幅最大", T("CropFitHeight")),
+            ("位置調整", T("PositionAdjustment")),
+            ("X 位置", T("XPosition")),
+            ("Y 位置", T("YPosition")),
+            ("左に移動", T("MoveLeft")),
+            ("右に移動", T("MoveRight")),
+            ("上に移動", T("MoveUp")),
+            ("下に移動", T("MoveDown")),
+            ("タグの選択", T("TagSelectTitle")),
+            ("フォルダの種類を色で識別できます", T("TagSelectDesc")),
+            ("タグを編集", T("TagEditTitle")),
+            ("ヒント", T("HintTitle")),
+            ("プレビューの枠内が実際に表示される範囲です", T("HintPreviewRange")),
+            ("キャンセル", T("Cancel")),
+            ("適用", T("Apply")),
+            ("戻る", T("Back")),
+            ("タグ名とアイコンをカスタマイズできます", T("TagEditDesc")),
+            ("タグ一覧", T("TagListTitle")),
+            ("クリックして編集", T("ClickToEdit")),
+            ("新規タグを追加", T("NewTagBtn")),
+            ("タグの編集", T("TagEditHeadTitle")),
+            ("プレビュー — フォルダの左上タブに表示されます", T("PreviewOnFolderTab")),
+            ("フォルダアイコン上にタグ名を表示", T("ShowTagNameOnIcon")),
+            ("オフにすると、左上タブにアイコンと色のみが表示されます", T("ShowTagNameOffNote")),
+            ("フォルダアイコン上にアイコンを表示", T("ShowTagIconOnIcon")),
+            ("タグごとに選んだアイコンを左上タブに表示します", T("ShowTagIconOnIconNote")),
+            ("タグ名を入力", T("TagNamePlaceholder")),
+            ("タグ名", T("TagNameLabel")),
+            ("カラー", T("TagColorLabel")),
+            ("アイコン", T("TagIconLabel")),
+            ("変更は「保存」を押すまで反映されません", T("SaveChangesHint")),
+            ("保存", T("Save")),
+            ("編集", T("IconEdit")),
+            ("メディア", T("IconMedia")),
+            ("仕事", T("IconWork")),
+            ("ドキュメント", T("IconDocument")),
+            ("ダウンロード", T("IconDownload")),
+            ("その他", T("IconOther")),
+            ("写真", T("IconPhoto")),
+            ("音楽", T("IconMusic")),
+            ("ゲーム", T("IconGame")),
+            ("学習", T("IconStudy")),
+            ("デザイン", T("IconDesign")),
+            ("重要", T("IconImportant")),
+            ("プライベート", T("IconPrivate")),
+        };
+
+        foreach (var (from, to) in replacements)
+            html = html.Replace(from, to, StringComparison.Ordinal);
+
+        if (AppServices.Localize.CurrentLang == "ja")
+            return html;
+
+        html = html.Replace(
+            "<div class=\"editing\"><b id=\"editing-tag-name\">「—」</b> を編集中</div>",
+            $"<div class=\"editing\">{T("EditingSuffix")} <b id=\"editing-tag-name\">&quot;—&quot;</b></div>",
+            StringComparison.Ordinal);
+        html = html.Replace(
+            "headEl.textContent = '「' + data.name + '」';",
+            "headEl.textContent = '\"' + data.name + '\"';",
+            StringComparison.Ordinal);
+        html = html.Replace(
+            "headEl.textContent = '「' + nameInput.value + '」';",
+            "headEl.textContent = '\"' + nameInput.value + '\"';",
+            StringComparison.Ordinal);
+
+        var applyButtonHtml = "<span class=\"ico\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"4,12 10,18 20,6\"/></svg></span>"
+            + Html(L["Apply"]);
+        html = html.Replace(
+            $"btn.textContent = '{Html(L["Apply"])}中...';",
+            $"btn.textContent = {JsonSerializer.Serialize(L["Applying"])};",
+            StringComparison.Ordinal);
+        html = html.Replace(
+            $"btn.innerHTML = '<span class=\"ico\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"4,12 10,18 20,6\"/></svg></span>{Html(L["Apply"])}';",
+            $"btn.innerHTML = {JsonSerializer.Serialize(applyButtonHtml)};",
+            StringComparison.Ordinal);
+
+        return html;
     }
 
     private async void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
@@ -585,7 +692,7 @@ public partial class ApplyWindow : Window
             if (result.IsSuccess)
             {
                 await ExecuteScriptSafeAsync(
-                    "document.getElementById('btn-apply').textContent='✓ 適用完了';");
+                    $"document.getElementById('btn-apply').textContent={JsonSerializer.Serialize("✓ " + AppServices.Localize["ApplyCompleted"])};");
 
                 Hide();
                 if (ShouldReopenExplorer())

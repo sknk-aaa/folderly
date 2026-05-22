@@ -12,4 +12,8 @@
     <PublishSelfContained>false</PublishSelfContained>
     <EnableComHosting>true</EnableComHosting>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Folderly.Core\Folderly.Core.csproj" />
+  </ItemGroup>
 </Project>

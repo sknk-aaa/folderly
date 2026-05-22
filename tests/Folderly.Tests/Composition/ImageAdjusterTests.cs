@@ -47,6 +47,20 @@ public class ImageAdjusterTests
     }
 
     [Fact]
+    public void Adjust_CenterCropScaleHalf_KeepsImageCentered()
+    {
+        using var src = CreateSolidImage(300, 300, r: 255, g: 0, b: 0);
+        using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Scale: 0.5f));
+
+        Assert.Equal(0, result[0, 0].A);
+        Assert.Equal(0, result[Target.Width - 1, Target.Height - 1].A);
+
+        var centerPx = result[Target.Width / 2, Target.Height / 2];
+        Assert.Equal(255, centerPx.A);
+        Assert.Equal(255, centerPx.R);
+    }
+
+    [Fact]
     public void Adjust_OffsetX_DoesNotThrow()
     {
         using var src = CreateSolidImage(200, 200, r: 255, g: 0, b: 0);

@@ -13,13 +13,12 @@ public record ImageAdjustParams(
     CropMode Mode = CropMode.Center);
 
 /// <summary>
-/// 入力画像を指定した targetSize に合わせて調整する。
+/// Adjusts an input image to the requested target size.
 /// </summary>
 public static class ImageAdjuster
 {
     /// <summary>
-    /// 入力画像を targetSize にフィットさせた新しい Image を返す。
-    /// 呼び出し元が Dispose する責務を持つ。
+    /// Returns a new adjusted image. The caller owns the returned image and must dispose it.
     /// </summary>
     public static Image<Rgba32> Adjust(
         Image sourceImage,
@@ -38,45 +37,22 @@ public static class ImageAdjuster
     private static Image<Rgba32> ApplyCenterCrop(
         Image source, Size target, float scale, float offsetX, float offsetY)
     {
-        // スケール後のサイズ
-        float scaledW = source.Width * scale;
-        float scaledH = source.Height * scale;
-
-        // targetSize に対してスケール後画像が収まらない場合の補正スケール
-        // (Center モードではスケール後サイズ < target を許容し、その場合はリサイズのみ)
         float baseScale = Math.Max(
             (float)target.Width / source.Width,
             (float)target.Height / source.Height);
-        float effectiveScale = baseScale * scale;
+        float effectiveScale = Math.Max(baseScale * scale, 0.001f);
 
         int resizedW = Math.Max(1, (int)Math.Round(source.Width * effectiveScale));
         int resizedH = Math.Max(1, (int)Math.Round(source.Height * effectiveScale));
 
-        // クロップ原点（中央基準 + オフセット）
-        float cropOriginX = (resizedW - target.Width) / 2f - offsetX;
-        float cropOriginY = (resizedH - target.Height) / 2f - offsetY;
-
-        // クランプ
-        int cropX = Math.Clamp((int)cropOriginX, 0, Math.Max(0, resizedW - target.Width));
-        int cropY = Math.Clamp((int)cropOriginY, 0, Math.Max(0, resizedH - target.Height));
-        int cropW = Math.Min(target.Width, resizedW - cropX);
-        int cropH = Math.Min(target.Height, resizedH - cropY);
-
-        var result = new Image<Rgba32>(target.Width, target.Height); // デフォルトで透明
+        var result = new Image<Rgba32>(target.Width, target.Height);
 
         var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
         try
         {
-            var cropped = resized.Clone(ctx => ctx.Crop(
-                new Rectangle(cropX, cropY, cropW, cropH)));
-            try
-            {
-                result.Mutate(ctx => ctx.DrawImage(cropped, new Point(0, 0), 1f));
-            }
-            finally
-            {
-                cropped.Dispose();
-            }
+            int pasteX = (int)Math.Round((target.Width - resizedW) / 2f + offsetX);
+            int pasteY = (int)Math.Round((target.Height - resizedH) / 2f + offsetY);
+            DrawClipped(result, resized, pasteX, pasteY);
         }
         finally
         {
@@ -90,44 +66,20 @@ public static class ImageAdjuster
         Image source, Size target, float scale, float offsetX, float offsetY)
     {
         float fitScale = (float)target.Width / source.Width;
-        float effectiveScale = fitScale * scale;
-        effectiveScale = Math.Max(effectiveScale, 0.001f);
+        float effectiveScale = Math.Max(fitScale * scale, 0.001f);
 
         int resizedW = Math.Max(1, (int)Math.Round(source.Width * effectiveScale));
         int resizedH = Math.Max(1, (int)Math.Round(source.Height * effectiveScale));
 
-        // 中央配置のオフセット
         int pasteX = (target.Width - resizedW) / 2 + (int)offsetX;
         int pasteY = (target.Height - resizedH) / 2 + (int)offsetY;
 
-        var result = new Image<Rgba32>(target.Width, target.Height); // デフォルトで透明
+        var result = new Image<Rgba32>(target.Width, target.Height);
 
         var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
         try
         {
-            // target 外へのはみ出しを防ぐクリッピング
-            int srcX = 0, srcY = 0;
-            int destX = pasteX, destY = pasteY;
-            int drawW = resizedW, drawH = resizedH;
-
-            if (destX < 0) { srcX = -destX; drawW += destX; destX = 0; }
-            if (destY < 0) { srcY = -destY; drawH += destY; destY = 0; }
-            if (destX + drawW > target.Width) drawW = target.Width - destX;
-            if (destY + drawH > target.Height) drawH = target.Height - destY;
-
-            if (drawW > 0 && drawH > 0)
-            {
-                var visible = resized.Clone(ctx => ctx.Crop(
-                    new Rectangle(srcX, srcY, drawW, drawH)));
-                try
-                {
-                    result.Mutate(ctx => ctx.DrawImage(visible, new Point(destX, destY), 1f));
-                }
-                finally
-                {
-                    visible.Dispose();
-                }
-            }
+            DrawClipped(result, resized, pasteX, pasteY);
         }
         finally
         {
@@ -141,8 +93,7 @@ public static class ImageAdjuster
         Image source, Size target, float scale, float offsetX, float offsetY)
     {
         float fitScale = (float)target.Height / source.Height;
-        float effectiveScale = fitScale * scale;
-        effectiveScale = Math.Max(effectiveScale, 0.001f);
+        float effectiveScale = Math.Max(fitScale * scale, 0.001f);
 
         int resizedW = Math.Max(1, (int)Math.Round(source.Width * effectiveScale));
         int resizedH = Math.Max(1, (int)Math.Round(source.Height * effectiveScale));
@@ -155,28 +106,7 @@ public static class ImageAdjuster
         var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
         try
         {
-            int srcX = 0, srcY = 0;
-            int destX = pasteX, destY = pasteY;
-            int drawW = resizedW, drawH = resizedH;
-
-            if (destX < 0) { srcX = -destX; drawW += destX; destX = 0; }
-            if (destY < 0) { srcY = -destY; drawH += destY; destY = 0; }
-            if (destX + drawW > target.Width) drawW = target.Width - destX;
-            if (destY + drawH > target.Height) drawH = target.Height - destY;
-
-            if (drawW > 0 && drawH > 0)
-            {
-                var visible = resized.Clone(ctx => ctx.Crop(
-                    new Rectangle(srcX, srcY, drawW, drawH)));
-                try
-                {
-                    result.Mutate(ctx => ctx.DrawImage(visible, new Point(destX, destY), 1f));
-                }
-                finally
-                {
-                    visible.Dispose();
-                }
-            }
+            DrawClipped(result, resized, pasteX, pasteY);
         }
         finally
         {
@@ -184,5 +114,32 @@ public static class ImageAdjuster
         }
 
         return result;
+    }
+
+    private static void DrawClipped(Image<Rgba32> target, Image resized, int pasteX, int pasteY)
+    {
+        int srcX = 0, srcY = 0;
+        int destX = pasteX, destY = pasteY;
+        int drawW = resized.Width, drawH = resized.Height;
+
+        if (destX < 0) { srcX = -destX; drawW += destX; destX = 0; }
+        if (destY < 0) { srcY = -destY; drawH += destY; destY = 0; }
+        if (destX + drawW > target.Width) drawW = target.Width - destX;
+        if (destY + drawH > target.Height) drawH = target.Height - destY;
+
+        if (drawW <= 0 || drawH <= 0)
+        {
+            return;
+        }
+
+        var visible = resized.Clone(ctx => ctx.Crop(new Rectangle(srcX, srcY, drawW, drawH)));
+        try
+        {
+            target.Mutate(ctx => ctx.DrawImage(visible, new Point(destX, destY), 1f));
+        }
+        finally
+        {
+            visible.Dispose();
+        }
     }
 }
