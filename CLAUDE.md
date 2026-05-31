@@ -9,6 +9,7 @@ WPF + WebView2 エディタ + ImageSharp + SQLite + MSIX（Explorer コンテキ
 - [docs/OPERATIONS.md](docs/OPERATIONS.md) — ビルド・パッケージ・Store 提出・テスト
 - [docs/HANDOFF.md](docs/HANDOFF.md) — 現状・残タスク・既知の問題
 - [docs/TESTING.md](docs/TESTING.md) — 手動テストチェックリスト
+- [docs/MARKETING.md](docs/MARKETING.md) — チャネル方針・ASO・キーワード調査・競合・SEO/LP設計
 
 ## Current State
 
