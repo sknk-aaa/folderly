@@ -1,96 +1,71 @@
 # Folderly Agent Notes
 
-This file is for implementation agents. Keep it short, current, and practical.
+Folderly は Windows フォルダのアイコンをカバー画像とカラータグでカスタマイズするデスクトップアプリ。
+WPF + WebView2 エディタ + ImageSharp + SQLite + MSIX（Explorer コンテキストメニュー付き）。
+
+## Docs
+
+- [docs/DESIGN.md](docs/DESIGN.md) — 仕様・データモデル・実装詳細
+- [docs/OPERATIONS.md](docs/OPERATIONS.md) — ビルド・パッケージ・Store 提出・テスト
+- [docs/HANDOFF.md](docs/HANDOFF.md) — 現状・残タスク・既知の問題
+- [docs/TESTING.md](docs/TESTING.md) — 手動テストチェックリスト
 
 ## Current State
 
-- Current Store package version: `1.0.16.0`
-- Current Store candidate: `_out\Folderly_1.0.16.0_x64_store.msix`
-- Partner Center package upload: completed
-- Main app: WPF + WebView2 editor
-- Context menu: MSIX Packaged COM `IExplorerCommand`
-- Core rendering: ImageSharp -> folder template -> ICO -> `desktop.ini`
+- Current Store package version: `1.0.17.0`
+- Current Store candidate: `_out\Folderly_1.0.17.0_x64_store.msix`
 - Tests: `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
 
 ## Non-Negotiable Implementation Contracts
 
 ### Preview Performance
 
-The editor preview must remain smooth.
-
-- Do not run exact WPF/offscreen rendering on every pointer move.
-- Use `transformPreview` for throttled, lightweight updates while dragging/sliding.
-- Use `transform` only on commit, mouseup, or delayed settle.
-- Preview drag must not continuously move the X/Y slider thumbs.
-- If jank appears, inspect `ApplyWindow.html` first:
-  - `scheduleTransformPreviewPost`
-  - `scheduleTransformPost`
-  - `postTransformNow`
-  - `commitOffsetFromPreview`
-  - preview drag handlers
+- `mousemove` ごとに正確レンダリングを実行しない。`transformPreview` でスロットル（50ms）、コミットは mouseup または遅延後。
+- プレビュードラッグ中は X/Y スライダーのサムを動かさない。
+- `scale`・`offsetX`・`offsetY`・`cropMode` は必ず4値まとめて `transform`/`transformPreview` メッセージに含める。cropMode を分離して送るとリグレッションが起きる。
+- jank が出たら `ApplyWindow.html` の `scheduleTransformPreviewPost`・`scheduleTransformPost`・`postTransformNow`・`commitOffsetFromPreview` を確認。
 
 ### Preview/Final Icon Consistency
 
-The WebView preview and generated icon must share the same folder template geometry.
-
-- `FolderTemplate.GetImageRegionPixelSize()` is the source for the image region size.
-- `TemplateRenderer` and preview code must agree on the visible image area.
-- Avoid fixes that make the preview look right but final ICO differ, or the reverse.
+- `FolderTemplate.GetImageRegionPixelSize()` が画像領域サイズのソース。`TemplateRenderer` とプレビューコードはこれに従う。
+- プレビューだけ合わせて最終 ICO がずれる修正、またはその逆はしない。
 
 ### Source Image Restoration
 
-Applied images are copied into Folderly-managed storage.
-
-- Directory: `%LOCALAPPDATA%\Folderly\source-images\`
-- History stores the managed copy path.
-- Drag-and-drop images are restorable only after being applied with the current storage behavior.
-- Old drag-and-drop history entries with empty source paths cannot be recovered retroactively.
-- Unreferenced managed source images are cleaned up on reapply/revert.
+- 管理済みソース画像ディレクトリ: `%LOCALAPPDATA%\Folderly\source-images\`
+- 履歴は管理済みコピーのパスを保持する。
+- 参照されていない管理済みソース画像は reapply/revert 時にクリーンアップする。
 
 ### Explorer Refresh
 
-Explorer may show stale folder icons even when `desktop.ini` is correct.
-
-- Keep shell notifications.
-- Keep the targeted Explorer-window reopen behavior.
-- Do not kill or restart the whole Explorer shell as part of normal apply/install behavior.
+- シェル通知を残す。
+- 対象 Explorer ウィンドウの再オープン動作を残す。
+- 通常の apply/install で Explorer プロセス全体を kill・再起動しない。
 
 ### UI Scope
 
-- There is one image entry point: the drag/drop area, which also opens the file picker.
-- `Reset image` clears the current image.
-- Do not re-add the lower duplicate image-select button.
-- Do not show `Add new tag` until actual custom tag creation exists.
-- Folder sorting by Folderly tag in Explorer is out of scope.
+- 画像エントリポイントはドロップエリア1箇所のみ。下部の重複ボタンは復活させない。
+- `Reset image` で画像をクリアする。
+- カスタムタグ作成が実装されるまで `Add new tag` を表示しない。
+- Explorer でのタグソートはスコープ外。
 
 ## Important Files
 
-- `src/Folderly.App/Resources/ApplyWindow.html`: editor UI and interaction logic
-- `src/Folderly.App/Views/ApplyWindow.xaml.cs`: WebView bridge, image loading, apply, Explorer refresh
-- `src/Folderly.Core/Application/ApplyService.cs`: apply pipeline
-- `src/Folderly.Core/Application/RevertService.cs`: revert pipeline
-- `src/Folderly.Core/Application/ManagedSourceImageStore.cs`: managed source image cleanup
-- `src/Folderly.Core/Composition/FolderTemplate.cs`: template geometry
-- `src/Folderly.Core/Composition/TemplateRenderer.cs`: final icon rendering
-- `src/Folderly.ContextMenu/FolderlyContextMenuHandler.cs`: Explorer context menu
-- `src/Folderly.Package/Package.appxmanifest`: MSIX identity, COM registration, version
+- `src/Folderly.App/Resources/ApplyWindow.html`: エディタ UI と操作ロジック
+- `src/Folderly.App/Views/ApplyWindow.xaml.cs`: WebView ブリッジ、画像ロード、apply、Explorer リフレッシュ
+- `src/Folderly.Core/Application/ApplyService.cs`: apply パイプライン
+- `src/Folderly.Core/Application/RevertService.cs`: revert パイプライン
+- `src/Folderly.Core/Application/ManagedSourceImageStore.cs`: 管理済みソース画像クリーンアップ
+- `src/Folderly.Core/Composition/FolderTemplate.cs`: テンプレートジオメトリ
+- `src/Folderly.Core/Composition/TemplateRenderer.cs`: 最終アイコンレンダリング
+- `src/Folderly.App/ContextMenuHandler.cs`: Explorer コンテキストメニュー EXE COM サーバー
+- `src/Folderly.Package/Package.appxmanifest`: MSIX アイデンティティ、COM 登録、バージョン
 
 ## Packaging Notes
 
-- `WebView2Loader.dll` must be copied to the package output root. `runtimes\win-x64\native` alone is not enough.
-- Store package identity: `KanekoApps.Folderly`.
-- Store publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
-- Older local sideload builds used signing certificate subject `CN=Folderly`.
-- Visual Studio did not expose `Publish` / `Store` / `Create App Packages` for `Folderly.Package` in the current environment; the accepted Store candidate was created manually with `makeappx`.
-- Microsoft Store rejects non-zero MSIX revision numbers. Use versions like `1.0.16.0`, not `1.0.0.16`.
-- Current Store output package is `_out\Folderly_1.0.16.0_x64_store.msix`.
-- `_out` MSIX files are generated artifacts.
-
-## Documentation
-
-For fuller context, read:
-
-- `HANDOVER.md`
-- `SPEC.md`
-- `docs/TESTING.md`
-- `docs/STORE_SUBMISSION.md`
+- `WebView2Loader.dll` はパッケージ出力ルートにある必要がある（`runtimes\win-x64\native` だけでは不足）。
+- Store package identity: `KanekoApps.Folderly`
+- Store publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+- 旧 sideload ビルドの publisher は `CN=Folderly`（別 identity）。
+- Visual Studio がこの環境で Publish / Store / Create App Packages を表示しないため、Store 候補は `makeappx` で手動作成。
+- Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.0.17.0` は OK、`1.0.0.17` は NG。

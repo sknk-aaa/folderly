@@ -4,19 +4,19 @@ Use this checklist when validating a new Folderly build on Windows.
 
 Current verified baseline:
 
-- Date: 2026-05-23
+- Date: 2026-05-25
 - Store package identity: `KanekoApps.Folderly`
-- Store package version: `1.0.16.0`
-- Store candidate package: `_out/Folderly_1.0.16.0_x64_store.msix`
+- Store package version: `1.0.17.0`
+- Store candidate package: `_out/Folderly_1.0.17.0_x64_store.msix`
 - Partner Center package upload: previous candidate completed; upload the latest regenerated Store package after fixes
 - Architecture: x64
-- Automated tests: `133` passed
-- Final manual QA: completed before Store submission prep
+- Automated tests: `137` passed
+- Final manual QA: completed for `1.0.17.0`; corrected package resubmitted and certification pending
 
 Historical note:
 
 - Last sideload package before Store identity change: `Folderly.FolderlyApp 1.0.0.16`
-- Store rejected `1.0.0.16` because Store MSIX revisions must be `0`; use `1.0.16.0`.
+- Store rejected `1.0.0.16` because Store MSIX revisions must be `0`; use `1.0.17.0` for the certification fix submission.
 
 ## Automated Tests
 
@@ -31,6 +31,22 @@ Expected:
 - All included tests pass.
 - The excluded permission test is intentionally skipped in the normal local flow.
 
+## Certification Regression Evidence
+
+Run the real Windows Shell integration test separately when preparing a Store candidate:
+
+```powershell
+dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj `
+  --filter "FullyQualifiedName~ExplorerIconIntegrationTests" `
+  --logger "console;verbosity=detailed"
+```
+
+This test creates a normal local folder containing a file, applies two different icons through the real `ShellNotifier`, and compares the icon returned by `SHGetFileInfo` with the ICO currently referenced by `desktop.ini`. The `default`, `first`, and `second` output hashes must all be different. It passed five consecutive runs on 2026-05-25.
+
+Run this from a standard-user terminal. The 2026-05-25 certification verification run reported `IsAdministrator: False` at medium integrity level.
+
+Supporting evidence for the certification fix submission is recorded in [CERTIFICATION_FIX_EVIDENCE.md](CERTIFICATION_FIX_EVIDENCE.md).
+
 ## Package Verification
 
 - [ ] Release x64 build succeeds.
@@ -38,10 +54,10 @@ Expected:
 - [ ] MSIX payload includes `WebView2Loader.dll` at the package root.
 - [ ] `Package.appxmanifest` has Store identity `KanekoApps.Folderly`.
 - [ ] `Package.appxmanifest` has Publisher `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
-- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.0.16.0`.
+- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.0.17.0`.
 - [ ] Partner Center accepts the uploaded package.
 - [ ] If sideload testing locally, the signing certificate subject matches the active package publisher.
-- [ ] If sideload testing locally, install `_out/Folderly_1.0.16.0_x64_sideload.msix`, not the unsigned Store package.
+- [ ] If sideload testing locally, install `_out/Folderly_1.0.17.0_x64_sideload.msix`, not the unsigned Store package.
 - [ ] The sideload certificate is trusted in LocalMachine Root/TrustedPeople if `Add-AppxPackage` reports `0x800B0109`.
 - [ ] Old `Folderly.FolderlyApp 1.0.0.16` is uninstalled before testing the Store identity.
 - [ ] App launches from Start menu.
@@ -57,7 +73,8 @@ Expected:
 - [ ] `<folder>\desktop.ini` exists.
 - [ ] `<folder>\_folderly\cover_<hash8>.ico` exists.
 - [ ] `%LOCALAPPDATA%\Folderly\icons\<hash>.ico` exists.
-- [ ] `desktop.ini` references the central AppData ICO.
+- [ ] `desktop.ini` references the unique relative `_folderly\cover_<hash8>.ico` path.
+- [ ] The installed app launches on a test account without .NET Desktop Runtime installed.
 - [ ] Explorer shows the customized folder icon after the target window refresh.
 - [ ] Applying a different image to the same folder updates the visible icon within a few seconds after refresh.
 
@@ -173,3 +190,8 @@ Explorer windows may briefly reopen after applying. This is intentional and refr
 - [ ] Age rating questionnaire is completed.
 - [ ] `runFullTrust` justification is filled.
 - [ ] Submission is sent for certification.
+
+Submission note:
+
+- The `1.0.17.0` certification-fix package was resubmitted on 2026-05-25 after the manual icon apply/reapply, self-contained startup, and Support link checks passed.
+- If Microsoft rejects a subsequent submission, use [CERTIFICATION_REJECTION_PLAYBOOK.md](CERTIFICATION_REJECTION_PLAYBOOK.md).
