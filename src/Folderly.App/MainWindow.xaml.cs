@@ -1,7 +1,10 @@
 using Folderly.App.Infrastructure;
 using Folderly.App.ViewModels;
 using Folderly.App.Views;
+using Folderly.Core;
+using Microsoft.Win32;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace Folderly.App;
@@ -71,23 +74,18 @@ public partial class MainWindow : Window
 
         var L = AppServices.Localize;
 
-        // フォルダが移動・改名・削除されている場合は実体を復元できないため、履歴のみ削除を提案する。
-        if (!System.IO.Directory.Exists(item.FolderPath))
+        // フォルダが移動・改名・削除されている場合は元のパスでは解除できないため、3択を提示する。
+        if (!Directory.Exists(item.FolderPath))
         {
-            var moveMsg = string.Format(L["FolderMovedMessage"], item.FolderPath);
-            var moveRes = MessageBox.Show(moveMsg, L["FolderMovedTitle"],
-                MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-            if (moveRes != MessageBoxResult.OK) return;
-
-            try
+            switch (MovedFolderDialog.Show(this, item.FolderPath))
             {
-                AppServices.Revert.DeleteHistoryOnly(item.FolderPath);
-                _vm.Refresh();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(string.Format(L["RevertFailed"], ex.Message),
-                    "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
+                case MovedFolderChoice.Locate:
+                    await LocateAndRevertAsync(item.FolderPath);
+                    break;
+                case MovedFolderChoice.HistoryOnly:
+                    try { AppServices.Revert.DeleteHistoryOnly(item.FolderPath); _vm.Refresh(); }
+                    catch (Exception ex) { ShowRevertError(ex); }
+                    break;
             }
             return;
         }
@@ -108,6 +106,40 @@ public partial class MainWindow : Window
                 "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
+    private async Task LocateAndRevertAsync(string historyKeyPath)
+    {
+        var L = AppServices.Localize;
+
+        var picker = new OpenFolderDialog { Title = L["FolderMovedLocateTitle"] };
+        if (picker.ShowDialog(this) != true) return;
+        var newPath = picker.FolderName;
+
+        // 選択フォルダが本当にこの履歴のものか検証（_folderly\cover_<hash8>.ico の有無）。
+        var entry = AppServices.History.GetByPath(Path.GetFullPath(historyKeyPath));
+        if (entry is not null && entry.IconHash is { Length: >= 8 })
+        {
+            var coverPath = Path.Combine(
+                newPath, FolderlyConstants.FolderlyDirectoryName, $"cover_{entry.IconHash[..8]}.ico");
+            if (!File.Exists(coverPath))
+            {
+                var warn = MessageBox.Show(L["FolderMismatchMessage"], L["FolderMismatchTitle"],
+                    MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (warn != MessageBoxResult.OK) return;
+            }
+        }
+
+        try
+        {
+            await AppServices.Revert.RevertAsync(historyKeyPath, newPath);
+            _vm.Refresh();
+        }
+        catch (Exception ex) { ShowRevertError(ex); }
+    }
+
+    private void ShowRevertError(Exception ex)
+        => MessageBox.Show(string.Format(AppServices.Localize["RevertFailed"], ex.Message),
+            "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
 
     private async void ClearAllHistory_Click(object sender, RoutedEventArgs e)
     {

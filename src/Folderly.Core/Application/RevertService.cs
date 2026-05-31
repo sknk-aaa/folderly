@@ -28,13 +28,21 @@ public sealed class RevertService
     }
 
     public Task RevertAsync(string folderPath, CancellationToken ct = default)
+        => RevertAsync(folderPath, folderPath, ct);
+
+    /// <summary>
+    /// 履歴は <paramref name="historyKeyPath"/> で引き、ファイル操作は <paramref name="actualFolderPath"/>
+    /// に対して実行する。フォルダが移動・改名された場合に、移動先を指定して実体を解除するために使う。
+    /// </summary>
+    public Task RevertAsync(string historyKeyPath, string actualFolderPath, CancellationToken ct = default)
     {
-        var normalized = Path.GetFullPath(folderPath);
+        var keyNormalized = Path.GetFullPath(historyKeyPath);
+        var normalized = Path.GetFullPath(actualFolderPath);
 
         // 1. 履歴取得
-        var entry = _history.GetByPath(normalized)
+        var entry = _history.GetByPath(keyNormalized)
             ?? throw new InvalidOperationException(
-                $"履歴が見つかりません: {normalized}");
+                $"履歴が見つかりません: {keyNormalized}");
 
         _logger.LogInformation("Reverting {FolderPath}", normalized);
 
@@ -110,7 +118,7 @@ public sealed class RevertService
             _shellNotifier.NotifyFolderReverted(normalized);
 
             // 6. 履歴削除
-            _history.Delete(normalized);
+            _history.Delete(keyNormalized);
             ManagedSourceImageStore.TryDeleteIfUnreferenced(
                 entry.SourceImagePath,
                 _history.GetAll(),
@@ -142,16 +150,8 @@ public sealed class RevertService
             }
             catch (Exception ex)
             {
+                // 移動・改名・削除などで実体を戻せなかったものは履歴を残し、一覧から個別解除できるようにする。
                 _logger.LogWarning(ex, "Failed to revert history entry {FolderPath}", entry.FolderPath);
-                try
-                {
-                    _history.Delete(entry.FolderPath);
-                    ManagedSourceImageStore.TryDeleteIfUnreferenced(
-                        entry.SourceImagePath,
-                        _history.GetAll(),
-                        _logger);
-                }
-                catch { }
                 failCount++;
             }
         }
