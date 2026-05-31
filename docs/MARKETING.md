@@ -14,7 +14,7 @@
 
 - **本命：SEOランディングページ → Microsoft Store へ送客**（外部流入を作る）。
 - **直接販売（Store外）は保留**。¥300 単価に対し、コード署名・決済手数料・各国税・ライセンス基盤・サポートの固定費が見合わない。将来やるなら Merchant of Record（Paddle / Lemon Squeezy 等）。LPは「あとで Buy direct を足せる」余地だけ残す。
-- **公開基盤**：独自ドメイン取得＋ **Cloudflare Pages**（原価ドメイン・無料プライバシー配慮アナリティクス・エッジ拡張）。**言語別URL＋hreflang** で日英を別ページ最適化。
+- **公開基盤**：独自ドメイン **`folderlyapp.com`**（2026-06-01 決定。`folderly.com`＝メール到達性SaaS、`folderly.app`＝他社取得済みのため回避）＋ **Cloudflare Pages**（原価ドメイン・無料プライバシー配慮アナリティクス・エッジ拡張）。**言語別URL＋hreflang** で日英を別ページ最適化。canonical は apex（`folderlyapp.com`）、`www` は apex へリダイレクト。
   - 移行注意：現 `sknk-aaa.github.io/folderly/` は Store のプライバシー/サポートURL＋アプリ内ヘルプ(`#faq`)から参照中。新ドメイン移行時は Store URL 更新（再提出不要）＋旧URLはリダイレクトで生かす。公開コンテンツの正本は1ドメインに統一（重複コンテンツ回避）。
 - 補助チャネル（コツコツ型）：Reddit（r/Windows11 等・Before/After投稿）、YouTube Shorts（how-to）、日本語記事（note/Qiita）。
 - 現実認識：この領域は**ニッチ**。SEOは「細く長く」積む施策で、短期の量は期待しない。
@@ -99,7 +99,7 @@ SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(e
 ## 残タスク
 
 - [ ] キーワード実数取得（Keyword Surfer 継続 ＋ 余力で Microsoft 広告/Google プランナー）
-- [ ] 独自ドメイン取得 → Cloudflare Pages 公開（言語別URL＋hreflang、旧github.ioリダイレクト）
+- [ ] `folderlyapp.com` を Cloudflare Registrar で登録 → Cloudflare Pages 公開（言語別URL＋hreflang、旧github.ioから移行）
 - [ ] LP（日英）＋ how-to 記事（日英）制作。モックは ChatGPT、コピーは本doc/OPERATIONS準拠
 - [ ] スクリーンショット/動画の作り込み（Before/Afterヒーロー＋短尺デモ）
 - [ ] レビュー獲得策（初期数件で競合に並ぶ）
