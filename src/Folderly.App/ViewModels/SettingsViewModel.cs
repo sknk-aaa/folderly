@@ -30,13 +30,6 @@ public sealed class SettingsViewModel : ViewModelBase
 
     // ─── 履歴 ─────────────────────────────────────────────────────────────────
 
-    private int _historyMaxCount;
-    public int HistoryMaxCount
-    {
-        get => _historyMaxCount;
-        set => SetField(ref _historyMaxCount, Math.Clamp(value, 1, 1000));
-    }
-
     private bool _reopenExplorerWindowsAfterApply;
     public bool ReopenExplorerWindowsAfterApply
     {
@@ -78,7 +71,6 @@ public sealed class SettingsViewModel : ViewModelBase
     public SettingsViewModel()
     {
         _selectedLang    = AppServices.History.GetSetting("language") ?? "system";
-        _historyMaxCount = int.TryParse(AppServices.History.GetSetting("history_max_count"), out var n) ? n : 100;
         _reopenExplorerWindowsAfterApply =
             AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
         _showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
@@ -90,13 +82,11 @@ public sealed class SettingsViewModel : ViewModelBase
     public void Save()
     {
         AppServices.History.SetSetting("language", SelectedLang);
-        AppServices.History.SetSetting("history_max_count", HistoryMaxCount.ToString());
         AppServices.History.SetSetting(
             "force_explorer_restart_on_reapply",
             ReopenExplorerWindowsAfterApply ? "true" : "false");
         TagSettingsService.SetShowTagNameOnIcon(ShowTagNameOnIcon);
         TagSettingsService.SetShowTagIconOnIcon(ShowTagIconOnIcon);
         AppServices.Localize.SetLanguage(SelectedLang);
-        AppServices.History.EnforceMaxCount(HistoryMaxCount);
     }
 }

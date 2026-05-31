@@ -161,6 +161,20 @@ public sealed class RevertService
         return new RevertAllResult(entries.Count, cleanedOrphans, failCount);
     }
 
+    /// <summary>
+    /// フォルダが移動・改名・削除されて実体を復元できない場合に、履歴エントリのみを削除する。
+    /// 参照されなくなった管理済みソース画像もクリーンアップする。
+    /// </summary>
+    public void DeleteHistoryOnly(string folderPath)
+    {
+        var normalized = Path.GetFullPath(folderPath);
+        var entry = _history.GetByPath(normalized);
+        _history.Delete(normalized);
+        if (entry is not null)
+            ManagedSourceImageStore.TryDeleteIfUnreferenced(
+                entry.SourceImagePath, _history.GetAll(), _logger);
+    }
+
     private void TryClearAttributes(string path)
     {
         try { File.SetAttributes(path, FileAttributes.Normal); }

@@ -142,6 +142,8 @@
   <data name="RevertConfirmMessage" xml:space="preserve"><value>This will remove the cover image and tag from:&#x0a;{0}&#x0a;&#x0a;The folder will be restored to its original state.</value></data>
   <data name="RevertButton" xml:space="preserve"><value>Revert</value></data>
   <data name="RevertFailed" xml:space="preserve"><value>Failed to revert: {0}</value></data>
+  <data name="FolderMovedTitle" xml:space="preserve"><value>Folder not found</value></data>
+  <data name="FolderMovedMessage" xml:space="preserve"><value>This folder's path has changed (it may have been moved or renamed):&#x0a;{0}&#x0a;&#x0a;The folder itself can no longer be restored. Remove the history entry only?</value></data>
   <data name="TrialBanner" xml:space="preserve"><value>Free trial: {0} days remaining</value></data>
   <data name="BuyNow" xml:space="preserve"><value>Buy on Microsoft Store</value></data>
   <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>Revert all folders?</value></data>
@@ -156,9 +158,7 @@
   <data name="LanguageSystem" xml:space="preserve"><value>Use system language</value></data>
   <data name="LanguageJapanese" xml:space="preserve"><value>日本語</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
-  <data name="HistorySection" xml:space="preserve"><value>History</value></data>
-  <data name="HistoryMaxCount" xml:space="preserve"><value>Maximum history count</value></data>
-  <data name="DeleteHistory" xml:space="preserve"><value>Revert All Folders</value></data>
+  <data name="HistorySection" xml:space="preserve"><value>History</value></data>  <data name="DeleteHistory" xml:space="preserve"><value>Revert All Folders</value></data>
   <data name="RefreshSection" xml:space="preserve"><value>Explorer Refresh</value></data>
   <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>Reopen Explorer windows after applying folder icons</value></data>
   <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>This makes icon changes appear immediately by reopening the affected Explorer window. The taskbar and Start menu are not restarted.</value></data>

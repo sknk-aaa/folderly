@@ -36,18 +36,6 @@
                    Foreground="{StaticResource TextSecondaryBrush}"
                    Margin="0,0,0,8"/>
 
-        <Grid Margin="0,0,0,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{Binding L[HistoryMaxCount]}"
-                       FontSize="13" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" Width="80"
-                     Text="{Binding HistoryMaxCount, UpdateSourceTrigger=PropertyChanged}"
-                     FontSize="13" Padding="6,4" TextAlignment="Right"/>
-        </Grid>
-
         <Button Content="{Binding L[DeleteHistory]}"
                 Style="{StaticResource SecondaryButton}"
                 Click="DeleteHistory_Click"

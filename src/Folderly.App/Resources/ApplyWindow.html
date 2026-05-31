@@ -851,6 +851,12 @@
             <div class="csw" data-color="#D14EA8" style="background:#D14EA8"></div>
             <div class="csw" data-color="#7A5AD6" style="background:#7A5AD6"></div>
             <div class="csw" data-color="#7A8593" style="background:#7A8593"></div>
+            <div class="csw" data-color="#3F51B5" style="background:#3F51B5"></div>
+            <div class="csw" data-color="#00ACC1" style="background:#00ACC1"></div>
+            <div class="csw" data-color="#7CB342" style="background:#7CB342"></div>
+            <div class="csw" data-color="#E91E63" style="background:#E91E63"></div>
+            <div class="csw" data-color="#8D6E63" style="background:#8D6E63"></div>
+            <div class="csw" data-color="#546E7A" style="background:#546E7A"></div>
           </div>
         </div>
 
@@ -901,6 +907,24 @@
             </div>
             <div class="ico-pick" data-icon-index="14" title="プライベート">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            </div>
+            <div class="ico-pick" data-icon-index="15" title="ホーム">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3,11 L12,3 L21,11 M5.5,9 L5.5,20 L18.5,20 L18.5,9"/></svg>
+            </div>
+            <div class="ico-pick" data-icon-index="16" title="フォルダ">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3,7 L9,7 L11,9 L21,9 L21,19 L3,19 Z"/></svg>
+            </div>
+            <div class="ico-pick" data-icon-index="17" title="タグ">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4,4 L11,4 L20,13 L13,20 L4,11 Z M6.8,7 A1.2,1.2,0,1,0,9.2,7 A1.2,1.2,0,1,0,6.8,7 Z"/></svg>
+            </div>
+            <div class="ico-pick" data-icon-index="18" title="場所">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6,8 A6,6,0,0,1,18,8 L12,21 Z M10,7.5 A2,2,0,1,0,14,7.5 A2,2,0,1,0,10,7.5 Z"/></svg>
+            </div>
+            <div class="ico-pick" data-icon-index="19" title="カレンダー">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4,5 L20,5 L20,20 L4,20 Z M4,9 L20,9 M8,3 L8,7 M16,3 L16,7"/></svg>
+            </div>
+            <div class="ico-pick" data-icon-index="20" title="フラグ">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5,3 L5,21 M5,4 L18,4 L15,8.5 L18,13 L5,13"/></svg>
             </div>
           </div>
         </div>
@@ -1119,7 +1143,10 @@
       var nameEl   = el.querySelector('.name');
       var swatchEl = el.querySelector('.swatch');
       if (nameEl)   nameEl.textContent     = data.name;
-      if (swatchEl) swatchEl.style.background = data.hexColor;
+      if (swatchEl) {
+        swatchEl.style.background = data.hexColor;
+        setSwatchIcon(swatchEl, data.iconIndex);
+      }
     });
   }
 
@@ -1215,7 +1242,10 @@
       var nm = el.querySelector('.nm');
       var sw = el.querySelector('.sw');
       if (nm) nm.textContent     = data.name;
-      if (sw) sw.style.background = data.hexColor;
+      if (sw) {
+        sw.style.background = data.hexColor;
+        setSwatchIcon(sw, data.iconIndex);
+      }
     });
   }
 
@@ -1277,6 +1307,28 @@
   function getIconSvgHtml(idx) {
     var pick = document.querySelector('.ico-pick[data-icon-index="' + idx + '"]');
     return pick ? pick.innerHTML : null;
+  }
+
+  // Swap the icon <svg> inside a swatch element (tag chip / edit list row) to match iconIndex.
+  // iconIndex === -1 (or invalid) removes the icon so the swatch shows color only.
+  function setSwatchIcon(swatchEl, iconIndex, size) {
+    if (!swatchEl) return;
+    var existing = swatchEl.querySelector('svg');
+    if (iconIndex === undefined || iconIndex === null || iconIndex < 0) {
+      if (existing) existing.remove();
+      return;
+    }
+    var svgSrc = getIconSvgHtml(iconIndex);
+    if (!svgSrc) return;
+    var tmp = document.createElement('div');
+    tmp.innerHTML = svgSrc;
+    var newSvg = tmp.querySelector('svg');
+    if (!newSvg) return;
+    var dim = size || 14;
+    newSvg.setAttribute('width', String(dim));
+    newSvg.setAttribute('height', String(dim));
+    if (existing) swatchEl.replaceChild(newSvg, existing);
+    else swatchEl.appendChild(newSvg);
   }
 
   // ===== Toggle switch =====
@@ -1421,6 +1473,9 @@
         document.querySelectorAll('.ico-pick').forEach(function(x) { x.classList.remove('active'); });
         p.classList.add('active');
         refreshEditPreview(key, editState.pending[key]);
+        // Update tag list row icon live (pending state isn't committed to appState until save)
+        var swRow = document.querySelector('#edit-taglist .tlrow[data-tag-key="' + key + '"] .sw');
+        if (swRow) setSwatchIcon(swRow, idx);
       });
     });
 

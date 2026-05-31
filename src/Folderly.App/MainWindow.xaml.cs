@@ -44,10 +44,12 @@ public partial class MainWindow : Window
         _vm.Refresh();
     }
 
+    private const string FaqUrl = "https://sknk-aaa.github.io/folderly/#faq";
+
     private void HelpTab_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Folderly v1.0\n\nFor support, please visit our website.",
-            "Help", MessageBoxButton.OK, MessageBoxImage.Information);
+        try { Process.Start(new ProcessStartInfo(FaqUrl) { UseShellExecute = true }); }
+        catch { /* サイレント無視 */ }
     }
 
     // ─── 履歴アクション ──────────────────────────────────────────────────────
@@ -67,7 +69,29 @@ public partial class MainWindow : Window
         if (sender is not System.Windows.Controls.Button btn ||
             btn.Tag is not HistoryItemViewModel item) return;
 
-        var L   = AppServices.Localize;
+        var L = AppServices.Localize;
+
+        // フォルダが移動・改名・削除されている場合は実体を復元できないため、履歴のみ削除を提案する。
+        if (!System.IO.Directory.Exists(item.FolderPath))
+        {
+            var moveMsg = string.Format(L["FolderMovedMessage"], item.FolderPath);
+            var moveRes = MessageBox.Show(moveMsg, L["FolderMovedTitle"],
+                MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            if (moveRes != MessageBoxResult.OK) return;
+
+            try
+            {
+                AppServices.Revert.DeleteHistoryOnly(item.FolderPath);
+                _vm.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format(L["RevertFailed"], ex.Message),
+                    "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            return;
+        }
+
         var msg = string.Format(L["RevertConfirmMessage"], item.FolderPath);
         var res = MessageBox.Show(msg, L["RevertConfirmTitle"],
             MessageBoxButton.OKCancel, MessageBoxImage.Question);

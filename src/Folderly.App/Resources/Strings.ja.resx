@@ -142,6 +142,8 @@
   <data name="RevertConfirmMessage" xml:space="preserve"><value>{0} の表紙画像とタグを解除し、元のフォルダの見た目に戻します。</value></data>
   <data name="RevertButton" xml:space="preserve"><value>元に戻す</value></data>
   <data name="RevertFailed" xml:space="preserve"><value>復元に失敗しました: {0}</value></data>
+  <data name="FolderMovedTitle" xml:space="preserve"><value>フォルダが見つかりません</value></data>
+  <data name="FolderMovedMessage" xml:space="preserve"><value>フォルダのパスが変更されています（移動または名前変更された可能性があります）：&#x0a;{0}&#x0a;&#x0a;このフォルダの実体は復元できません。履歴のみを削除しますか？</value></data>
   <data name="TrialBanner" xml:space="preserve"><value>無料試用：あと {0} 日</value></data>
   <data name="BuyNow" xml:space="preserve"><value>Microsoft Store で購入する</value></data>
   <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>全フォルダを元に戻しますか？</value></data>
@@ -156,9 +158,7 @@
   <data name="LanguageSystem" xml:space="preserve"><value>システム言語に従う</value></data>
   <data name="LanguageJapanese" xml:space="preserve"><value>日本語</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
-  <data name="HistorySection" xml:space="preserve"><value>履歴</value></data>
-  <data name="HistoryMaxCount" xml:space="preserve"><value>最大保持件数</value></data>
-  <data name="DeleteHistory" xml:space="preserve"><value>全フォルダを元に戻す</value></data>
+  <data name="HistorySection" xml:space="preserve"><value>履歴</value></data>  <data name="DeleteHistory" xml:space="preserve"><value>全フォルダを元に戻す</value></data>
   <data name="RefreshSection" xml:space="preserve"><value>Explorer の反映</value></data>
   <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>フォルダアイコン適用後に Explorer ウィンドウを開き直す</value></data>
   <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>対象フォルダ周辺の Explorer ウィンドウだけを開き直して、変更をすぐ反映します。タスクバーとスタートメニューは再起動しません。</value></data>
