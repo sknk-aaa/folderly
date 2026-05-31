@@ -12,10 +12,10 @@
 | Package family name | `KanekoApps.Folderly_q8156m1pgwn5a` |
 | Store ID | `9N99JH5H91H8` |
 | Store URL | `https://apps.microsoft.com/detail/9N99JH5H91H8` |
-| Current version | `1.0.17.0` |
+| Current version | `1.2.0.0`（アプリ表示 `1.2.0`） |
 | Min OS | Windows 10 1809 (`10.0.17763.0`) |
 
-バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.0.17.0` は OK、`1.0.0.17` は NG。次リリースは `1.0.18.0` とする。
+バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.2.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースは `1.3.0.0` など 4 桁目 0。
 
 ## Key URLs
 
@@ -49,7 +49,7 @@ Visual Studio がこの環境で Publish / Store / Create App Packages を表示
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$version = '1.0.17.0'
+$version = '1.2.0.0'
 $root = (Resolve-Path .).Path
 $outDir = Join-Path $root '_out'
 $stage = Join-Path $outDir "store_msix_stage_$version"
@@ -72,8 +72,8 @@ $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeapp
 MSIX 内容確認：
 
 ```powershell
-$msix = '_out\Folderly_1.0.17.0_x64_store.msix'
-$verify = '_out\verify_store_msix_manifest_1.0.17.0'
+$msix = '_out\Folderly_1.2.0.0_x64_store.msix'
+$verify = '_out\verify_store_msix_manifest_1.2.0.0'
 $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe'
 Remove-Item -LiteralPath $verify -Recurse -Force -ErrorAction SilentlyContinue
 & $makeappx unpack /p $msix /d $verify
@@ -86,15 +86,15 @@ Get-Content (Join-Path $verify 'AppxManifest.xml')
 
 Store 用パッケージ（Partner Center へアップロードするもの）はローカルに直接インストールできない。ローカルテスト用にはコピーに署名した sideload パッケージを使う。
 
-- Store upload: `_out\Folderly_1.0.17.0_x64_store.msix`（署名なし）
-- Local install: `_out\Folderly_1.0.17.0_x64_sideload.msix`（署名済み）
+- Store upload: `_out\Folderly_1.2.0.0_x64_store.msix`（署名なし）
+- Local install: `_out\Folderly_1.2.0.0_x64_sideload.msix`（署名済み）
 
 ```powershell
 $ErrorActionPreference = 'Stop'
 $publisher = 'CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E'
 $root = (Resolve-Path .).Path
-$storeMsix = Join-Path $root '_out\Folderly_1.0.17.0_x64_store.msix'
-$sideloadMsix = Join-Path $root '_out\Folderly_1.0.17.0_x64_sideload.msix'
+$storeMsix = Join-Path $root '_out\Folderly_1.2.0.0_x64_store.msix'
+$sideloadMsix = Join-Path $root '_out\Folderly_1.2.0.0_x64_sideload.msix'
 $certPath = Join-Path $root '_out\Folderly_LocalSideload.cer'
 
 $cert = Get-ChildItem Cert:\CurrentUser\My |
@@ -176,7 +176,7 @@ dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj `
 | Privacy Policy URL | `https://sknk-aaa.github.io/folderly/` |
 | Support URL | `https://sknk-aaa.github.io/folderly/#support` |
 | Price | 300 JPY |
-| Trial | 7 days |
+| Trial | 1 day |
 
 Age rating：ローカルデスクトップユーティリティ。ユーザー生成コンテンツ共有・ギャンブル・成人向けコンテンツなし。
 
@@ -190,55 +190,59 @@ Folderly only operates on folders explicitly selected by the user. It does not r
 
 ## Store Listing Text
 
+> ASO で確定したコピー（2026-05 のキーワード調査ベース）。Partner Center に貼る元データ。
+
 ### Japanese
 
-**App Name**: Folderly - フォルダのサムネイル変更
+**App Name**: Folderly - フォルダアイコンを画像に変更
 
-**Short Description**: フォルダの見た目を、好きな画像と色タグでカスタマイズできます。
+**Short Description**: フォルダのアイコンを好きな画像に変更。.ico変換も難しい設定も不要で、ドラッグするだけ。色タグでフォルダを一目で見分けられます。
 
 **Long Description**:
 
-Folderly は、Windows のフォルダアイコンを好きな画像でカスタマイズできるデスクトップアプリです。
+Folderly は、Windows 10 / 11 のフォルダアイコンを好きな画像に変更できるアプリです。
 
-写真、イラスト、ロゴ、スクリーンショットなどを選んで、フォルダの表紙のように表示できます。色タグやタグ名も使えるので、仕事、学習、制作、保管用など、フォルダの用途を見た目で分けやすくなります。
+写真・イラスト・ロゴ・スクリーンショットなどを、そのままフォルダの「表紙」にできます。.ico への変換も、面倒な設定もいりません。お気に入りの画像で可愛くしたり、目的のフォルダを一目で見分けたり、自由にカスタマイズできます。
 
 主な機能:
-- フォルダを右クリックしてすぐにカスタマイズ
-- 好きな画像をフォルダアイコンに適用
-- 余白なし、横幅最大、縦幅最大の表示モード
-- 拡大率と X/Y 位置の調整
-- 色タグの選択・タグ名の編集・タグアイコンの選択
-- アイコン上のタグ名・タグアイコン表示 ON/OFF
-- 適用履歴の確認・元に戻す
+- フォルダを右クリックして「Folderlyでカスタマイズ」
+- 好きな画像（PNG / JPG）をドラッグするだけ。.ico 変換は不要
+- 拡大率・位置・表示モードをプレビューで調整
+- 色タグやタグ名でフォルダを分類（仕事・学習・写真・制作など）
+- 買い切り。サブスクなし・広告なし・PC内だけで完結
+- いつでも元のフォルダに戻せる
 
-注意: アイコン更新時に、対象の Explorer ウィンドウを開き直す場合があります。Windows のアイコンキャッシュを更新するための動作です。
+注意: アイコン適用後、対象の Explorer ウィンドウが一瞬開き直すことがあります。新しいアイコンをすぐ反映させるための動作です。
 
-**Keywords**: フォルダ, アイコン, カスタマイズ, サムネイル, 整理, タグ, Windows, ファイル管理, デスクトップ
+**Keywords**（検索用語・7枠）: `フォルダ アイコン 画像` / `フォルダ アイコン 可愛い` / `フォルダ 色 変更` / `フォルダ アイコン windows11` / `アイコン カスタマイズ` / `デスクトップ 整理` / `フォルダ アイコン ico`
 
 ### English
 
-**App Name**: Folderly - Folder Thumbnail Changer
+**App Name**: Folderly - Folder Icon Changer
 
-**Short Description**: Customize Windows folders with your own images and color tags.
+**Short Description**: Change Windows folder icons to your own photos and images. Color-tag and organize any folder right from the right-click menu — no .ico conversion needed.
 
 **Long Description**:
 
-Folderly lets you customize Windows folder icons with your own images.
+Folderly lets you change Windows folder icons to your own images — no .ico file conversion needed.
 
-Choose a photo, illustration, logo, or screenshot and use it like a visual cover for a folder. You can also choose color tags and tag labels, making it easier to visually separate folders for work, study, creative projects, archives, and more.
+Pick a photo, illustration, logo, or screenshot and use it as a visual cover for any folder. Add color tags to tell folders apart at a glance, making it easier to organize folders for work, study, creative projects, and archives.
 
 Key features:
-- Customize a folder directly from the right-click menu
-- Apply your own image to a folder icon
-- Choose from no-margin, fit-width, and fit-height display modes
-- Adjust zoom and X/Y position
-- Choose color tags, edit tag names, choose tag icons
-- Show or hide tag names/icons on icons
-- View application history and revert customized folders
+- Change a folder icon right from the right-click menu
+- Apply any image (PNG, JPG) — no .ico conversion required
+- No-margin, fit-width, and fit-height display modes
+- Adjust zoom and X/Y position with live preview
+- Color-tag folders and edit tag names
+- Choose tag icons, and show or hide tag names on icons
+- View your customization history
+- Revert any folder back to normal anytime
 
-Note: Folderly may reopen the target Explorer window after applying an icon to refresh the Windows icon cache.
+One-time purchase. No subscription, no ads, runs entirely on your PC.
 
-**Keywords**: folder, icon, customize, folder icon, organization, productivity, windows, tag, file management, thumbnail
+Note: Folderly may briefly reopen the target Explorer window after applying an icon. This refreshes the Windows icon cache so your new icon shows right away.
+
+**Keywords**（search terms・7 slots）: `custom folder icon` / `change folder icon` / `folder color tag` / `organize folders` / `desktop organization` / `folder image` / `folder customizer`
 
 **Screenshot Plan**:
 1. Explorer 右クリックメニューに Folderly コマンドが表示されている画面
@@ -262,7 +266,7 @@ Note: Folderly may reopen the target Explorer window after applying an icon to r
 5. 提出した MSIX のファイル名と SHA-256
 
 ```powershell
-Get-FileHash .\_out\Folderly_1.0.17.0_x64_store.msix -Algorithm SHA256
+Get-FileHash .\_out\Folderly_1.2.0.0_x64_store.msix -Algorithm SHA256
 ```
 
 ### 指摘別の切り分け

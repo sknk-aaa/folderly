@@ -12,8 +12,8 @@ WPF + WebView2 エディタ + ImageSharp + SQLite + MSIX（Explorer コンテキ
 
 ## Current State
 
-- Current Store package version: `1.0.17.0`
-- Current Store candidate: `_out\Folderly_1.0.17.0_x64_store.msix`
+- Current Store package version: `1.2.0.0`（アプリ表示 `1.2.0`）
+- Current Store candidate: `_out\Folderly_1.2.0.0_x64_store.msix`
 - Tests: `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
 
 ## Non-Negotiable Implementation Contracts
@@ -68,4 +68,4 @@ WPF + WebView2 エディタ + ImageSharp + SQLite + MSIX（Explorer コンテキ
 - Store publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
 - 旧 sideload ビルドの publisher は `CN=Folderly`（別 identity）。
 - Visual Studio がこの環境で Publish / Store / Create App Packages を表示しないため、Store 候補は `makeappx` で手動作成。
-- Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.0.17.0` は OK、`1.0.0.17` は NG。
+- Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.2.0.0` は OK、`1.0.0.17` は NG。

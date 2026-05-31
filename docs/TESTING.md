@@ -2,16 +2,17 @@
 
 Use this checklist when validating a new Folderly build on Windows.
 
-Current verified baseline:
+Current candidate:
 
-- Date: 2026-05-25
+- Date: 2026-05-31
 - Store package identity: `KanekoApps.Folderly`
-- Store package version: `1.0.17.0`
-- Store candidate package: `_out/Folderly_1.0.17.0_x64_store.msix`
-- Partner Center package upload: previous candidate completed; upload the latest regenerated Store package after fixes
+- Store package version: `1.2.0.0`（アプリ表示 `1.2.0`）
+- Store candidate package: `_out/Folderly_1.2.0.0_x64_store.msix`
+- SHA-256: `906452A7C1A2B95E3800F76D8C03EA3475AFC0D724A16CCF6BFDB6384943F2F3`
 - Architecture: x64
 - Automated tests: `137` passed
-- Final manual QA: completed for `1.0.17.0`; corrected package resubmitted and certification pending
+- Feature verification: 1.2.0 の変更点（タグアイコン反映・色/アイコン追加・移動フォルダ3択解除・設定/ヘルプ）を Debug ビルドで目視確認済み
+- Pending: パッケージ形態でのフル手動チェックリスト、および Partner Center へのアップロード
 
 Historical note:
 
@@ -54,10 +55,10 @@ Supporting evidence for the certification fix submission is recorded in [CERTIFI
 - [ ] MSIX payload includes `WebView2Loader.dll` at the package root.
 - [ ] `Package.appxmanifest` has Store identity `KanekoApps.Folderly`.
 - [ ] `Package.appxmanifest` has Publisher `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
-- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.0.17.0`.
+- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.2.0.0`.
 - [ ] Partner Center accepts the uploaded package.
 - [ ] If sideload testing locally, the signing certificate subject matches the active package publisher.
-- [ ] If sideload testing locally, install `_out/Folderly_1.0.17.0_x64_sideload.msix`, not the unsigned Store package.
+- [ ] If sideload testing locally, install `_out/Folderly_1.2.0.0_x64_sideload.msix`, not the unsigned Store package.
 - [ ] The sideload certificate is trusted in LocalMachine Root/TrustedPeople if `Add-AppxPackage` reports `0x800B0109`.
 - [ ] Old `Folderly.FolderlyApp 1.0.0.16` is uninstalled before testing the Store identity.
 - [ ] App launches from Start menu.
