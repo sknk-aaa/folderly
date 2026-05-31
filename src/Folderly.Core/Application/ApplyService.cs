@@ -109,23 +109,24 @@ public sealed class ApplyService
 
         // 6. ICO ファイル保存（パスをハッシュ由来でユニークにし、Explorer アイコンキャッシュ無効化）
         var iconFileName = $"cover_{iconHash[..8]}.ico";
-        var (centralIcoPath, _) = await SaveIcoFilesAsync(
+        var (centralIcoPath, localIcoPath) = await SaveIcoFilesAsync(
             folderPath, iconHash, iconFileName, icoBytes, ct);
 
         // 7. _folderly ディレクトリ作成（SaveIcoFilesAsync 内で作成済だが念のため）
         var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
         Directory.CreateDirectory(folderlyDir);
 
-        // 8. desktop.ini 書き込み
-        // Explorer は OneDrive 配下の ICO をすぐ再読込しないことがあるため、
-        // IconResource は常にローカル AppData に保存した ICO を指す。
+        // 8. Explorer recognizes desktop.ini only on a customized folder.
+        // Use a unique relative icon path in the folder so a new customization
+        // also changes Explorer's icon resource identity without admin access.
+        FolderAttributesService.ApplyFolderAttributes(folderPath);
+        var iconResourcePath = Path.GetRelativePath(folderPath, localIcoPath);
         DesktopIniManager.Write(
             folderPath,
-            centralIcoPath,
+            iconResourcePath,
             existingIniContent);
 
         // 9. ファイル属性設定
-        FolderAttributesService.ApplyFolderAttributes(folderPath);
         FolderAttributesService.ApplyDesktopIniAttributes(iniPath);
         FolderAttributesService.ApplyHiddenFolderlyAttributes(folderlyDir);
 

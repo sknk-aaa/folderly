@@ -125,6 +125,23 @@ public class DesktopIniManagerTests : IDisposable
     }
 
     [Fact]
+    public void Write_ExistingHiddenSystemFile_UpdatesAndRetainsAttributes()
+    {
+        var iniPath = Path.Combine(_tempDir, "desktop.ini");
+        DesktopIniManager.Write(_tempDir, @"_folderly\cover_old.ico");
+        File.SetAttributes(iniPath, FileAttributes.Hidden | FileAttributes.System);
+
+        DesktopIniManager.Write(_tempDir, @"_folderly\cover_new.ico",
+            DesktopIniManager.Read(_tempDir));
+
+        var content = DesktopIniManager.Read(_tempDir);
+        var attributes = File.GetAttributes(iniPath);
+        Assert.Contains(@"_folderly\cover_new.ico", content);
+        Assert.True(attributes.HasFlag(FileAttributes.Hidden));
+        Assert.True(attributes.HasFlag(FileAttributes.System));
+    }
+
+    [Fact]
     public void UpdateOrAddKey_NoSection_AddsSection()
     {
         var content = "[Other]\r\nKey=Val\r\n";

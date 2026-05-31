@@ -15,7 +15,7 @@
   <Identity
     Name="KanekoApps.Folderly"
     Publisher="CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E"
-    Version="1.0.16.0"
+    Version="1.2.0.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
@@ -56,19 +56,20 @@
       <Extensions>
 
         <!--
-          COM SurrogateServer 登録。
-          Folderly.ContextMenu.comhost.dll が IExplorerCommand を公開し、Explorer から
-          DLL surrogate 経由で読み込まれる。
+          Self-contained out-of-process COM server for Explorer.
+          Folderly.exe implements IExplorerCommand in COM server mode.
           Clsid: {2A7A05DA-70D8-4302-8B23-AE8D79D801B6}
         -->
         <com:Extension Category="windows.comServer">
           <com:ComServer>
-            <com:SurrogateServer DisplayName="Folderly Context Menu Handler">
+            <com:ExeServer
+              Executable="Folderly.exe"
+              DisplayName="Folderly Context Menu Handler"
+              Arguments="--com-server">
               <com:Class
                 Id="2A7A05DA-70D8-4302-8B23-AE8D79D801B6"
-                Path="Folderly.ContextMenu.comhost.dll"
-                ThreadingModel="STA" />
-            </com:SurrogateServer>
+                DisplayName="Folderly.ContextMenuHandler" />
+            </com:ExeServer>
           </com:ComServer>
         </com:Extension>
 

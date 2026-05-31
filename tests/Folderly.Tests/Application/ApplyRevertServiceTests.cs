@@ -149,17 +149,19 @@ public class ApplyRevertServiceTests : IDisposable
     [Fact]
     public async Task ApplyAsync_Reapply_DesktopIniPointsToLatestIco()
     {
+        var folderlyDir = Path.Combine(_tempDir, FolderlyConstants.FolderlyDirectoryName);
+
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Blue));
-        var firstEntry = _repo.GetByPath(Path.GetFullPath(_tempDir));
-        var firstIco = firstEntry!.IconStoragePath;
+        var firstIco = Directory.GetFiles(folderlyDir, "cover_*.ico").Single();
 
         await _applyService.ApplyAsync(MakeRequest(tagColor: TagColors.Red));
-        var latestEntry = _repo.GetByPath(Path.GetFullPath(_tempDir));
-        var latestIco = latestEntry!.IconStoragePath;
+        var latestIco = Directory.GetFiles(folderlyDir, "cover_*.ico")
+            .Single(path => !string.Equals(path, firstIco, StringComparison.OrdinalIgnoreCase));
 
         var content = DesktopIniManager.Read(_tempDir);
-        var expectedResource = $@"IconResource={latestIco},0";
-        var expectedFile = $@"IconFile={latestIco}";
+        var latestRelativePath = $@"{FolderlyConstants.FolderlyDirectoryName}\{Path.GetFileName(latestIco)}";
+        var expectedResource = $@"IconResource={latestRelativePath},0";
+        var expectedFile = $@"IconFile={latestRelativePath}";
         Assert.NotEqual(firstIco, latestIco);
         Assert.Contains(expectedResource, content);
         Assert.Contains(expectedFile, content);
@@ -283,6 +285,9 @@ public class ApplyRevertServiceTests : IDisposable
             var result = await _applyService.ApplyAsync(req);
 
             Assert.True(result.IsSuccess);
+            var content = DesktopIniManager.Read(subPath);
+            Assert.Contains($@"IconResource={FolderlyConstants.FolderlyDirectoryName}\cover_", content);
+            Assert.DoesNotContain(_folderlyDataDir, content);
         }
         finally
         {

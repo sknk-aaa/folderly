@@ -664,7 +664,7 @@ public partial class ApplyWindow : Window
         if (protection.IsWarning)
         {
             var L   = AppServices.Localize;
-            var msg = IsOneDrivePath(_vm.FolderPath)
+            var msg = FolderProtection.IsOneDrivePath(_vm.FolderPath)
                 ? L["OneDriveWarningMessage"]
                 : string.Format(L["WarningGenericMessage"], protection.Reason);
             var res = MessageBox.Show(msg, L["WarningGenericTitle"],
@@ -734,27 +734,6 @@ public partial class ApplyWindow : Window
 
     private static bool ShouldReopenExplorer()
         => AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
-
-    private static bool IsOneDrivePath(string folderPath)
-    {
-        var normalized = Path.GetFullPath(folderPath)
-            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-            + Path.DirectorySeparatorChar;
-
-        return IsUnderRoot(normalized, Environment.GetEnvironmentVariable("OneDrive")) ||
-               IsUnderRoot(normalized, Environment.GetEnvironmentVariable("OneDriveCommercial"));
-
-        static bool IsUnderRoot(string normalizedPath, string? root)
-        {
-            if (string.IsNullOrWhiteSpace(root)) return false;
-
-            var normalizedRoot = Path.GetFullPath(root)
-                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                + Path.DirectorySeparatorChar;
-
-            return normalizedPath.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase);
-        }
-    }
 
     private static async Task ReopenExplorerWindowsAsync(string folderPath)
     {

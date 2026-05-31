@@ -55,15 +55,32 @@ public static class DesktopIniManager
     {
         var iniPath = Path.Combine(folderPath, "desktop.ini");
         var tempPath = iniPath + ".tmp";
+        FileAttributes? originalAttributes = null;
         try
         {
+            if (File.Exists(iniPath))
+            {
+                originalAttributes = File.GetAttributes(iniPath);
+                var writableAttributes = originalAttributes.Value
+                    & ~(FileAttributes.Hidden | FileAttributes.System | FileAttributes.ReadOnly);
+                File.SetAttributes(
+                    iniPath,
+                    writableAttributes == 0 ? FileAttributes.Normal : writableAttributes);
+            }
+
             File.WriteAllText(tempPath, content, Utf16LeBom);
             File.Move(tempPath, iniPath, overwrite: true);
+
+            if (originalAttributes.HasValue)
+                File.SetAttributes(iniPath, originalAttributes.Value);
         }
         finally
         {
             if (File.Exists(tempPath))
                 File.Delete(tempPath);
+
+            if (originalAttributes.HasValue && File.Exists(iniPath))
+                File.SetAttributes(iniPath, originalAttributes.Value);
         }
     }
 

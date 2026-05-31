@@ -14,13 +14,7 @@ public sealed class ShellNotifier : IShellNotifier
     {
         TryTouchFolder(folderPath);
         TouchFolderAttributesWithoutClearingCustomization(folderPath);
-
-        // グローバルアイコンキャッシュを更新
-        NativeMethods.SHChangeNotify(
-            NativeMethods.SHCNE_UPDATEIMAGE,
-            NativeMethods.SHCNF_FLUSH,
-            nint.Zero,
-            nint.Zero);
+        ApplyIconWithShellApi(folderPath);
 
         // 特定フォルダへの変更通知
         var parentPath = Directory.GetParent(folderPath)?.FullName;
@@ -56,9 +50,6 @@ public sealed class ShellNotifier : IShellNotifier
         // UPDATEDIR だけでは古いキャッシュが残るケースに対応するための直接的なアプローチ
         ForceIconIndexUpdate(folderPath);
 
-        // 自己リネームトリック: Explorer にフォルダのメタデータ（desktop.ini含む）を強制再読み込みさせる
-        NotifyRenameFolderToSelf(folderPath);
-
         // Shell.Application 経由で開いている Explorer ウィンドウを直接 Refresh する。
         // SHChangeNotify は非同期処理キューに積むだけだが、Document.Refresh() は
         // 対象ウィンドウの再描画を即座に強制するため、開いているウィンドウがあれば即時反映できる。
@@ -74,12 +65,6 @@ public sealed class ShellNotifier : IShellNotifier
     {
         TryTouchFolder(folderPath);
         TouchFolderAttributesWithoutClearingCustomization(folderPath);
-
-        NativeMethods.SHChangeNotify(
-            NativeMethods.SHCNE_UPDATEIMAGE,
-            NativeMethods.SHCNF_FLUSH,
-            nint.Zero,
-            nint.Zero);
 
         var parentPath = Directory.GetParent(folderPath)?.FullName;
         var desktopIniPath = Path.Combine(folderPath, "desktop.ini");
@@ -103,7 +88,6 @@ public sealed class ShellNotifier : IShellNotifier
 
         ForceThumbnailExtraction(folderPath);
         ForceIconIndexUpdate(folderPath);
-        NotifyRenameFolderToSelf(folderPath);
         RefreshExplorerWindows(folderPath);
     }
 
@@ -221,6 +205,36 @@ public sealed class ShellNotifier : IShellNotifier
             File.SetAttributes(folderPath, attrs);
         }
         catch { }
+    }
+
+    private static void ApplyIconWithShellApi(string folderPath)
+    {
+        if (!Directory.Exists(folderPath) || folderPath.Length >= 260)
+            return;
+
+        var iconPath = ReadIconResourcePath(Path.Combine(folderPath, "desktop.ini"));
+        if (string.IsNullOrWhiteSpace(iconPath))
+            return;
+
+        var nativeIconPath = Marshal.StringToCoTaskMemUni(iconPath);
+        try
+        {
+            var settings = new NativeMethods.SHFOLDERCUSTOMSETTINGS
+            {
+                dwSize = (uint)Marshal.SizeOf<NativeMethods.SHFOLDERCUSTOMSETTINGS>(),
+                dwMask = NativeMethods.FCSM_ICONFILE,
+                pszIconFile = nativeIconPath,
+                iIconIndex = 0,
+            };
+            NativeMethods.SHGetSetFolderCustomSettings(
+                ref settings,
+                folderPath,
+                NativeMethods.FCS_FORCEWRITE);
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(nativeIconPath);
+        }
     }
 
     private static void NotifyCurrentIcon(string? iconPath)
@@ -370,22 +384,6 @@ public sealed class ShellNotifier : IShellNotifier
                 Marshal.ReleaseComObject(item);
             if (cacheObject is not null)
                 Marshal.ReleaseComObject(cacheObject);
-        }
-    }
-
-    private static unsafe void NotifyRenameFolderToSelf(string path)
-    {
-        if (!Directory.Exists(path)) return;
-        // 異なるオブジェクト（別アドレス）で同一内容の文字列を生成し、
-        // p1 != p2 を保証したうえで "自分自身へのリネーム" を通知する
-        var pathCopy = new string(path.AsSpan());
-        fixed (char* p1 = path)
-        fixed (char* p2 = pathCopy)
-        {
-            NativeMethods.SHChangeNotify(
-                NativeMethods.SHCNE_RENAMEFOLDER,
-                NativeMethods.SHCNF_PATHW | NativeMethods.SHCNF_FLUSH,
-                (nint)p1, (nint)p2);
         }
     }
 

@@ -63,10 +63,7 @@ public static class FolderProtection
             return Denied("書き込み権限がありません");
 
         // ⑤ 警告: OneDrive 配下
-        var oneDrive = Environment.GetEnvironmentVariable("OneDrive");
-        var oneDriveCommercial = Environment.GetEnvironmentVariable("OneDriveCommercial");
-        if ((!string.IsNullOrEmpty(oneDrive) && IsSubPathOf(normalized, oneDrive)) ||
-            (!string.IsNullOrEmpty(oneDriveCommercial) && IsSubPathOf(normalized, oneDriveCommercial)))
+        if (IsOneDrivePath(normalized))
             return Warning("OneDrive フォルダです。変更は他のデバイスにも同期される可能性があります");
 
         // ⑥ 警告: Dropbox 配下（パス文字列判定、保守的実装）
@@ -78,6 +75,27 @@ public static class FolderProtection
             return Warning("パスが 260 文字を超えています");
 
         return new ProtectionResult(ProtectionLevel.Allowed, null);
+    }
+
+    public static bool IsOneDrivePath(string path)
+    {
+        var normalized = Path.GetFullPath(path).TrimEnd(
+            Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        return IsSameOrSubPathOf(normalized, Environment.GetEnvironmentVariable("OneDrive")) ||
+               IsSameOrSubPathOf(normalized, Environment.GetEnvironmentVariable("OneDriveConsumer")) ||
+               IsSameOrSubPathOf(normalized, Environment.GetEnvironmentVariable("OneDriveCommercial"));
+    }
+
+    private static bool IsSameOrSubPathOf(string path, string? root)
+    {
+        if (string.IsNullOrWhiteSpace(root))
+            return false;
+
+        var normalizedRoot = Path.GetFullPath(root)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return string.Equals(path, normalizedRoot, StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith(normalizedRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsSubPathOf(string path, string root)

@@ -91,6 +91,24 @@ public class FolderProtectionTests : IDisposable
     }
 
     [Fact]
+    public void IsOneDrivePath_RootAndConsumerPath_AreDetected()
+    {
+        var originalOneDriveConsumer = Environment.GetEnvironmentVariable("OneDriveConsumer");
+        try
+        {
+            Environment.SetEnvironmentVariable("OneDriveConsumer", _tempDir);
+            var childPath = Path.Combine(_tempDir, "Child");
+
+            Assert.True(FolderProtection.IsOneDrivePath(_tempDir));
+            Assert.True(FolderProtection.IsOneDrivePath(childPath));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("OneDriveConsumer", originalOneDriveConsumer);
+        }
+    }
+
+    [Fact]
     public void CheckPath_NoWriteAccess_IsDenied()
     {
         // chmod 444（読み取り専用）のディレクトリを作成
