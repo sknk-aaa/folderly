@@ -144,7 +144,7 @@
   <data name="RevertFailed" xml:space="preserve"><value>復元に失敗しました: {0}</value></data>
   <data name="FolderMovedTitle" xml:space="preserve"><value>フォルダが見つかりません</value></data>
   <data name="FolderMovedMessage" xml:space="preserve"><value>フォルダのパスが変更されています（移動または名前変更された可能性があります）：&#x0a;{0}&#x0a;&#x0a;どうしますか？</value></data>
-  <data name="FolderMovedLocate" xml:space="preserve"><value>フォルダを指定して解除（推奨）</value></data>
+  <data name="FolderMovedLocate" xml:space="preserve"><value>フォルダを指定して元に戻す（推奨）</value></data>
   <data name="FolderMovedHistoryOnly" xml:space="preserve"><value>履歴のみ削除</value></data>
   <data name="FolderMovedLocateTitle" xml:space="preserve"><value>解除するフォルダを選択</value></data>
   <data name="FolderMismatchTitle" xml:space="preserve"><value>フォルダが一致しません</value></data>
