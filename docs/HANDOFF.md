@@ -35,13 +35,14 @@ Webサイト（2026-06-01 完了）：
 - **JP LP（`/`）と EN LP（`/en/`）を公開**（Claude Design ハンドオフ `Folderly LP.html` を忠実再現）。JPをルートに（主市場が日本のため）、ENを `/en/`。言語切替（English↔日本語）＋hreflang（ja=`/`、en=`/en/`、x-default=`/en/`）整備済み。`/privacy/` 移設済み。
 - 画像：JPは `/assets/`、ENは英語UIで撮り直した版を `/assets/en/`（キャプション帯は切り取り）。
 - 価格：**JP ¥500 / EN $3.99 買い切り**（Store価格に一致。Store JPは¥500に変更済み）。
+- **Partner Center の Privacy/Support URL を `https://folderlyapp.com/privacy/`（#support）に更新する更新サブミッションを提出済み**（前回認定完了後に実施・認定待ち）。
+- **Google Search Console・Bing Webmaster Tools に `folderlyapp.com` を登録、sitemap 送信済み**（Bing は GSC からインポート）。
 
 未完了（次バージョン以降）：
-- Partner Center の Privacy/Support URL を `https://folderlyapp.com/privacy/` に更新（再提出不要・優先度高）
-- アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え（次バージョン時）
-- ChatGPT モックが完成したら `/index.html`・`/ja/index.html` にLP本体を差し込み
-- Google Search Console・Bing Webmaster Tools に `folderlyapp.com` を登録し sitemap 送信
-- `www.folderlyapp.com` → apex への 301 リダイレクト設定（Cloudflare Redirect Rules）
+- アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え（次バージョン時。現状は旧 github.io を指すが生存中なので動作はする）
+- `www.folderlyapp.com` → apex への 301 リダイレクト設定（Cloudflare Redirect Rules・任意）
+- how-to 記事（`/blog/`・日英）で検索流入を作る
+- EN 画像の最適化（容量削減）
 
 メモ：
 - 試用期限切れ後の起動ブロックは Microsoft Store の自動挙動に委ねる方針（アプリ側の強制ロジックは未実装）。runFullTrust パッケージ済みデスクトップアプリでの自動ブロック挙動は実機で要確認。効かない場合は次バージョンで `IsActive` 判定による Apply 無効化＋購入プロンプトを追加検討。
