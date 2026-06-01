@@ -13,7 +13,7 @@
 ## チャネル方針
 
 - **本命：SEOランディングページ → Microsoft Store へ送客**（外部流入を作る）。
-- **直接販売（Store外）は保留**。¥300 単価に対し、コード署名・決済手数料・各国税・ライセンス基盤・サポートの固定費が見合わない。将来やるなら Merchant of Record（Paddle / Lemon Squeezy 等）。LPは「あとで Buy direct を足せる」余地だけ残す。
+- **直接販売（Store外）は保留**。¥500 単価に対し、コード署名・決済手数料・各国税・ライセンス基盤・サポートの固定費が見合わない。将来やるなら Merchant of Record（Paddle / Lemon Squeezy 等）。LPは「あとで Buy direct を足せる」余地だけ残す。
 - **公開基盤**：独自ドメイン **`folderlyapp.com`**（2026-06-01 決定。`folderly.com`＝メール到達性SaaS、`folderly.app`＝他社取得済みのため回避）＋ **Cloudflare Pages**（原価ドメイン・無料プライバシー配慮アナリティクス・エッジ拡張）。**言語別URL＋hreflang** で日英を別ページ最適化。canonical は apex（`folderlyapp.com`）、`www` は apex へリダイレクト。
   - 移行注意：現 `sknk-aaa.github.io/folderly/` は Store のプライバシー/サポートURL＋アプリ内ヘルプ(`#faq`)から参照中。新ドメイン移行時は Store URL 更新（再提出不要）＋旧URLはリダイレクトで生かす。公開コンテンツの正本は1ドメインに統一（重複コンテンツ回避）。
 - 補助チャネル（コツコツ型）：Reddit（r/Windows11 等・Before/After投稿）、YouTube Shorts（how-to）、日本語記事（note/Qiita）。
@@ -66,13 +66,13 @@
 
 | 競合 | 価格 | 特徴 | 対 Folderly |
 |---|---|---|---|
-| FolderIco（Store外・老舗） | $29.99 | ワンクリック色付け中心、**写真カバー非対応** | Folderlyは自分の画像OK・¥300 |
+| FolderIco（Store外・老舗） | $29.99 | ワンクリック色付け中心、**写真カバー非対応** | Folderlyは自分の画像OK・¥500 |
 | Folder Marker | 有料 | ワンクリック、優先度色分け | 同上 |
 | Folder Icon Changer PRO（MS Store / MakeTone） | ¥980 | 画像→アイコン D&D・**レビュー0** | UI/価格で優位、レビュー薄く割って入れる |
 | Folder Icon Change / Custom Folder Icon Changer / FolderIconStudio 等 | 無料〜 | 既製アイコン選択型も混在 | 「自分の画像が使える」で差別化 |
 
 - 市場は同名アプリが密集するが**レビュー定着が薄い**（PRO=0件）。**レビューを数件取るだけで信頼度上位に並べる**。
-- Folderly差別化：**自分の画像／¥300買い切り／色タグ・タグ名／プレビュー調整／いつでも元に戻す**。
+- Folderly差別化：**自分の画像／¥500買い切り／色タグ・タグ名／プレビュー調整／いつでも元に戻す**。
 - 英語側は "free / png / download / crack" 意図が濃い＝価格で勝てない層は捨て、「ラクして綺麗に」で勝つ。
 
 ## サイト / LP 設計
@@ -99,7 +99,7 @@ SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(e
 ## 残タスク
 
 - [ ] キーワード実数取得（Keyword Surfer 継続 ＋ 余力で Microsoft 広告/Google プランナー）
-- [ ] `folderlyapp.com` を Cloudflare Registrar で登録 → Cloudflare Pages 公開（言語別URL＋hreflang、旧github.ioから移行）
+- [x] `folderlyapp.com` 公開（Cloudflare Pages、リポ `folderly-web`）。**JP LP をルート `/` に公開済み**（Claude Design 忠実再現・¥500）。privacy/FAQ は `/privacy/`。EN は `/en/` 後日。
 - [ ] LP（日英）＋ how-to 記事（日英）制作。モックは ChatGPT、コピーは本doc/OPERATIONS準拠
 - [ ] スクリーンショット/動画の作り込み（Before/Afterヒーロー＋短尺デモ）
 - [ ] レビュー獲得策（初期数件で競合に並ぶ）

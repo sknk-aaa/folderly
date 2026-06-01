@@ -175,7 +175,7 @@ dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj `
 | Device family | Windows 10/11 Desktop のみ |
 | Privacy Policy URL | `https://sknk-aaa.github.io/folderly/` |
 | Support URL | `https://sknk-aaa.github.io/folderly/#support` |
-| Price | 300 JPY |
+| Price | 500 JPY |
 | Trial | 1 day |
 
 Age rating：ローカルデスクトップユーティリティ。ユーザー生成コンテンツ共有・ギャンブル・成人向けコンテンツなし。
