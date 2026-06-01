@@ -32,8 +32,9 @@
 Webサイト（2026-06-01 完了）：
 - ドメイン `folderlyapp.com` を取得（お名前.com）・Cloudflare 管理へ移行・Active 確認済み
 - `folderly-web` リポジトリ（`github.com/sknk-aaa/folderly-web`）を作成・Cloudflare Pages に接続・公開済み
-- **JP LP 本体を公開**（Claude Design ハンドオフ `Folderly LP.html` を忠実再現）。ルート `/` に配置（主市場が日本のため）。画像は `/assets/`。`/privacy/` は移設済み。EN版は `/en/` に後日。
-- 価格は **¥500 買い切り**（Store側も¥500に変更済み）。LP・docs を ¥500 に統一。
+- **JP LP（`/`）と EN LP（`/en/`）を公開**（Claude Design ハンドオフ `Folderly LP.html` を忠実再現）。JPをルートに（主市場が日本のため）、ENを `/en/`。言語切替（English↔日本語）＋hreflang（ja=`/`、en=`/en/`、x-default=`/en/`）整備済み。`/privacy/` 移設済み。
+- 画像：JPは `/assets/`、ENは英語UIで撮り直した版を `/assets/en/`（キャプション帯は切り取り）。
+- 価格：**JP ¥500 / EN $3.99 買い切り**（Store価格に一致。Store JPは¥500に変更済み）。
 
 未完了（次バージョン以降）：
 - Partner Center の Privacy/Support URL を `https://folderlyapp.com/privacy/` に更新（再提出不要・優先度高）

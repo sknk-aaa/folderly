@@ -99,8 +99,11 @@ SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(e
 ## 残タスク
 
 - [ ] キーワード実数取得（Keyword Surfer 継続 ＋ 余力で Microsoft 広告/Google プランナー）
-- [x] `folderlyapp.com` 公開（Cloudflare Pages、リポ `folderly-web`）。**JP LP をルート `/` に公開済み**（Claude Design 忠実再現・¥500）。privacy/FAQ は `/privacy/`。EN は `/en/` 後日。
-- [ ] LP（日英）＋ how-to 記事（日英）制作。モックは ChatGPT、コピーは本doc/OPERATIONS準拠
+- [x] `folderlyapp.com` 公開（Cloudflare Pages、リポ `folderly-web`）。**JP LP をルート `/`・EN LP を `/en/` に公開済み**（Claude Design 忠実再現）。privacy/FAQ は `/privacy/`。言語切替（English↔日本語）＋hreflang（ja=`/`、en=`/en/`、x-default=`/en/`）整備済み。
+  - 価格：JP ¥500 / EN $3.99（US Store価格）。EN画像はキャプション帯を切り取り、英語UIで撮り直した版を `/assets/en/`。
+- [x] LP（日英）制作・公開済み（Claude Design 忠実再現）。
+- [ ] how-to 記事（日英）を `/blog/` に制作（拡散需要を回収して LP/Store へ送客）
+- [ ] EN `solution-folders` 等の画像最適化（合計が大きめ。WebP化/リサイズ）
 - [ ] スクリーンショット/動画の作り込み（Before/Afterヒーロー＋短尺デモ）
 - [ ] レビュー獲得策（初期数件で競合に並ぶ）
 - [ ] 公開後：Reddit / YouTube Shorts / note でコツコツ発信
