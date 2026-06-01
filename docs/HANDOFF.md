@@ -37,11 +37,12 @@ Webサイト（2026-06-01 完了）：
 - 価格：**JP ¥500 / EN $3.99 買い切り**（Store価格に一致。Store JPは¥500に変更済み）。
 - **Partner Center の Privacy/Support URL を `https://folderlyapp.com/privacy/`（#support）に更新する更新サブミッションを提出済み**（前回認定完了後に実施・認定待ち）。
 - **Google Search Console・Bing Webmaster Tools に `folderlyapp.com` を登録、sitemap 送信済み**（Bing は GSC からインポート）。
+- **ブログ記事1本目を公開**：`/blog/windows-folder-icon-change/`「Windows 11でフォルダのアイコンを画像に変更する方法」。手順スクショ・作例画像・比較表・トラブル対処を含む読み物。記事内 CTA は LP（`/`）に一本化（記事→LP→ストアのファネル）。ブログ index・sitemap 登録済み。
 
 未完了（次バージョン以降）：
 - アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え（次バージョン時。現状は旧 github.io を指すが生存中なので動作はする）
 - `www.folderlyapp.com` → apex への 301 リダイレクト設定（Cloudflare Redirect Rules・任意）
-- how-to 記事（`/blog/`・日英）で検索流入を作る
+- how-to 記事の拡充（JP pillar 1本公開済み。残：JP★「変更できない時の対処法」・EN版）
 - EN 画像の最適化（容量削減）
 
 メモ：

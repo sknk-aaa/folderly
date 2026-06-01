@@ -83,13 +83,15 @@ URL構成（言語別＋hreflang）：
                       狙い: フォルダアイコン変更 / フォルダ アイコン 画像 / windows フォルダ アイコン
 /en/         EN LP  title「Folder Icon Changer for Windows 10 & 11 | Folderly」
                       狙い: folder icon changer / change folder icon windows 11 / custom folder icons
-/blog/...    記事(日英) how-to で拡散需要を回収 → LP/Store へ送客
+/blog/...    記事(日英) how-to で拡散需要を回収 → LP へ送客（記事内CTAはLP一本化）
    JP: 「Windows 11でフォルダのアイコンを画像に変更する方法」「フォルダアイコンが変更できない時の対処法」
    EN: 「How to change folder icons on Windows 11」「Custom folder icons not working (fix)」
 ```
 （主市場が日本のため JP をルート `/`、EN を `/en/` に配置。x-default=`/en/`、ja=`/`、en=`/en/`）
 
 ファネル：**記事（how-to・拡散需要回収）→ LP（製品訴求）→ Microsoft Store（購入）**。
+
+**記事内の CTA は LP（`/`）一本化**（ストア直リンクは置かない）。理由：①ストアに送ると以後の計測・改善が一切できないが、LP は計測・AB・再訪導線を自前で持てる ②記事読者は情報収集段階で、購入説得（Before/After・無料試用・価格）は作り込んだ LP に集約した方が転換率が高い ③LP 自体に強いストア CTA が複数あるため遠回りにならない。将来 LP がボトルネックと判明したら部分的にストア直ショートカットを検討（最適化フェーズの判断）。
 
 LP の10セクション骨格：Hero(Before/After＋CTA) → 信頼バー → 課題→解決 → Before/Afterショーケース → 使い方3ステップ → 機能グリッド → 競合比較 → 価格/試用 → FAQ → 最終CTA/フッター。
 
@@ -121,7 +123,7 @@ SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(e
 SERPが情報系なので、how-to/悩み解決記事で拡散需要を回収→LP/Storeへ送客：
 - JP：「Windows 11でフォルダのアイコンを画像に変更する方法」「フォルダアイコンが変更できない時の対処法」「フォルダアイコン 可愛い 画像の作り方」
 - EN：「How to change folder icons on Windows 11」「Custom folder icons not working on Windows 11（fix）」「How to put a picture on a folder」
-- 各記事末から LP/Store へ内部リンク。比較/代替ページ（"FolderIco alternative" 等）も有効。
+- 記事内の CTA・内部リンクは LP（`/`）へ統一（ストア送客は LP が担当）。比較/代替ページ（"FolderIco alternative" 等）も有効。
 
 ### 権威・被リンク（新規ドメイン対策）
 - Product Hunt ローンチ、ソフト系ディレクトリ（AlternativeTo / Softpedia / Softonic）登録、Reddit（r/Windows11・作品見せ）。
@@ -141,7 +143,7 @@ SERPが情報系なので、how-to/悩み解決記事で拡散需要を回収→
   - 価格：JP ¥500 / EN $3.99（US Store価格）。EN画像はキャプション帯を切り取り、英語UIで撮り直した版を `/assets/en/`。
 - [x] LP（日英）制作・公開済み（Claude Design 忠実再現）。
 - [x] SEO/CWV基礎：title最適化・SoftwareApplication構造化データ・全画像WebP化＋preload/width-height（~11MB→~0.5MB）・GSC/Bing登録。
-- [ ] **how-to 記事（日英）を `/blog/` に制作**（拡散需要を回収して LP/Store へ送客。SEOの本命）
+- [~] **how-to 記事を `/blog/` に制作**（SEOの本命）。JP pillar「Windows 11でフォルダのアイコンを画像に変更する方法」公開済み（`/blog/windows-folder-icon-change/`・手順スクショ＋作例＋比較・CTAはLP一本）。残：JP★「変更できない時の対処法」・EN版。
 - [ ] 被リンク：Product Hunt / AlternativeTo・Softpedia / Reddit など（新規ドメインの権威づけ）
 - [ ] スクリーンショット/動画の作り込み（Before/Afterヒーロー＋短尺デモ）
 - [ ] レビュー獲得策（初期数件で競合に並ぶ）
