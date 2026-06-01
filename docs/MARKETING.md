@@ -79,14 +79,15 @@
 
 URL構成（言語別＋hreflang）：
 ```
-/            EN LP   "Folder Icon Changer for Windows 10 & 11"
-                      狙い: change folder icon windows 11 / custom folder icons / folder icon changer
-/ja/         JP LP   "フォルダアイコンを画像に変更"
-                      狙い: フォルダアイコン変更 / windows フォルダ アイコン / フォルダ画像 アイコン
+/            JP LP（x-default） title「フォルダアイコンを画像に変更 | Folderly（Windows 10/11）」
+                      狙い: フォルダアイコン変更 / フォルダ アイコン 画像 / windows フォルダ アイコン
+/en/         EN LP  title「Folder Icon Changer for Windows 10 & 11 | Folderly」
+                      狙い: folder icon changer / change folder icon windows 11 / custom folder icons
 /blog/...    記事(日英) how-to で拡散需要を回収 → LP/Store へ送客
-   JP: 「Windows 11でフォルダのアイコンを“好きな画像”に変える方法」
-   EN: 「How to change folder icons on Windows 11 (to any image)」
+   JP: 「Windows 11でフォルダのアイコンを画像に変更する方法」「フォルダアイコンが変更できない時の対処法」
+   EN: 「How to change folder icons on Windows 11」「Custom folder icons not working (fix)」
 ```
+（主市場が日本のため JP をルート `/`、EN を `/en/` に配置。x-default=`/en/`、ja=`/`、en=`/en/`）
 
 ファネル：**記事（how-to・拡散需要回収）→ LP（製品訴求）→ Microsoft Store（購入）**。
 
@@ -96,14 +97,52 @@ LP の10セクション骨格：Hero(Before/After＋CTA) → 信頼バー → �
 
 SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(en/ja/x-default)・OGP・`sitemap.xml`・`robots.txt`・Search Console/Bing登録。
 
+## SEO戦略（2026-06-01 調査・実装）
+
+### ランキング要因の優先度（調査結論）
+1. **コンテンツ × 検索意図の一致**（最重要）。薄い1枚LPは競合語で上がりにくい。
+2. **被リンク（権威）**。新規ドメイン＝権威ゼロが最大ハンデ。
+3. **Core Web Vitals**（画像がLCPの85%/76%を占める＝画像最適化が単一で最も効く）。
+4. title先頭キーワード／見出し階層／構造化データ／内部リンク／コンテンツ鮮度。
+- 新規ドメインは効果が出るまで概ね **3〜6か月**。on-page は必要条件だが十分条件ではない（順位を動かすのは②コンテンツ＋③被リンク）。
+
+### SERP実態（target語を実見）
+- 「change folder icon windows 11」「フォルダ アイコン 変更」の上位は **Microsoft Support・フォーラム・Q&A・how-to記事** が大半。製品LPはごく一部。
+- **悩み系クエリ**（"Custom ICO not working" / "Cannot change folder icon" / フォルダアイコン 変更できない）が上位＝高需要、かつ **Folderly が直接の解決策**。→ 記事の最優先ターゲット＆高CV。
+
+### 実装済み（on-page / 技術）
+- title をキーワード先頭に（JP「フォルダアイコンを画像に変更 | Folderly（Windows 10/11）」／EN「Folder Icon Changer for Windows 10 & 11 | Folderly」）。
+- description（キーワード入り）・canonical・hreflang(ja/en/x-default)・OGP。
+- **`SoftwareApplication` 構造化データ**（OS・価格 JPY¥500/USD$3.99・DLリンク）。
+- **Core Web Vitals**：全画像を WebP 化＋最大1300px(ロゴ160px)にリサイズ（合計 ~11MB→~0.5MB、hero 937→57KB）。hero に `preload`＋`fetchpriority=high`、全 `<img>` に width/height（CLS防止）、ヒーロー以外は `loading=lazy`。
+- sitemap.xml / robots.txt、Google Search Console・Bing Webmaster Tools 登録・sitemap送信済み。
+
+### コンテンツ計画（本命の集客レバー＝`/blog/`）
+SERPが情報系なので、how-to/悩み解決記事で拡散需要を回収→LP/Storeへ送客：
+- JP：「Windows 11でフォルダのアイコンを画像に変更する方法」「フォルダアイコンが変更できない時の対処法」「フォルダアイコン 可愛い 画像の作り方」
+- EN：「How to change folder icons on Windows 11」「Custom folder icons not working on Windows 11（fix）」「How to put a picture on a folder」
+- 各記事末から LP/Store へ内部リンク。比較/代替ページ（"FolderIco alternative" 等）も有効。
+
+### 権威・被リンク（新規ドメイン対策）
+- Product Hunt ローンチ、ソフト系ディレクトリ（AlternativeTo / Softpedia / Softonic）登録、Reddit（r/Windows11・作品見せ）。
+- リンクされやすい資産：無料フォルダアイコン素材パック、決定版 how-to ガイド。
+
+### 計測して回す
+- GSC/Bing で「表示回数の多い語」を数週間後に確認 → title・本文・記事を実データで改善（“当て”でなく観測→改善）。
+
+### 注意
+- FAQ構造化データは2023年以降リッチリザルトが政府/医療系に限定 → 付けても星/FAQ表示は基本出ない（優先度低）。
+- og:image / JSON-LD image は社会的互換のため PNG 維持（ページ表示は WebP）。
+
 ## 残タスク
 
 - [ ] キーワード実数取得（Keyword Surfer 継続 ＋ 余力で Microsoft 広告/Google プランナー）
 - [x] `folderlyapp.com` 公開（Cloudflare Pages、リポ `folderly-web`）。**JP LP をルート `/`・EN LP を `/en/` に公開済み**（Claude Design 忠実再現）。privacy/FAQ は `/privacy/`。言語切替（English↔日本語）＋hreflang（ja=`/`、en=`/en/`、x-default=`/en/`）整備済み。
   - 価格：JP ¥500 / EN $3.99（US Store価格）。EN画像はキャプション帯を切り取り、英語UIで撮り直した版を `/assets/en/`。
 - [x] LP（日英）制作・公開済み（Claude Design 忠実再現）。
-- [ ] how-to 記事（日英）を `/blog/` に制作（拡散需要を回収して LP/Store へ送客）
-- [ ] EN `solution-folders` 等の画像最適化（合計が大きめ。WebP化/リサイズ）
+- [x] SEO/CWV基礎：title最適化・SoftwareApplication構造化データ・全画像WebP化＋preload/width-height（~11MB→~0.5MB）・GSC/Bing登録。
+- [ ] **how-to 記事（日英）を `/blog/` に制作**（拡散需要を回収して LP/Store へ送客。SEOの本命）
+- [ ] 被リンク：Product Hunt / AlternativeTo・Softpedia / Reddit など（新規ドメインの権威づけ）
 - [ ] スクリーンショット/動画の作り込み（Before/Afterヒーロー＋短尺デモ）
 - [ ] レビュー獲得策（初期数件で競合に並ぶ）
 - [ ] 公開後：Reddit / YouTube Shorts / note でコツコツ発信
