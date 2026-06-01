@@ -27,10 +27,19 @@
 - Store candidate MSIX 作成・内容確認（version 1.2.0.0・WebView2Loader.dll・coreclr/hostfxr/hostpolicy/PresentationNative_cor3・e_sqlite3 同梱を確認）
 - FAQ ページ(`docs/index.html` の `#faq`)を GitHub へ push 済み
 - 試用版を 1 日に設定
+- **`_out\Folderly_1.2.0.0_x64_store.msix` を Partner Center にアップロード済み（1.0.17.0 を差し替え）・提出済み・認定待ち**
 
-未完了（ユーザー操作）：
-- `_out\Folderly_1.2.0.0_x64_store.msix` を Partner Center にアップロード（保留中だった `1.0.17.0` を差し替え）
-- 提出 → 認定
+Webサイト（2026-06-01 完了）：
+- ドメイン `folderlyapp.com` を取得（お名前.com）・Cloudflare 管理へ移行・Active 確認済み
+- `folderly-web` リポジトリ（`github.com/sknk-aaa/folderly-web`）を作成・Cloudflare Pages に接続・公開済み
+- `https://folderlyapp.com/`（英語 LP プレースホルダ）・`/ja/`（日本語 LP）・`/privacy/`（プライバシー/FAQ）が正常表示を確認済み
+
+未完了（次バージョン以降）：
+- Partner Center の Privacy/Support URL を `https://folderlyapp.com/privacy/` に更新（再提出不要・優先度高）
+- アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え（次バージョン時）
+- ChatGPT モックが完成したら `/index.html`・`/ja/index.html` にLP本体を差し込み
+- Google Search Console・Bing Webmaster Tools に `folderlyapp.com` を登録し sitemap 送信
+- `www.folderlyapp.com` → apex への 301 リダイレクト設定（Cloudflare Redirect Rules）
 
 メモ：
 - 試用期限切れ後の起動ブロックは Microsoft Store の自動挙動に委ねる方針（アプリ側の強制ロジックは未実装）。runFullTrust パッケージ済みデスクトップアプリでの自動ブロック挙動は実機で要確認。効かない場合は次バージョンで `IsActive` 判定による Apply 無効化＋購入プロンプトを追加検討。
