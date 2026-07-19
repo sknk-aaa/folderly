@@ -175,7 +175,7 @@ dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj `
 | Device family | Windows 10/11 Desktop のみ |
 | Privacy Policy URL | `https://folderlyapp.com/privacy/` |
 | Support URL | `https://folderlyapp.com/privacy/#support` |
-| Price | 500 JPY |
+| Price | JP `¥480` / US `$2.99` |
 | Trial | 1 day |
 
 Age rating：ローカルデスクトップユーティリティ。ユーザー生成コンテンツ共有・ギャンブル・成人向けコンテンツなし。
@@ -190,19 +190,19 @@ Folderly only operates on folders explicitly selected by the user. It does not r
 
 ## Store Listing Text
 
-> ASO で確定したコピー（2026-05 のキーワード調査ベース）。Partner Center に貼る元データ。
+> ASO で確定したコピー（2026-07-19 更新）。Partner Center に貼る元データ。
 
 ### Japanese
 
-**App Name**: Folderly - フォルダアイコンを画像に変更
+**App Name**: Folderly - フォルダアイコン変更
 
-**Short Description**: フォルダのアイコンを好きな画像に変更。.ico変換も難しい設定も不要で、ドラッグするだけ。色タグでフォルダを一目で見分けられます。
+**Short Description**: Windowsのフォルダアイコンを好きな画像に変更。色タグとプレビューで、仕事・写真・資料フォルダを見つけやすく整理できます。
 
 **Long Description**:
 
-Folderly は、Windows 10 / 11 のフォルダアイコンを好きな画像に変更できるアプリです。
+Folderly は、Windows 10 / 11 のフォルダアイコンを好きな画像・写真・ロゴ・スクリーンショットに変更できるアプリです。.ico 変換は不要です。
 
-写真・イラスト・ロゴ・スクリーンショットなどを、そのままフォルダの「表紙」にできます。.ico への変換も、面倒な設定もいりません。お気に入りの画像で可愛くしたり、目的のフォルダを一目で見分けたり、自由にカスタマイズできます。
+重要なフォルダを見た目で判別できるようにし、色タグで仕事・写真・資料・学習・制作ファイルを整理できます。右クリックから開き、プレビューを見ながら拡大率・位置・表示モードを調整して、そのまま適用できます。
 
 主な機能:
 - フォルダを右クリックして「Folderlyでカスタマイズ」
@@ -214,35 +214,59 @@ Folderly は、Windows 10 / 11 のフォルダアイコンを好きな画像に�
 
 注意: アイコン適用後、対象の Explorer ウィンドウが一瞬開き直すことがあります。新しいアイコンをすぐ反映させるための動作です。
 
-**Keywords**（検索用語・7枠）: `フォルダ アイコン 画像` / `フォルダ アイコン 可愛い` / `フォルダ 色 変更` / `フォルダ アイコン windows11` / `アイコン カスタマイズ` / `デスクトップ 整理` / `フォルダ アイコン ico`
+**Keywords**（検索用語・7枠）: `フォルダ アイコン 変更` / `フォルダ アイコン 画像` / `Windows11 フォルダ アイコン` / `フォルダ 色分け` / `アイコン カスタマイズ` / `デスクトップ 整理` / `ico 変換`
 
 ### English
 
 **App Name**: Folderly - Folder Icon Changer
 
-**Short Description**: Change Windows folder icons to your own photos and images. Color-tag and organize any folder right from the right-click menu — no .ico conversion needed.
+**Short Description**: Change Windows folder icons to your own images. Add color tags, preview the result, and organize folders at a glance — no .ico conversion needed.
 
 **Long Description**:
 
-Folderly lets you change Windows folder icons to your own images — no .ico file conversion needed.
+Folderly helps you change Windows folder icons to your own images, photos, logos, or screenshots — without converting files to .ico.
 
-Pick a photo, illustration, logo, or screenshot and use it as a visual cover for any folder. Add color tags to tell folders apart at a glance, making it easier to organize folders for work, study, creative projects, and archives.
+Turn important folders into visual covers, add color tags, and find the right folder faster in File Explorer. It is made for people who organize work files, photos, design assets, study materials, projects, and archives on a Windows PC.
 
-Key features:
-- Change a folder icon right from the right-click menu
-- Apply any image (PNG, JPG) — no .ico conversion required
-- No-margin, fit-width, and fit-height display modes
-- Adjust zoom and X/Y position with live preview
-- Color-tag folders and edit tag names
-- Choose tag icons, and show or hide tag names on icons
-- View your customization history
-- Revert any folder back to normal anytime
+What you can do:
+- Change a folder icon from the right-click menu in File Explorer
+- Use PNG or JPG images as folder covers
+- Preview the folder icon before applying
+- Adjust zoom, position, and fit mode
+- Add color tags and optional tag labels
+- Edit tag names, colors, and icons
+- Revert a folder back to normal anytime
+- Run locally on your PC with no subscription and no ads
 
-One-time purchase. No subscription, no ads, runs entirely on your PC.
+How it works:
+1. Right-click a folder and choose "Customize with Folderly"
+2. Select or drag in an image
+3. Adjust the preview and choose a color tag
+4. Apply the icon
 
-Note: Folderly may briefly reopen the target Explorer window after applying an icon. This refreshes the Windows icon cache so your new icon shows right away.
+Folderly may briefly reopen the target File Explorer window after applying an icon. This refreshes Windows so the new folder icon appears right away.
 
-**Keywords**（search terms・7 slots）: `custom folder icon` / `change folder icon` / `folder color tag` / `organize folders` / `desktop organization` / `folder image` / `folder customizer`
+**Keywords**（search terms・7 slots）: `change folder icon` / `folder icon changer` / `custom folder icon` / `folder color tag` / `folder image` / `folder organizer` / `desktop organization`
+
+**Product features**:
+- Use your own images
+- No .ico conversion needed
+- Right-click from File Explorer
+- Live folder icon preview
+- Zoom and position controls
+- Fit width and fit height modes
+- Color tags and labels
+- Edit tag colors and icons
+- Revert folders anytime
+- One-time purchase, no ads
+
+**What's new in this version**:
+
+```text
+Fixed a startup crash that could occur when opening Folderly from File Explorer while another instance was already running.
+
+Improved reliability for Store-installed users.
+```
 
 **Screenshot Plan**:
 1. Explorer 右クリックメニューに Folderly コマンドが表示されている画面

@@ -9,15 +9,17 @@
 - Store candidate: `_out\Folderly_1.3.0.0_x64_store.msix`
 - SHA-256: `7E1F6A4B07402B62690F905686FA7283E478A8740879142304536A4EF7A85E7A`
 - Free trial: 1 日（Partner Center 設定）
+- Price: JP `¥480` / US `$2.99`（2026-07-19 に調整）
 - Tests: `137` passed（filter: `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`）
-- Source: `1.3.0` ホットフィックス候補（Store クラッシュ修正＋ヘルプURL更新）
+- Source: `1.3.0` Store 提出済み（Store クラッシュ修正＋ヘルプURL更新＋Store画像/ASO更新）
 
 ## 1.3.0 で入れた変更
 
 - Store 正常性で出ていた `CLR_EXCEPTION_80131600` クラッシュを修正（多重起動時に所有していない Mutex を解放しない）
 - アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え
 - Store candidate MSIX 作成・内容確認済み（version 1.3.0.0・WebView2Loader.dll・coreclr/hostfxr/hostpolicy/PresentationNative_cor3・e_sqlite3 同梱を確認）
-- **次の作業: `_out\Folderly_1.3.0.0_x64_store.msix` を Partner Center にアップロードして提出**
+- Partner Center に提出済み（2026-07-19）。提出内容: `_out\Folderly_1.3.0.0_x64_store.msix`、Store スクリーンショット更新、ASO テキスト更新、価格 JP `¥480` / US `$2.99`。
+- **次の作業: 認定結果を待つ。公開後 2〜4 週間、ページビュー・インストール・売上/PV・市場別/流入別データを確認する**
 
 ## 1.2.0 で入れた変更
 
@@ -41,7 +43,7 @@ Webサイト（2026-06-01 完了）：
 - `folderly-web` リポジトリ（`github.com/sknk-aaa/folderly-web`）を作成・Cloudflare Pages に接続・公開済み
 - **JP LP（`/`）と EN LP（`/en/`）を公開**（Claude Design ハンドオフ `Folderly LP.html` を忠実再現）。JPをルートに（主市場が日本のため）、ENを `/en/`。言語切替（English↔日本語）＋hreflang（ja=`/`、en=`/en/`、x-default=`/en/`）整備済み。`/privacy/` 移設済み。
 - 画像：JPは `/assets/`、ENは英語UIで撮り直した版を `/assets/en/`（キャプション帯は切り取り）。
-- 価格：**JP ¥500 / EN $3.99 買い切り**（Store価格に一致。Store JPは¥500に変更済み）。
+- 価格：**JP ¥480 / EN $2.99 買い切り**（2026-07-19 Store提出で調整）。
 - **Partner Center の Privacy/Support URL を `https://folderlyapp.com/privacy/`（#support）に更新する更新サブミッションを提出済み**（前回認定完了後に実施・認定待ち）。
 - **Google Search Console・Bing Webmaster Tools に `folderlyapp.com` を登録、sitemap 送信済み**（Bing は GSC からインポート）。
 - **ブログ記事1本目を公開**：`/blog/windows-folder-icon-change/`「Windows 11でフォルダのアイコンを画像に変更する方法」。手順スクショ・作例画像・比較表・トラブル対処を含む読み物。記事内 CTA は LP（`/`）に一本化（記事→LP→ストアのファネル）。ブログ index・sitemap 登録済み。

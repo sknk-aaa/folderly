@@ -13,7 +13,7 @@
 ## チャネル方針
 
 - **本命：SEOランディングページ → Microsoft Store へ送客**（外部流入を作る）。
-- **直接販売（Store外）は保留**。¥500 単価に対し、コード署名・決済手数料・各国税・ライセンス基盤・サポートの固定費が見合わない。将来やるなら Merchant of Record（Paddle / Lemon Squeezy 等）。LPは「あとで Buy direct を足せる」余地だけ残す。
+- **直接販売（Store外）は保留**。¥480 単価に対し、コード署名・決済手数料・各国税・ライセンス基盤・サポートの固定費が見合わない。将来やるなら Merchant of Record（Paddle / Lemon Squeezy 等）。LPは「あとで Buy direct を足せる」余地だけ残す。
 - **公開基盤**：独自ドメイン **`folderlyapp.com`**（2026-06-01 決定。`folderly.com`＝メール到達性SaaS、`folderly.app`＝他社取得済みのため回避）＋ **Cloudflare Pages**（原価ドメイン・無料プライバシー配慮アナリティクス・エッジ拡張）。**言語別URL＋hreflang** で日英を別ページ最適化。canonical は apex（`folderlyapp.com`）、`www` は apex へリダイレクト。
   - 移行済み：Store のプライバシー/サポートURLとアプリ内ヘルプ(`#faq`)は `folderlyapp.com/privacy/` に統一。旧 `sknk-aaa.github.io/folderly/` は必要に応じて生かす。
 - 補助チャネル（コツコツ型）：Reddit（r/Windows11 等・Before/After投稿）、YouTube Shorts（how-to）、日本語記事（note/Qiita）。
@@ -26,6 +26,17 @@
   - キーワードは下記調査で検証した語に差し替え（素材語/Mac語は外す）。
   - 訴求軸：**「自分の画像が使える（既製アイコンと違う）／.ico変換不要・面倒な設定なし／買い切り・サブスク無」**。
 - 試用版：**1日**（7日だとずるずる使われるため短縮）。試用期限切れ後の起動ブロックは Microsoft Store の自動挙動に委ねる（runFullTrust パッケージでの自動ブロックは実機で要確認、効かなければ次版で `IsActive` 判定によるApply無効化＋購入プロンプトを追加）。
+
+### 2026-07-19 Store リローンチ判断
+
+- 1.3.0.0 は Store クラッシュ修正を最優先で提出。あわせて Store スクリーンショット、ASO テキスト、価格を更新して提出済み。
+- 直近3か月の Partner Center 取得データは、ページビュー 532・インストール 25・コンバージョン 4.7%・インストール成功率 100%。直近でダウンロードが止まっているため、課題は「価格だけ」ではなく、露出不足と Store ページ訴求の弱さが混在している可能性が高い。
+- 画像以外の ASO 要素: 製品名、短いタイトル、短い説明、長い説明、Product features、検索語句、カテゴリ、言語別ローカライズ、価格/試用、評価・レビュー、最新情報、外部流入/キャンペーン計測。
+- 製品名は英 `Folderly - Folder Icon Changer` を維持。主検索語 `folder icon changer` を自然に含み、過剰なキーワード詰め込みにならないため。
+- 英語の短い説明と長い説明は、冒頭で `change Windows folder icons`、`own images`、`no .ico conversion`、`color tags` を明示する方針。機能名より先に「何の問題を解くか」を見せる。
+- 検索語句は最大7枠のため、素材探し・Mac意図・広すぎる語を避け、購入/導入意図に近い語へ寄せる。英: `change folder icon` / `folder icon changer` / `custom folder icon` / `folder color tag` / `folder image` / `folder organizer` / `desktop organization`。日: `フォルダ アイコン 変更` / `フォルダ アイコン 画像` / `Windows11 フォルダ アイコン` / `フォルダ 色分け` / `アイコン カスタマイズ` / `デスクトップ 整理` / `ico 変換`。
+- 価格は JP `¥480` / US `$2.99` に調整。恒久的な大幅値下げはしない。500円→300円級の値下げは販売数が約1.67倍以上にならないと売上増にならず、現在の流入量では根拠が足りないため。
+- 以後の判断指標はインストール数単体ではなく **売上/PV**。価格・画像・ASO更新後、2〜4週間または最低数百PVを見て、市場別・流入別・CVR別に判断する。
 
 ## キーワード調査（2026-05-31）
 
@@ -66,13 +77,13 @@
 
 | 競合 | 価格 | 特徴 | 対 Folderly |
 |---|---|---|---|
-| FolderIco（Store外・老舗） | $29.99 | ワンクリック色付け中心、**写真カバー非対応** | Folderlyは自分の画像OK・¥500 |
+| FolderIco（Store外・老舗） | $29.99 | ワンクリック色付け中心、**写真カバー非対応** | Folderlyは自分の画像OK・¥480 |
 | Folder Marker | 有料 | ワンクリック、優先度色分け | 同上 |
 | Folder Icon Changer PRO（MS Store / MakeTone） | ¥980 | 画像→アイコン D&D・**レビュー0** | UI/価格で優位、レビュー薄く割って入れる |
 | Folder Icon Change / Custom Folder Icon Changer / FolderIconStudio 等 | 無料〜 | 既製アイコン選択型も混在 | 「自分の画像が使える」で差別化 |
 
 - 市場は同名アプリが密集するが**レビュー定着が薄い**（PRO=0件）。**レビューを数件取るだけで信頼度上位に並べる**。
-- Folderly差別化：**自分の画像／¥500買い切り／色タグ・タグ名／プレビュー調整／いつでも元に戻す**。
+- Folderly差別化：**自分の画像／¥480買い切り／色タグ・タグ名／プレビュー調整／いつでも元に戻す**。
 - 英語側は "free / png / download / crack" 意図が濃い＝価格で勝てない層は捨て、「ラクして綺麗に」で勝つ。
 
 ## サイト / LP 設計
@@ -115,7 +126,7 @@ SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(e
 ### 実装済み（on-page / 技術）
 - title をキーワード先頭に（JP「フォルダアイコンを画像に変更 | Folderly（Windows 10/11）」／EN「Folder Icon Changer for Windows 10 & 11 | Folderly」）。
 - description（キーワード入り）・canonical・hreflang(ja/en/x-default)・OGP。
-- **`SoftwareApplication` 構造化データ**（OS・価格 JPY¥500/USD$3.99・DLリンク）。
+- **`SoftwareApplication` 構造化データ**（OS・価格 JPY¥480/USD$2.99・DLリンク）。
 - **Core Web Vitals**：全画像を WebP 化＋最大1300px(ロゴ160px)にリサイズ（合計 ~11MB→~0.5MB、hero 937→57KB）。hero に `preload`＋`fetchpriority=high`、全 `<img>` に width/height（CLS防止）、ヒーロー以外は `loading=lazy`。
 - sitemap.xml / robots.txt、Google Search Console・Bing Webmaster Tools 登録・sitemap送信済み。
 
@@ -140,7 +151,7 @@ SERPが情報系なので、how-to/悩み解決記事で拡散需要を回収→
 
 - [ ] キーワード実数取得（Keyword Surfer 継続 ＋ 余力で Microsoft 広告/Google プランナー）
 - [x] `folderlyapp.com` 公開（Cloudflare Pages、リポ `folderly-web`）。**JP LP をルート `/`・EN LP を `/en/` に公開済み**（Claude Design 忠実再現）。privacy/FAQ は `/privacy/`。言語切替（English↔日本語）＋hreflang（ja=`/`、en=`/en/`、x-default=`/en/`）整備済み。
-  - 価格：JP ¥500 / EN $3.99（US Store価格）。EN画像はキャプション帯を切り取り、英語UIで撮り直した版を `/assets/en/`。
+  - 価格：JP ¥480 / EN $2.99（US Store価格）。EN画像はキャプション帯を切り取り、英語UIで撮り直した版を `/assets/en/`。
 - [x] LP（日英）制作・公開済み（Claude Design 忠実再現）。
 - [x] SEO/CWV基礎：title最適化・SoftwareApplication構造化データ・全画像WebP化＋preload/width-height（~11MB→~0.5MB）・GSC/Bing登録。
 - [~] **how-to 記事を `/blog/` に制作**（SEOの本命）。JP pillar「Windows 11でフォルダのアイコンを画像に変更する方法」公開済み（`/blog/windows-folder-icon-change/`・手順スクショ＋作例＋比較・CTAはLP一本）。残：JP★「変更できない時の対処法」・EN版。
