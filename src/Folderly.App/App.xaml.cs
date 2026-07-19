@@ -15,6 +15,7 @@ public partial class App : Application
     private static readonly TimeSpan IdleShutdownDelay = TimeSpan.FromMinutes(5);
 
     private Mutex?       _mutex;
+    private bool         _ownsMutex;
     private MainWindow?  _mainWindow;
     private DispatcherTimer? _idleShutdownTimer;
     private int _applyWindowCount;
@@ -32,6 +33,7 @@ public partial class App : Application
         }
 
         _mutex = new Mutex(initiallyOwned: true, MutexName, out bool createdNew);
+        _ownsMutex = createdNew;
 
         if (!createdNew)
         {
@@ -63,7 +65,12 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        _mutex?.ReleaseMutex();
+        if (_ownsMutex)
+        {
+            _mutex?.ReleaseMutex();
+            _ownsMutex = false;
+        }
+
         _mutex?.Dispose();
         base.OnExit(e);
     }
