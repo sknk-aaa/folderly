@@ -54,6 +54,12 @@ Webサイト（2026-06-01 完了）：
 - 古いドラッグ＆ドロップ履歴エントリ（SourceImagePath が空）は再 Apply するまでプレビュー復元不可。
 - 旧パッケージ `Folderly.FolderlyApp 1.0.0.16`（publisher: `CN=Folderly`）がローカルに残っていると新 Store identity のテストに干渉する。テスト前に削除すること。
 
+## Store Crash Triage
+
+- 2026-07-19: Partner Center 正常性で `1.2.0.0` の過去30日クラッシュ 27 件・影響デバイス 9 台を確認。`errors/` にスクショ・WER・minidump を保存。
+- 主分類 `CLR_EXCEPTION_80131600` は `System.ApplicationException HResult=0x80131600`。多重起動時に 2 個目のプロセスが所有していない Mutex を `OnExit` で `ReleaseMutex()` していた経路と一致。
+- 修正コミット: `f7c5d2b 多重起動時のMutex解放クラッシュを修正`。`App.xaml.cs` で Mutex 所有フラグを保持し、所有時のみ解放する。
+
 ## Four Things That Must Stay in Sync
 
 以下4つは常に整合している必要がある。一つを変更するときは残り3つへの影響を確認すること：
