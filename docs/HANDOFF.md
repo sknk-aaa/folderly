@@ -4,13 +4,20 @@
 
 ## Current State
 
-- Store package version: `1.2.0.0`（アプリ表示は `1.2.0`）
+- Store package version: `1.3.0.0`（アプリ表示は `1.3.0`）
 - Store identity: `KanekoApps.Folderly`
-- Store candidate: `_out\Folderly_1.2.0.0_x64_store.msix`
-- SHA-256: `906452A7C1A2B95E3800F76D8C03EA3475AFC0D724A16CCF6BFDB6384943F2F3`
+- Store candidate: `_out\Folderly_1.3.0.0_x64_store.msix`
+- SHA-256: `7E1F6A4B07402B62690F905686FA7283E478A8740879142304536A4EF7A85E7A`
 - Free trial: 1 日（Partner Center 設定）
 - Tests: `137` passed（filter: `FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied`）
-- Source: `1.2.0` としてコミット済み（認定対策の実装一式＋下記の改善を含む）
+- Source: `1.3.0` ホットフィックス候補（Store クラッシュ修正＋ヘルプURL更新）
+
+## 1.3.0 で入れた変更
+
+- Store 正常性で出ていた `CLR_EXCEPTION_80131600` クラッシュを修正（多重起動時に所有していない Mutex を解放しない）
+- アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え
+- Store candidate MSIX 作成・内容確認済み（version 1.3.0.0・WebView2Loader.dll・coreclr/hostfxr/hostpolicy/PresentationNative_cor3・e_sqlite3 同梱を確認）
+- **次の作業: `_out\Folderly_1.3.0.0_x64_store.msix` を Partner Center にアップロードして提出**
 
 ## 1.2.0 で入れた変更
 
@@ -40,14 +47,13 @@ Webサイト（2026-06-01 完了）：
 - **ブログ記事1本目を公開**：`/blog/windows-folder-icon-change/`「Windows 11でフォルダのアイコンを画像に変更する方法」。手順スクショ・作例画像・比較表・トラブル対処を含む読み物。記事内 CTA は LP（`/`）に一本化（記事→LP→ストアのファネル）。ブログ index・sitemap 登録済み。
 
 未完了（次バージョン以降）：
-- アプリ内ヘルプURL（`MainWindow.xaml.cs` の `FaqUrl`）を `https://folderlyapp.com/privacy/#faq` へ差し替え（次バージョン時。現状は旧 github.io を指すが生存中なので動作はする）
 - `www.folderlyapp.com` → apex への 301 リダイレクト設定（Cloudflare Redirect Rules・任意）
 - how-to 記事の拡充（JP pillar 1本公開済み。残：JP★「変更できない時の対処法」・EN版）
 - EN 画像の最適化（容量削減）
 
 メモ：
 - 試用期限切れ後の起動ブロックは Microsoft Store の自動挙動に委ねる方針（アプリ側の強制ロジックは未実装）。runFullTrust パッケージ済みデスクトップアプリでの自動ブロック挙動は実機で要確認。効かない場合は次バージョンで `IsActive` 判定による Apply 無効化＋購入プロンプトを追加検討。
-- 再提出が必要になった場合は [docs/OPERATIONS.md](OPERATIONS.md) の Certification Rejection Playbook に従う。次候補は `1.3.0.0` など 4 桁目 0。
+- 再提出が必要になった場合は [docs/OPERATIONS.md](OPERATIONS.md) の Certification Rejection Playbook に従う。次候補は `1.4.0.0` など 4 桁目 0。
 
 ## Known Issues
 
@@ -58,7 +64,7 @@ Webサイト（2026-06-01 完了）：
 
 - 2026-07-19: Partner Center 正常性で `1.2.0.0` の過去30日クラッシュ 27 件・影響デバイス 9 台を確認。`errors/` にスクショ・WER・minidump を保存。
 - 主分類 `CLR_EXCEPTION_80131600` は `System.ApplicationException HResult=0x80131600`。多重起動時に 2 個目のプロセスが所有していない Mutex を `OnExit` で `ReleaseMutex()` していた経路と一致。
-- 修正コミット: `f7c5d2b 多重起動時のMutex解放クラッシュを修正`。`App.xaml.cs` で Mutex 所有フラグを保持し、所有時のみ解放する。
+- 修正コミット: `f7c5d2b 多重起動時のMutex解放クラッシュを修正`。`App.xaml.cs` で Mutex 所有フラグを保持し、所有時のみ解放する。`1.3.0.0` Store 候補に含めた。
 
 ## Four Things That Must Stay in Sync
 

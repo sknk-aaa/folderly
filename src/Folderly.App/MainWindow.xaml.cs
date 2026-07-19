@@ -47,7 +47,7 @@ public partial class MainWindow : Window
         _vm.Refresh();
     }
 
-    private const string FaqUrl = "https://sknk-aaa.github.io/folderly/#faq";
+    private const string FaqUrl = "https://folderlyapp.com/privacy/#faq";
 
     private void HelpTab_Click(object sender, RoutedEventArgs e)
     {

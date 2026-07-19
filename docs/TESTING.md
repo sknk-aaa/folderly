@@ -4,15 +4,15 @@ Use this checklist when validating a new Folderly build on Windows.
 
 Current candidate:
 
-- Date: 2026-05-31
+- Date: 2026-07-19
 - Store package identity: `KanekoApps.Folderly`
-- Store package version: `1.2.0.0`（アプリ表示 `1.2.0`）
-- Store candidate package: `_out/Folderly_1.2.0.0_x64_store.msix`
-- SHA-256: `906452A7C1A2B95E3800F76D8C03EA3475AFC0D724A16CCF6BFDB6384943F2F3`
+- Store package version: `1.3.0.0`（アプリ表示 `1.3.0`）
+- Store candidate package: `_out/Folderly_1.3.0.0_x64_store.msix`
+- SHA-256: `7E1F6A4B07402B62690F905686FA7283E478A8740879142304536A4EF7A85E7A`
 - Architecture: x64
 - Automated tests: `137` passed
-- Feature verification: 1.2.0 の変更点（タグアイコン反映・色/アイコン追加・移動フォルダ3択解除・設定/ヘルプ）を Debug ビルドで目視確認済み
-- Pending: パッケージ形態でのフル手動チェックリスト、および Partner Center へのアップロード
+- Feature verification: 1.3.0 の変更点（Store `CLR_EXCEPTION_80131600` 対策・ヘルプURL差し替え）をコード/パッケージ内容で確認済み
+- Pending: Partner Center へのアップロード、必要に応じたパッケージ形態でのフル手動チェックリスト
 
 Historical note:
 
@@ -55,10 +55,10 @@ Supporting evidence for the certification fix submission is recorded in [CERTIFI
 - [ ] MSIX payload includes `WebView2Loader.dll` at the package root.
 - [ ] `Package.appxmanifest` has Store identity `KanekoApps.Folderly`.
 - [ ] `Package.appxmanifest` has Publisher `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`.
-- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.2.0.0`.
+- [ ] `Package.appxmanifest` version uses revision `0`, for example `1.3.0.0`.
 - [ ] Partner Center accepts the uploaded package.
 - [ ] If sideload testing locally, the signing certificate subject matches the active package publisher.
-- [ ] If sideload testing locally, install `_out/Folderly_1.2.0.0_x64_sideload.msix`, not the unsigned Store package.
+- [ ] If sideload testing locally, install `_out/Folderly_1.3.0.0_x64_sideload.msix`, not the unsigned Store package.
 - [ ] The sideload certificate is trusted in LocalMachine Root/TrustedPeople if `Add-AppxPackage` reports `0x800B0109`.
 - [ ] Old `Folderly.FolderlyApp 1.0.0.16` is uninstalled before testing the Store identity.
 - [ ] App launches from Start menu.
@@ -183,8 +183,8 @@ Explorer windows may briefly reopen after applying. This is intentional and refr
 
 ## Store Submission
 
-- [ ] GitHub Pages privacy/support URL is public: `https://sknk-aaa.github.io/folderly/`.
-- [ ] Support section is public: `https://sknk-aaa.github.io/folderly/#support`.
+- [ ] Privacy/support URL is public: `https://folderlyapp.com/privacy/`.
+- [ ] Support section is public: `https://folderlyapp.com/privacy/#support`.
 - [ ] Partner Center category is set to `Utilities & tools`.
 - [ ] Device family is `Windows 10/11 Desktop` only.
 - [ ] Price/trial/market settings are completed.

@@ -15,7 +15,7 @@
 - **本命：SEOランディングページ → Microsoft Store へ送客**（外部流入を作る）。
 - **直接販売（Store外）は保留**。¥500 単価に対し、コード署名・決済手数料・各国税・ライセンス基盤・サポートの固定費が見合わない。将来やるなら Merchant of Record（Paddle / Lemon Squeezy 等）。LPは「あとで Buy direct を足せる」余地だけ残す。
 - **公開基盤**：独自ドメイン **`folderlyapp.com`**（2026-06-01 決定。`folderly.com`＝メール到達性SaaS、`folderly.app`＝他社取得済みのため回避）＋ **Cloudflare Pages**（原価ドメイン・無料プライバシー配慮アナリティクス・エッジ拡張）。**言語別URL＋hreflang** で日英を別ページ最適化。canonical は apex（`folderlyapp.com`）、`www` は apex へリダイレクト。
-  - 移行注意：現 `sknk-aaa.github.io/folderly/` は Store のプライバシー/サポートURL＋アプリ内ヘルプ(`#faq`)から参照中。新ドメイン移行時は Store URL 更新（再提出不要）＋旧URLはリダイレクトで生かす。公開コンテンツの正本は1ドメインに統一（重複コンテンツ回避）。
+  - 移行済み：Store のプライバシー/サポートURLとアプリ内ヘルプ(`#faq`)は `folderlyapp.com/privacy/` に統一。旧 `sknk-aaa.github.io/folderly/` は必要に応じて生かす。
 - 補助チャネル（コツコツ型）：Reddit（r/Windows11 等・Before/After投稿）、YouTube Shorts（how-to）、日本語記事（note/Qiita）。
 - 現実認識：この領域は**ニッチ**。SEOは「細く長く」積む施策で、短期の量は期待しない。
 

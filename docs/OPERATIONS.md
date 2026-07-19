@@ -12,20 +12,20 @@
 | Package family name | `KanekoApps.Folderly_q8156m1pgwn5a` |
 | Store ID | `9N99JH5H91H8` |
 | Store URL | `https://apps.microsoft.com/detail/9N99JH5H91H8` |
-| Current version | `1.2.0.0`（アプリ表示 `1.2.0`） |
+| Current version | `1.3.0.0`（アプリ表示 `1.3.0`） |
 | Min OS | Windows 10 1809 (`10.0.17763.0`) |
 
-バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.2.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースは `1.3.0.0` など 4 桁目 0。
+バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.3.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースは `1.4.0.0` など 4 桁目 0。
 
 ## Key URLs
 
 | Purpose | URL |
 |---|---|
-| Privacy Policy / GitHub Pages | `https://sknk-aaa.github.io/folderly/` |
-| Partner Center Support | `https://sknk-aaa.github.io/folderly/#support` |
+| Privacy Policy | `https://folderlyapp.com/privacy/` |
+| Partner Center Support | `https://folderlyapp.com/privacy/#support` |
 | App Settings Contact Support | `https://github.com/sknk-aaa/folderly/issues` |
 
-プライバシーポリシーの公開ページは `docs/index.html`（GitHub Pages 公開済み）。
+プライバシーポリシー/FAQ/サポートの公開ページは `folderly-web` の `/privacy/`。
 
 ## Build
 
@@ -49,7 +49,7 @@ Visual Studio がこの環境で Publish / Store / Create App Packages を表示
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$version = '1.2.0.0'
+$version = '1.3.0.0'
 $root = (Resolve-Path .).Path
 $outDir = Join-Path $root '_out'
 $stage = Join-Path $outDir "store_msix_stage_$version"
@@ -72,8 +72,8 @@ $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeapp
 MSIX 内容確認：
 
 ```powershell
-$msix = '_out\Folderly_1.2.0.0_x64_store.msix'
-$verify = '_out\verify_store_msix_manifest_1.2.0.0'
+$msix = '_out\Folderly_1.3.0.0_x64_store.msix'
+$verify = '_out\verify_store_msix_manifest_1.3.0.0'
 $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe'
 Remove-Item -LiteralPath $verify -Recurse -Force -ErrorAction SilentlyContinue
 & $makeappx unpack /p $msix /d $verify
@@ -86,15 +86,15 @@ Get-Content (Join-Path $verify 'AppxManifest.xml')
 
 Store 用パッケージ（Partner Center へアップロードするもの）はローカルに直接インストールできない。ローカルテスト用にはコピーに署名した sideload パッケージを使う。
 
-- Store upload: `_out\Folderly_1.2.0.0_x64_store.msix`（署名なし）
-- Local install: `_out\Folderly_1.2.0.0_x64_sideload.msix`（署名済み）
+- Store upload: `_out\Folderly_1.3.0.0_x64_store.msix`（署名なし）
+- Local install: `_out\Folderly_1.3.0.0_x64_sideload.msix`（署名済み）
 
 ```powershell
 $ErrorActionPreference = 'Stop'
 $publisher = 'CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E'
 $root = (Resolve-Path .).Path
-$storeMsix = Join-Path $root '_out\Folderly_1.2.0.0_x64_store.msix'
-$sideloadMsix = Join-Path $root '_out\Folderly_1.2.0.0_x64_sideload.msix'
+$storeMsix = Join-Path $root '_out\Folderly_1.3.0.0_x64_store.msix'
+$sideloadMsix = Join-Path $root '_out\Folderly_1.3.0.0_x64_sideload.msix'
 $certPath = Join-Path $root '_out\Folderly_LocalSideload.cer'
 
 $cert = Get-ChildItem Cert:\CurrentUser\My |
@@ -173,8 +173,8 @@ dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj `
 |---|---|
 | Primary category | `Utilities & tools` |
 | Device family | Windows 10/11 Desktop のみ |
-| Privacy Policy URL | `https://sknk-aaa.github.io/folderly/` |
-| Support URL | `https://sknk-aaa.github.io/folderly/#support` |
+| Privacy Policy URL | `https://folderlyapp.com/privacy/` |
+| Support URL | `https://folderlyapp.com/privacy/#support` |
 | Price | 500 JPY |
 | Trial | 1 day |
 
@@ -266,7 +266,7 @@ Note: Folderly may briefly reopen the target Explorer window after applying an i
 5. 提出した MSIX のファイル名と SHA-256
 
 ```powershell
-Get-FileHash .\_out\Folderly_1.2.0.0_x64_store.msix -Algorithm SHA256
+Get-FileHash .\_out\Folderly_1.3.0.0_x64_store.msix -Algorithm SHA256
 ```
 
 ### 指摘別の切り分け
