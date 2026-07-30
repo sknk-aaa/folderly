@@ -1,5 +1,69 @@
 # Folderly Operations
 
+## 2026-07-30 Store Submission Notes
+
+### Current Store Submission
+
+- Submitted version: `1.4.0.0`
+- Store upload candidate: `_out\Folderly_1.4.0.0_x64_store.msix`
+- Local sideload candidate: `_out\Folderly_1.4.0.0_x64_sideload.msix`
+- Main changes:
+  - New app icon based on `icons/icon-v1.4.png`.
+  - Japanese Store first screenshot improved.
+  - Japanese resource/language recognition improved for Store listing.
+  - Purchase/review Store links improved inside the app.
+  - Review request flow improved after successful folder icon customization.
+
+### Store Review Count Issue
+
+Observed:
+
+- Partner Center shows 1 rating/review.
+- Public Microsoft Store page can still show 0 reviews.
+
+Likely causes:
+
+- Store catalog cache delay.
+- Region-specific review aggregation.
+- Review text moderation delay.
+- Difference between Partner Center analytics and public Store rating display.
+- Rating exists but is not yet eligible for public display.
+
+Action taken:
+
+- Microsoft support request submitted from Engage Center.
+- Product: `Windows Developer Center`
+- Issue type/subtype used: `App Management`
+
+Follow-up:
+
+1. Wait for Microsoft response.
+2. After certification/publication, check both:
+   - `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=ja-JP&gl=JP`
+   - `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=en-US&gl=US`
+3. If public rating remains 0, reply to the support case with:
+   - Store ID: `9N99JH5H91H8`
+   - App name: `Folderly - Folder Icon Changer`
+   - Partner Center screenshot showing 1 review
+   - Public Store screenshots showing 0 reviews for JP/US
+   - Review date shown in Partner Center: `2026-07-05 UTC`
+
+### Post-Certification Visual Check
+
+After the Store update is live, check:
+
+- App icon is the new v1.4 icon.
+- Japanese first screenshot communicates the benefits clearly.
+- Supported language includes Japanese on the public catalog.
+- Price is JP `¥480` and US `$2.99`.
+- Description mentions:
+  - own photos/images
+  - color tags
+  - no `.ico` conversion
+  - local/private operation
+  - one-time purchase / trial
+- Public rating/review count is no longer unexpectedly hidden.
+
 環境固定・パッケージ ID・ビルド・Store 提出・テスト。変化が遅い。
 
 ## Store Identity

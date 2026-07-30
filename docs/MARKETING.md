@@ -1,5 +1,63 @@
 # Folderly Marketing
 
+## 2026-07-30 Update: LP/SEO/Store Growth Plan
+
+### 今日の結論
+
+- 日本語流入が現状の主戦場。GSCではクリックの大半が日本から来ているため、まず日本語LPと日本語SEO記事を強くする。
+- 訴求の中心は「フォルダを写真と色タグで見分けやすく」。
+- LPのH1は「フォルダアイコンを、好きな画像に変更。」へ寄せた。
+- 「フォルダアイコン 変更できない」より、「フォルダアイコン 変更方法」「フォルダアイコン 好きな画像」「Windows 11 フォルダアイコン 変更」系の検索意図を優先する。
+- Store単体の露出だけでは弱いので、LP/SEO記事で検索流入を作り、Microsoft Storeへ送客する。
+
+### 2026-07-30 に完了した施策
+
+- `folderly-win`
+  - v1.4.0.0 の次版MSIXを作成。
+  - Store用アイコン素材を `icons/icon-v1.4.png` 系に更新。
+  - 日本語Store画像の1枚目を改善。
+  - 日本語対応がStore上で認識されるように、manifest/リソース設定を改善。
+  - アプリ内のStore導線、購入導線、レビュー導線を改善。
+  - Microsoft Store更新申請済み。
+- `folderly-web`
+  - LPのH1/メタ/FAQ/CTAを「好きな画像に変更」「写真と色タグ」に寄せて改善。
+  - 日本語LPに「Windows標準 vs Folderly」の比較ブロックを追加。
+  - 英語LPも同じ軸で改善。
+  - `/blog/windows-folder-icon-change/` を本命SEO記事として更新。
+  - `/blog/folder-icon-not-changing/` に症状別CTAを追加。
+  - `/blog/folderly-how-to/` を新規作成。
+  - `blog/index.html` と `sitemap.xml` を更新。
+  - `folderly-web` は `2e0f605 LPとSEO記事導線を改善` まで push 済み。
+
+### まず見るURL
+
+| 優先 | URL | 見る理由 |
+|---|---|---|
+| 1 | `https://folderlyapp.com/` | 日本語LPの最重要ページ。H1、比較ブロック、FAQ、CTAが購入につながる流れか確認する。 |
+| 2 | `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=ja-JP&gl=JP` | 日本語Storeページ。申請反映後、アイコン、1枚目画像、対応言語、価格、説明文がLPとズレていないか確認する。 |
+| 3 | `https://folderlyapp.com/blog/windows-folder-icon-change/` | 本命SEO記事。「変更方法」の検索意図に答えつつ、Folderly導線が自然か確認する。 |
+| 4 | `https://folderlyapp.com/blog/folderly-how-to/` | 新規の使い方記事。Store/LPから来たユーザーの不安解消ページとして機能するか確認する。 |
+| 5 | `https://folderlyapp.com/en/` | 英語LP。海外展開用に「photos + color tags」「no .ico conversion」が自然に伝わるか確認する。 |
+| 6 | `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=en-US&gl=US` | 英語Storeページ。海外向けの訴求と画像品質を確認する。 |
+| 7 | `https://folderlyapp.com/blog/folder-icon-not-changing/` | 困っているユーザー向け記事。症状別CTAが自然か確認する。 |
+| 8 | `https://folderlyapp.com/blog/` | 新規記事と更新記事が一覧に出ているか確認する。 |
+
+### 次にやるべきこと
+
+1. Store申請の審査通過後、日本語/英語のStore表示をChromeで目視確認する。
+2. Search Consoleで更新済みURLと新規URLのインデックス登録をリクエストする。
+3. GSCで2-4週間後に、表示回数が増えたクエリへ記事タイトル/本文を寄せ直す。
+4. noteに日本語記事を投稿し、`/blog/windows-folder-icon-change/` かLPへ送客する。
+5. Product Hunt/Reddit/AlternativeToなど海外露出を準備する。ただし、海外向けは英語Store画像と英語LPの見え方確認後に行う。
+6. 直販は保留。まずはStore販売でCVRとレビューを作り、LPの勝ち筋が見えてから検討する。
+
+### レビュー表示の注意
+
+- Partner Centerでは1件の評価/レビューが見えているが、公開Storeでは0件表示になることがある。
+- 想定原因は、公開反映の遅延、国/地域別表示、レビュー本文のモデレーション、評価とレビューの集計仕様、Store側キャッシュ。
+- Microsoftへサポートリクエスト送信済み。回答待ち。
+- 公開Storeでレビュー0件が続く場合、レビュー獲得導線をさらに強化する。初期はレビュー件数そのものがCVRにかなり効く。
+
 マーケティングの正（チャネル方針・ASO・キーワード調査・競合・SEO/LP設計）。施策で得た知見はここに集約する。
 ストア掲載の確定コピー（製品名/短い説明/キーワード/説明）は重複を避け [docs/OPERATIONS.md](OPERATIONS.md) の「Store Listing Text」に置く。
 

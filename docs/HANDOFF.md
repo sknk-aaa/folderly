@@ -1,5 +1,69 @@
 # Folderly Handoff
 
+## 2026-07-30 Handoff
+
+### 今日完了したこと
+
+- `folderly-win`
+  - v1.4.0.0 のStore候補MSIXを作成。
+  - 新アイコン `icons/icon-v1.4.png` を採用し、アプリ/LPで使うアイコン素材を更新。
+  - 日本語のStore 1枚目画像を、ベネフィットが伝わる方向へ改善。
+  - manifest/リソース設定を見直し、Store対応言語に日本語が出るように改善。
+  - Microsoft Storeの商品ページへ直接飛ぶ導線を追加/改善。
+  - レビュー依頼導線を追加/改善。
+  - Store更新申請済み。
+  - GitHub push済み。最新コミット: `b1011f9 アイコン素材をv1.4版に更新`。
+- `folderly-web`
+  - 日本語LPのH1を「フォルダアイコンを、好きな画像に変更。」へ変更。
+  - 訴求を「フォルダを写真と色タグで見分けやすく」に統一。
+  - LPに「Windows標準 vs Folderly」比較を追加。
+  - 日本語/英語LPのFAQ、CTA、meta、schemaを改善。
+  - `/blog/windows-folder-icon-change/` を本命SEO記事として更新。
+  - `/blog/folder-icon-not-changing/` に症状別CTAを追加。
+  - `/blog/folderly-how-to/` を新規作成。
+  - sitemapとブログ一覧を更新。
+  - GitHub push済み。最新コミット: `2e0f605 LPとSEO記事導線を改善`。
+
+### 明日まず見るもの
+
+1. `https://folderlyapp.com/`
+   - 日本語LP。ファーストビュー、比較ブロック、FAQ、CTAの流れを見る。
+2. `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=ja-JP&gl=JP`
+   - 日本語Store。申請反映後、アイコン、1枚目画像、対応言語、価格、説明文を見る。
+3. `https://folderlyapp.com/blog/windows-folder-icon-change/`
+   - 本命SEO記事。検索意図に合っているか、LPへの導線が自然かを見る。
+4. `https://folderlyapp.com/blog/folderly-how-to/`
+   - 新規使い方記事。購入前の不安解消になっているかを見る。
+5. `https://folderlyapp.com/en/`
+   - 英語LP。海外向け訴求が自然かを見る。
+6. `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=en-US&gl=US`
+   - 英語Store。英語の画像/説明が弱くないかを見る。
+
+### 残タスク
+
+- Store審査通過後、日英StoreページをChromeで目視確認する。
+- Partner Centerのレビュー表示問題について、Microsoftサポート回答を確認する。
+- GSCで次のURLのインデックス登録をリクエストする。
+  - `https://folderlyapp.com/`
+  - `https://folderlyapp.com/blog/windows-folder-icon-change/`
+  - `https://folderlyapp.com/blog/folder-icon-not-changing/`
+  - `https://folderlyapp.com/blog/folderly-how-to/`
+- Cloudflare Pagesのデプロイが走っていない場合は手動で再デプロイする。
+- note記事、Product Hunt、Reddit、AlternativeToなど外部露出の準備を進める。
+- 直販は現時点では保留。まずはStoreでレビューとCVRを作る。
+
+### 未コミット/未追跡で残っているもの
+
+- `folderly-win`
+  - `_out/` 配下のMSIX/展開/検証成果物。
+  - `0730_GSC/` のGSCデータ。
+  - `.claude/` や `errors/` などのローカル作業物。
+- `folderly-web`
+  - `assets/raw/step1.png`
+  - `assets/raw/step2.png`
+
+これらは今回のpushには含めていない。必要なら別途整理する。
+
 現状・残タスク・既知の問題。
 
 ## Current State
