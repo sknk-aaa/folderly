@@ -705,6 +705,7 @@ public partial class ApplyWindow : Window
                 await ExecuteScriptSafeAsync(
                     $"document.getElementById('btn-apply').textContent={JsonSerializer.Serialize("✓ " + AppServices.Localize["ApplyCompleted"])};");
 
+                ShowReviewPromptIfNeeded();
                 Hide();
                 if (ShouldReopenExplorer())
                     await ReopenExplorerWindowsAsync(_vm.FolderPath);
@@ -727,6 +728,28 @@ public partial class ApplyWindow : Window
         {
             _vm.IsApplying = false;
             await ExecuteScriptSafeAsync("window.folderlySetApplying(false)");
+        }
+    }
+
+    private void ShowReviewPromptIfNeeded()
+    {
+        var applyCount = ReviewPromptService.RecordSuccessfulApplyAndGetPromptCount();
+        if (applyCount is null) return;
+
+        var result = MessageBox.Show(
+            AppServices.Localize["ReviewPromptMessage"],
+            AppServices.Localize["ReviewPromptTitle"],
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.OK)
+        {
+            ReviewPromptService.MarkReviewOpened();
+            StoreNavigationService.OpenReviewPage();
+        }
+        else
+        {
+            ReviewPromptService.MarkPromptSkipped(applyCount.Value);
         }
     }
 

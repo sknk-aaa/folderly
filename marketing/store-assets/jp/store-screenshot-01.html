@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Folderly JP Store Screenshot 01</title>
+<style>
+  :root {
+    --ink: #172033;
+    --muted: #607086;
+    --blue: #1467d9;
+    --blue-dark: #074aa6;
+    --line: #d8e2ef;
+    --paper: #f8fbff;
+    --yellow: #ffc93a;
+    --green: #17a773;
+    --red: #df3f3f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    color: var(--ink);
+    font-family: "Yu Gothic UI", "Meiryo", "Segoe UI", sans-serif;
+    background:
+      linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
+  }
+
+  .canvas {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    padding: 72px 92px 64px;
+  }
+
+  .topline {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-bottom: 30px;
+  }
+
+  .logo {
+    width: 86px;
+    height: 86px;
+    border-radius: 8px;
+    box-shadow: 0 14px 34px rgba(20, 103, 217, .20);
+  }
+
+  .brand {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .brand span {
+    color: var(--blue);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 76px;
+    line-height: 1.08;
+    letter-spacing: 0;
+    font-weight: 900;
+  }
+
+  .lead {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 30px;
+    line-height: 1.55;
+    font-weight: 650;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 625px 1fr;
+    gap: 58px;
+    align-items: start;
+  }
+
+  .copy {
+    padding-top: 8px;
+  }
+
+  .price {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 34px;
+    padding: 16px 22px;
+    border: 1px solid #cdddf2;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 16px 34px rgba(31, 72, 125, .10);
+    color: var(--blue-dark);
+    font-size: 26px;
+    font-weight: 800;
+  }
+
+  .price .trial {
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .screen-wrap {
+    position: relative;
+    padding-top: 18px;
+  }
+
+  .screen {
+    display: block;
+    width: 1110px;
+    border-radius: 8px;
+    border: 1px solid rgba(18, 93, 205, .25);
+    box-shadow: 0 28px 64px rgba(19, 56, 105, .23);
+  }
+
+  .callout {
+    position: absolute;
+    right: 24px;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: #111827;
+    background: var(--yellow);
+    box-shadow: 0 16px 34px rgba(173, 121, 0, .24);
+    font-size: 24px;
+    font-weight: 900;
+  }
+
+  .benefits {
+    position: absolute;
+    left: 92px;
+    right: 92px;
+    bottom: 64px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+
+  .benefit {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 132px;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .88);
+    box-shadow: 0 18px 38px rgba(29, 60, 104, .12);
+  }
+
+  .icon {
+    flex: 0 0 auto;
+    width: 62px;
+    height: 62px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: white;
+  }
+
+  .icon svg {
+    width: 34px;
+    height: 34px;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .b1 .icon { background: var(--blue); }
+  .b2 .icon { background: var(--red); }
+  .b3 .icon { background: var(--green); }
+  .b4 .icon { background: #404b5f; }
+
+  .benefit strong {
+    display: block;
+    font-size: 29px;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+
+  .benefit span {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.35;
+    font-weight: 650;
+  }
+</style>
+</head>
+<body>
+  <main class="canvas">
+    <div class="hero">
+      <section class="copy" aria-label="Folderly">
+        <div class="topline">
+          <img class="logo" src="source/app-icon.png" alt="">
+          <div class="brand"><span>Folderly</span></div>
+        </div>
+        <h1>フォルダを<br>見た目で探せる</h1>
+        <p class="lead">
+          好きな画像と色タグで、仕事・写真・資料フォルダを一目で整理。
+          .ico変換なしで、右クリックからすぐ変更できます。
+        </p>
+        <div class="price">
+          <span>買い切り ¥480</span>
+          <span class="trial">1日無料試用</span>
+        </div>
+      </section>
+
+      <section class="screen-wrap" aria-label="Folderly screenshot">
+        <div class="callout">Windows 10 / 11 対応</div>
+        <img class="screen" src="source/showcase-explorer.png" alt="">
+      </section>
+    </div>
+
+    <section class="benefits" aria-label="Benefits">
+      <div class="benefit b1">
+        <div class="icon">
+          <svg viewBox="0 0 24 24"><path d="M3 6h6l2 2h10v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13h8"/><path d="M12 9v8"/></svg>
+        </div>
+        <div><strong>探しやすい</strong><span>大量のフォルダも視覚で判別</span></div>
+      </div>
+      <div class="benefit b2">
+        <div class="icon">
+          <svg viewBox="0 0 24 24"><path d="M4 7h11l5 5-5 5H4z"/><circle cx="15" cy="12" r="1.7"/></svg>
+        </div>
+        <div><strong>色タグ</strong><span>仕事・写真・制作を色で分類</span></div>
+      </div>
+      <div class="benefit b3">
+        <div class="icon">
+          <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m7 17 4-4 3 3 2-2 2 3"/></svg>
+        </div>
+        <div><strong>好きな画像</strong><span>PNG/JPGをドラッグするだけ</span></div>
+      </div>
+      <div class="benefit b4">
+        <div class="icon">
+          <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.2 2.7 7.7 7 9 4.3-1.3 7-4.8 7-9V6z"/><path d="m9 12 2 2 4-5"/></svg>
+        </div>
+        <div><strong>PC内だけで完結</strong><span>サブスクなし・広告なし</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
