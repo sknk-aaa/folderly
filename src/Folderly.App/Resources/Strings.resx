@@ -174,5 +174,6 @@
   <data name="LicenseTrial" xml:space="preserve"><value>Free trial ({0} days left)</value></data>
   <data name="SupportLink" xml:space="preserve"><value>Contact Support</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>License Information</value></data>
+  <data name="RateReview" xml:space="preserve"><value>Rate on Store</value></data>
   <data name="Close" xml:space="preserve"><value>Close</value></data>
 </root>

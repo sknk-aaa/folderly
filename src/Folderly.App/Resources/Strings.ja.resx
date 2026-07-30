@@ -174,5 +174,6 @@
   <data name="LicenseTrial" xml:space="preserve"><value>無料試用（あと {0} 日）</value></data>
   <data name="SupportLink" xml:space="preserve"><value>サポートに連絡</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>ライセンス情報</value></data>
+  <data name="RateReview" xml:space="preserve"><value>Storeで評価</value></data>
   <data name="Close" xml:space="preserve"><value>閉じる</value></data>
 </root>

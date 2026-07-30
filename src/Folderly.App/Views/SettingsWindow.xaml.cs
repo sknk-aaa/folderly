@@ -40,8 +40,12 @@ public partial class SettingsWindow : Window
 
     private void LicenseInfo_Click(object sender, RoutedEventArgs e)
     {
-        try { Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true }); }
-        catch { /* サイレント無視 */ }
+        StoreNavigationService.OpenProductPage();
+    }
+
+    private void Review_Click(object sender, RoutedEventArgs e)
+    {
+        StoreNavigationService.OpenReviewPage();
     }
 
     private void EditTagNames_Click(object sender, RoutedEventArgs e)

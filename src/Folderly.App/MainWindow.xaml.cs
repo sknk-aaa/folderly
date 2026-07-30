@@ -1,4 +1,5 @@
 using Folderly.App.Infrastructure;
+using Folderly.App.Services;
 using Folderly.App.ViewModels;
 using Folderly.App.Views;
 using Folderly.Core;
@@ -159,8 +160,7 @@ public partial class MainWindow : Window
 
     private void BuyNow_Click(object sender, RoutedEventArgs e)
     {
-        try { Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true }); }
-        catch { /* サイレント無視 */ }
+        StoreNavigationService.OpenProductPage();
     }
 
     // ─── 外部から ApplyWindow を開く（単一インスタンス制御用） ───────────────

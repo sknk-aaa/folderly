@@ -132,6 +132,10 @@
             <Button Content="{Binding L[LicenseInfo]}"
                     Style="{StaticResource SecondaryButton}"
                     Click="LicenseInfo_Click"
+                    FontSize="13" Padding="12,5" Margin="0,0,8,0"/>
+            <Button Content="{Binding L[RateReview]}"
+                    Style="{StaticResource SecondaryButton}"
+                    Click="Review_Click"
                     FontSize="13" Padding="12,5"/>
         </StackPanel>
 
