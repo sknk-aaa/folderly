@@ -1,5 +1,25 @@
 # Folderly Handoff
 
+## 2026-08-19 Handoff
+
+### 今日完了したこと
+
+- `folderly-win`
+  - v1.5.0.0 のStore候補MSIX作成準備。
+  - ヘルプと設定を別ウィンドウではなくメイン画面タブ内表示に整理。
+  - ヘルプタブに「サポートに連絡」「よくある質問」の行カードと「Folderlyについて」を配置。
+  - 設定タブ下部に控えめなStore評価導線を配置。
+  - ローカル確認用 `1.4.2.0` / `1.4.3.0` をインストールして見た目確認。
+  - 提出用のソースバージョンを `1.5.0.0`（アプリ表示 `1.5.0`）に更新。
+
+### 提出時に見るもの
+
+1. Partner Center にアップロードするMSIX:
+   - `_out\Folderly_1.5.0.0_x64_store.msix`
+2. 提出後の公開確認:
+   - `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=ja-JP&gl=JP`
+   - `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=en-US&gl=US`
+
 ## 2026-07-30 Handoff
 
 ### 今日完了したこと
