@@ -11,14 +11,11 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>  <!-- タブバー -->
-            <RowDefinition Height="Auto"/>  <!-- セクションヘッダー -->
-            <RowDefinition Height="*"/>     <!-- 履歴リスト -->
-            <RowDefinition Height="Auto"/>  <!-- クリアボタン -->
-            <RowDefinition Height="Auto"/>  <!-- 試用版バナー -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- タブバー -->
         <Border Grid.Row="0" BorderBrush="{StaticResource BorderBrush}"
                 BorderThickness="0,0,0,1" Background="White">
             <StackPanel Orientation="Horizontal" Margin="16,0,0,0">
@@ -31,121 +28,279 @@
                         Click="SettingsTab_Click" Padding="16,10" FontSize="14"
                         Foreground="{StaticResource TextSecondaryBrush}"
                         Background="Transparent" BorderThickness="0"/>
-                <Button Content="{Binding L[HelpTab]}"
+                <Button x:Name="HelpTabBtn" Content="{Binding L[HelpTab]}"
                         Click="HelpTab_Click" Padding="16,10" FontSize="14"
                         Foreground="{StaticResource TextSecondaryBrush}"
                         Background="Transparent" BorderThickness="0"/>
             </StackPanel>
         </Border>
 
-        <!-- セクションヘッダー -->
-        <TextBlock Grid.Row="1" Text="{Binding L[RecentFolders]}"
-                   FontSize="13" FontWeight="SemiBold"
-                   Foreground="{StaticResource TextSecondaryBrush}"
-                   Margin="20,12,20,8"/>
+        <Grid Grid.Row="1">
+            <Grid x:Name="HistoryPanel">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-        <!-- 履歴リスト -->
-        <Grid Grid.Row="2">
-            <!-- 履歴なし表示 -->
-            <TextBlock Text="{Binding L[NoHistory]}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       FontSize="13"
-                       Visibility="{Binding HasItems, Converter={x:Static local:BoolToInvisibility.Instance}}"/>
+                <TextBlock Grid.Row="0" Text="{Binding L[RecentFolders]}"
+                           FontSize="13" FontWeight="SemiBold"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="20,12,20,8"/>
 
-            <!-- 履歴一覧 -->
-            <ListView x:Name="HistoryList"
-                      ItemsSource="{Binding Items}"
-                      BorderThickness="0"
-                      Background="Transparent"
-                      SelectionMode="Single"
-                      Visibility="{Binding HasItems, Converter={x:Static local:BoolToVisibility.Instance}}"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="Padding" Value="0"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="16,10,16,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="56"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                <Grid Grid.Row="1">
+                    <TextBlock Text="{Binding L[NoHistory]}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="13"
+                               Visibility="{Binding HasItems, Converter={x:Static local:BoolToInvisibility.Instance}}"/>
 
-                            <!-- サムネイル (48x48) -->
-                            <Border Grid.Column="0" Width="48" Height="48"
-                                    BorderBrush="{StaticResource BorderBrush}"
-                                    BorderThickness="1" CornerRadius="4"
-                                    Background="#F0F0F0">
-                                <Image Source="{Binding Thumbnail}"
-                                       Width="48" Height="48" Stretch="Uniform"
-                                       RenderOptions.BitmapScalingMode="HighQuality"/>
-                            </Border>
+                    <ListView x:Name="HistoryList"
+                              ItemsSource="{Binding Items}"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              SelectionMode="Single"
+                              Visibility="{Binding HasItems, Converter={x:Static local:BoolToVisibility.Instance}}"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="16,10,16,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="56"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                            <!-- フォルダパス・日時 -->
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
-                                <TextBlock Text="{Binding FolderName}"
-                                           FontSize="14" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding FolderPath}"
-                                           FontSize="11"
-                                           Foreground="{StaticResource TextSecondaryBrush}"
-                                           TextTrimming="CharacterEllipsis" Margin="0,2,0,2"/>
-                                <TextBlock Text="{Binding AppliedAtText}"
-                                           FontSize="11"
-                                           Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0"
-                                            Visibility="{Binding HasTag, Converter={x:Static local:BoolToVisibility.Instance}}">
-                                    <Ellipse Width="9" Height="9"
-                                             Fill="{Binding TagBrush}"
-                                             VerticalAlignment="Center"
-                                             Margin="0,0,5,0"/>
-                                    <TextBlock Text="{Binding TagName}"
-                                               FontSize="11"
-                                               Foreground="{StaticResource TextSecondaryBrush}"
-                                               TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-                            </StackPanel>
+                                    <Border Grid.Column="0" Width="48" Height="48"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1" CornerRadius="4"
+                                            Background="#F0F0F0">
+                                        <Image Source="{Binding Thumbnail}"
+                                               Width="48" Height="48" Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
 
-                            <!-- 「開く」ボタン -->
-                            <Button Grid.Column="2"
-                                    Content="{Binding DataContext.L[OpenFolder], RelativeSource={RelativeSource AncestorType=Window}}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Tag="{Binding}"
-                                    Click="OpenFolder_Click"
-                                    Margin="0,0,8,0" Padding="12,5"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
+                                        <TextBlock Text="{Binding FolderName}"
+                                                   FontSize="14" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding FolderPath}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   TextTrimming="CharacterEllipsis" Margin="0,2,0,2"/>
+                                        <TextBlock Text="{Binding AppliedAtText}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0"
+                                                    Visibility="{Binding HasTag, Converter={x:Static local:BoolToVisibility.Instance}}">
+                                            <Ellipse Width="9" Height="9"
+                                                     Fill="{Binding TagBrush}"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,5,0"/>
+                                            <TextBlock Text="{Binding TagName}"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </StackPanel>
 
-                            <!-- 「元に戻す」ボタン -->
-                            <Button Grid.Column="3"
-                                    Content="{Binding DataContext.L[RevertFolder], RelativeSource={RelativeSource AncestorType=Window}}"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Tag="{Binding}"
-                                    Click="Revert_Click"
-                                    Padding="12,5"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                                    <Button Grid.Column="2"
+                                            Content="{Binding DataContext.L[OpenFolder], RelativeSource={RelativeSource AncestorType=Window}}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Tag="{Binding}"
+                                            Click="OpenFolder_Click"
+                                            Margin="0,0,8,0" Padding="12,5"/>
+
+                                    <Button Grid.Column="3"
+                                            Content="{Binding DataContext.L[RevertFolder], RelativeSource={RelativeSource AncestorType=Window}}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Tag="{Binding}"
+                                            Click="Revert_Click"
+                                            Padding="12,5"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+
+                <Border Grid.Row="2" BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="0,1,0,0" Padding="16,10">
+                    <Button Content="{Binding L[ClearAllHistory]}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="ClearAllHistory_Click"
+                            HorizontalAlignment="Left"/>
+                </Border>
+            </Grid>
+
+            <ScrollViewer x:Name="SettingsPanel"
+                          Visibility="Collapsed"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          DataContext="{Binding SettingsContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                <StackPanel Margin="24,20,24,24" MaxWidth="560" HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding L[LanguageSection]}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <RadioButton Content="{Binding L[LanguageSystem]}"
+                                 IsChecked="{Binding IsSystemLang}"
+                                 Margin="0,0,0,4" FontSize="13"/>
+                    <RadioButton Content="{Binding L[LanguageJapanese]}"
+                                 IsChecked="{Binding IsJaLang}"
+                                 Margin="0,0,0,4" FontSize="13"/>
+                    <RadioButton Content="{Binding L[LanguageEnglish]}"
+                                 IsChecked="{Binding IsEnLang}"
+                                 Margin="0,0,0,0" FontSize="13"/>
+
+                    <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
+
+                    <TextBlock Text="{Binding L[HistorySection]}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <Button Content="{Binding L[DeleteHistory]}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="ClearAllHistory_Click"
+                            HorizontalAlignment="Left"
+                            FontSize="13" Padding="12,5"/>
+
+                    <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
+
+                    <TextBlock Text="{Binding L[TagNamesSection]}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <CheckBox Content="{Binding L[ShowTagNameOnIcon]}"
+                              IsChecked="{Binding ShowTagNameOnIcon}"
+                              FontSize="13"
+                              Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding L[ShowTagNameOnIconNote]}"
+                               FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="22,0,0,8"/>
+
+                    <CheckBox Content="{Binding L[ShowTagIconOnIcon]}"
+                              IsChecked="{Binding ShowTagIconOnIcon}"
+                              FontSize="13"
+                              Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding L[ShowTagIconOnIconNote]}"
+                               FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="22,0,0,8"/>
+
+                    <Button Content="{Binding L[EditTagNames]}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="EditTagNames_Click"
+                            HorizontalAlignment="Left"
+                            FontSize="13" Padding="12,5"/>
+
+                    <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
+
+                    <TextBlock Text="{Binding L[RefreshSection]}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <CheckBox Content="{Binding L[ReopenExplorerWindowsAfterApply]}"
+                              IsChecked="{Binding ReopenExplorerWindowsAfterApply}"
+                              FontSize="13"
+                              Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding L[ReopenExplorerWindowsAfterApplyNote]}"
+                               FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="22,0,0,0"/>
+
+                    <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
+
+                    <TextBlock Text="{Binding L[AboutSection]}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding L[VersionLabel]}"
+                                   FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Width="90"/>
+                        <TextBlock Grid.Column="1" Text="{Binding AppVersion}"
+                                   FontSize="13"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding L[LicenseLabel]}"
+                                   FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                                   Width="90"/>
+                        <TextBlock Grid.Column="1" Text="{Binding LicenseText}"
+                                   FontSize="13" TextWrapping="Wrap"/>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="{Binding L[LicenseInfo]}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="LicenseInfo_Click"
+                                FontSize="13" Padding="12,5"
+                                Margin="0,0,8,0"/>
+                        <Button Content="{Binding L[SupportLink]}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="Support_Click"
+                                FontSize="13" Padding="12,5"
+                                Margin="0,0,8,0"/>
+                        <Button Content="{Binding L[FaqTitle]}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="Faq_Click"
+                                FontSize="13" Padding="12,5"
+                                Margin="0,0,8,0"/>
+                        <Button Content="{Binding L[RateReview]}"
+                                Style="{StaticResource SecondaryButton}"
+                                Click="Review_Click"
+                                FontSize="13" Padding="12,5"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Grid x:Name="HelpPanel" Visibility="Collapsed">
+                <StackPanel Margin="24,24,24,24"
+                            Width="220"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top">
+                    <Button Content="{Binding L[SupportLink]}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="Support_Click"
+                            Padding="16,9"
+                            HorizontalContentAlignment="Center"
+                            Margin="0,0,0,10"/>
+                    <Button Content="{Binding L[FaqTitle]}"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="Faq_Click"
+                            Padding="16,9"
+                            HorizontalContentAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Grid>
 
-        <!-- クリアボタン -->
-        <Border Grid.Row="3" BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="0,1,0,0" Padding="16,10">
-            <Button Content="{Binding L[ClearAllHistory]}"
-                    Style="{StaticResource SecondaryButton}"
-                    Click="ClearAllHistory_Click"
-                    HorizontalAlignment="Left"/>
-        </Border>
-
-        <!-- 試用版バナー -->
-        <Border Grid.Row="4"
+        <Border Grid.Row="2"
                 Background="#FFF3CD"
                 BorderBrush="#FFE69C" BorderThickness="0,1,0,0"
                 Padding="16,10"

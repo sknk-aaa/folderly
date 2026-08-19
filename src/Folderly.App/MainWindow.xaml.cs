@@ -4,19 +4,22 @@ using Folderly.App.ViewModels;
 using Folderly.App.Views;
 using Folderly.Core;
 using Microsoft.Win32;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Folderly.App;
 
-/// <summary>
-/// メイン管理画面（SPEC Section 4.2, F-11, F-13）。
-/// スタートメニューから起動される。履歴一覧と「元に戻す」を提供する。
-/// </summary>
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _vm = new();
+    private readonly SettingsViewModel _settingsVm = new();
+    private MainTab _activeTab = MainTab.History;
+
+    public SettingsViewModel SettingsContext => _settingsVm;
 
     public MainWindow()
     {
@@ -24,8 +27,24 @@ public partial class MainWindow : Window
         DataContext = _vm;
 
         Loaded += OnLoaded;
-        AppServices.Localize.PropertyChanged += (_, _) => _vm.Notify(nameof(_vm.L));
-        AppServices.License.LicenseChanged   += (_, _) => Dispatcher.Invoke(_vm.RefreshLicense);
+        AppServices.Localize.PropertyChanged += (_, _) =>
+        {
+            _vm.Notify(nameof(_vm.L));
+            _settingsVm.Notify(nameof(_settingsVm.L));
+            _settingsVm.Notify(nameof(_settingsVm.LicenseText));
+        };
+        AppServices.License.LicenseChanged += (_, _) => Dispatcher.Invoke(() =>
+        {
+            _vm.RefreshLicense();
+            _settingsVm.Notify(nameof(_settingsVm.LicenseText));
+        });
+    }
+
+    private enum MainTab
+    {
+        History,
+        Settings,
+        Help
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -33,47 +52,67 @@ public partial class MainWindow : Window
         _vm.Refresh();
         await AppServices.License.InitializeAsync();
         _vm.RefreshLicense();
+        _settingsVm.Notify(nameof(_settingsVm.LicenseText));
     }
 
-    // ─── タブ ────────────────────────────────────────────────────────────────
-
-    private void HistoryTab_Click(object sender, RoutedEventArgs e) => _vm.Refresh();
-
-    public void RefreshHistory() => _vm.Refresh();
-
-    private void SettingsTab_Click(object sender, RoutedEventArgs e)
+    private void HistoryTab_Click(object sender, RoutedEventArgs e)
     {
-        var win = new SettingsWindow { Owner = this };
-        win.ShowDialog();
+        ShowTab(MainTab.History);
         _vm.Refresh();
     }
 
-    private void HelpTab_Click(object sender, RoutedEventArgs e)
+    public void RefreshHistory() => _vm.Refresh();
+
+    private void SettingsTab_Click(object sender, RoutedEventArgs e) => ShowTab(MainTab.Settings);
+
+    private void HelpTab_Click(object sender, RoutedEventArgs e) => ShowTab(MainTab.Help);
+
+    private void ShowTab(MainTab tab)
     {
-        var win = new HelpWindow { Owner = this };
-        win.ShowDialog();
+        if (_activeTab == MainTab.Settings)
+            SaveSettings();
+
+        _activeTab = tab;
+
+        HistoryPanel.Visibility = tab == MainTab.History ? Visibility.Visible : Visibility.Collapsed;
+        SettingsPanel.Visibility = tab == MainTab.Settings ? Visibility.Visible : Visibility.Collapsed;
+        HelpPanel.Visibility = tab == MainTab.Help ? Visibility.Visible : Visibility.Collapsed;
+
+        SetTabSelected(HistoryTabBtn, tab == MainTab.History);
+        SetTabSelected(SettingsTabBtn, tab == MainTab.Settings);
+        SetTabSelected(HelpTabBtn, tab == MainTab.Help);
     }
 
-    // ─── 履歴アクション ──────────────────────────────────────────────────────
+    private void SetTabSelected(Button button, bool selected)
+    {
+        button.Foreground = (Brush)FindResource(selected ? "PrimaryBrush" : "TextSecondaryBrush");
+        button.BorderBrush = selected ? (Brush)FindResource("PrimaryBrush") : Brushes.Transparent;
+        button.BorderThickness = selected ? new Thickness(0, 0, 0, 2) : new Thickness(0);
+    }
+
+    private void SaveSettings()
+    {
+        _settingsVm.Save();
+        _vm.RefreshLicense();
+        _settingsVm.Notify(nameof(_settingsVm.LicenseText));
+    }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is System.Windows.Controls.Button btn &&
-            btn.Tag is HistoryItemViewModel item)
-        {
-            try { Process.Start("explorer.exe", $"\"{item.FolderPath}\""); }
-            catch { /* サイレント無視 */ }
-        }
+        if (sender is not Button btn || btn.Tag is not HistoryItemViewModel item)
+            return;
+
+        try { Process.Start("explorer.exe", $"\"{item.FolderPath}\""); }
+        catch { }
     }
 
     private async void Revert_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not System.Windows.Controls.Button btn ||
-            btn.Tag is not HistoryItemViewModel item) return;
+        if (sender is not Button btn || btn.Tag is not HistoryItemViewModel item)
+            return;
 
         var L = AppServices.Localize;
 
-        // フォルダが移動・改名・削除されている場合は元のパスでは解除できないため、3択を提示する。
         if (!Directory.Exists(item.FolderPath))
         {
             switch (MovedFolderDialog.Show(this, item.FolderPath))
@@ -82,8 +121,15 @@ public partial class MainWindow : Window
                     await LocateAndRevertAsync(item.FolderPath);
                     break;
                 case MovedFolderChoice.HistoryOnly:
-                    try { AppServices.Revert.DeleteHistoryOnly(item.FolderPath); _vm.Refresh(); }
-                    catch (Exception ex) { ShowRevertError(ex); }
+                    try
+                    {
+                        AppServices.Revert.DeleteHistoryOnly(item.FolderPath);
+                        _vm.Refresh();
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowRevertError(ex);
+                    }
                     break;
             }
             return;
@@ -92,7 +138,8 @@ public partial class MainWindow : Window
         var msg = string.Format(L["RevertConfirmMessage"], item.FolderPath);
         var res = MessageBox.Show(msg, L["RevertConfirmTitle"],
             MessageBoxButton.OKCancel, MessageBoxImage.Question);
-        if (res != MessageBoxResult.OK) return;
+        if (res != MessageBoxResult.OK)
+            return;
 
         try
         {
@@ -101,8 +148,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(string.Format(L["RevertFailed"], ex.Message),
-                "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowRevertError(ex);
         }
     }
 
@@ -111,10 +157,10 @@ public partial class MainWindow : Window
         var L = AppServices.Localize;
 
         var picker = new OpenFolderDialog { Title = L["FolderMovedLocateTitle"] };
-        if (picker.ShowDialog(this) != true) return;
-        var newPath = picker.FolderName;
+        if (picker.ShowDialog(this) != true)
+            return;
 
-        // 選択フォルダが本当にこの履歴のものか検証（_folderly\cover_<hash8>.ico の有無）。
+        var newPath = picker.FolderName;
         var entry = AppServices.History.GetByPath(Path.GetFullPath(historyKeyPath));
         if (entry is not null && entry.IconHash is { Length: >= 8 })
         {
@@ -124,7 +170,8 @@ public partial class MainWindow : Window
             {
                 var warn = MessageBox.Show(L["FolderMismatchMessage"], L["FolderMismatchTitle"],
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                if (warn != MessageBoxResult.OK) return;
+                if (warn != MessageBoxResult.OK)
+                    return;
             }
         }
 
@@ -133,7 +180,10 @@ public partial class MainWindow : Window
             await AppServices.Revert.RevertAsync(historyKeyPath, newPath);
             _vm.Refresh();
         }
-        catch (Exception ex) { ShowRevertError(ex); }
+        catch (Exception ex)
+        {
+            ShowRevertError(ex);
+        }
     }
 
     private void ShowRevertError(Exception ex)
@@ -142,10 +192,11 @@ public partial class MainWindow : Window
 
     private async void ClearAllHistory_Click(object sender, RoutedEventArgs e)
     {
-        var L   = AppServices.Localize;
+        var L = AppServices.Localize;
         var res = MessageBox.Show(L["ClearHistoryConfirmMessage"], L["ClearHistoryConfirmTitle"],
             MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-        if (res != MessageBoxResult.OK) return;
+        if (res != MessageBoxResult.OK)
+            return;
 
         var result = await AppServices.Revert.RevertAllAsync();
 
@@ -161,7 +212,40 @@ public partial class MainWindow : Window
         StoreNavigationService.OpenProductPage();
     }
 
-    // ─── 外部から ApplyWindow を開く（単一インスタンス制御用） ───────────────
+    private void Support_Click(object sender, RoutedEventArgs e)
+    {
+        SaveSettings();
+        SupportNavigationService.OpenContactForm();
+    }
+
+    private void Faq_Click(object sender, RoutedEventArgs e)
+    {
+        SaveSettings();
+        SupportNavigationService.OpenFaq();
+    }
+
+    private void LicenseInfo_Click(object sender, RoutedEventArgs e)
+    {
+        SaveSettings();
+        StoreNavigationService.OpenProductPage();
+    }
+
+    private void Review_Click(object sender, RoutedEventArgs e)
+    {
+        SaveSettings();
+        StoreNavigationService.OpenReviewPage();
+    }
+
+    private void EditTagNames_Click(object sender, RoutedEventArgs e)
+    {
+        SaveSettings();
+        var dialog = new TagSettingsDialog { Owner = this };
+        if (dialog.ShowDialog() == true)
+        {
+            _settingsVm.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
+            _settingsVm.ShowTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
+        }
+    }
 
     public void OpenApplyWindow(string folderPath)
     {
@@ -172,5 +256,11 @@ public partial class MainWindow : Window
         win.Topmost = true;
         win.Topmost = false;
         win.Focus();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        SaveSettings();
+        base.OnClosing(e);
     }
 }

@@ -157,7 +157,7 @@
   <data name="Clear" xml:space="preserve"><value>Clear</value></data>
   <data name="AppliedAt" xml:space="preserve"><value>Applied: {0}</value></data>
 
-  <!-- SettingsWindow -->
+  <!-- Main window settings/help tabs -->
   <data name="SettingsTitle" xml:space="preserve"><value>Settings</value></data>
   <data name="LanguageSection" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageSystem" xml:space="preserve"><value>Use system language</value></data>
@@ -175,15 +175,7 @@
   <data name="SupportLink" xml:space="preserve"><value>Contact Support</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>License Information</value></data>
   <data name="RateReview" xml:space="preserve"><value>Rate on Store</value></data>
-  <data name="HelpWindowTitle" xml:space="preserve"><value>How can we help?</value></data>
-  <data name="HelpWindowLead" xml:space="preserve"><value>Choose the fastest path: contact support for a specific problem, or read the FAQ for common Windows folder icon behavior.</value></data>
-  <data name="SupportSection" xml:space="preserve"><value>Support and feedback</value></data>
-  <data name="ContactSupportTitle" xml:space="preserve"><value>Contact support</value></data>
-  <data name="ContactSupportDesc" xml:space="preserve"><value>Send a bug report, question, or folder icon issue through the support form.</value></data>
   <data name="FaqTitle" xml:space="preserve"><value>FAQ</value></data>
-  <data name="FaqDesc" xml:space="preserve"><value>Check common answers about icon refresh, supported images, and reverting folders.</value></data>
-  <data name="RateReviewTitle" xml:space="preserve"><value>Enjoying Folderly?</value></data>
-  <data name="RateReviewDesc" xml:space="preserve"><value>A quick Microsoft Store rating helps Folderly reach more Windows users.</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Rate Folderly</value></data>
   <data name="ReviewPromptMessage" xml:space="preserve"><value>If Folderly is helping you organize folders, please rate it on Microsoft Store. Choose OK to open the Store review page.</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Icon saved, but not visible yet</value></data>

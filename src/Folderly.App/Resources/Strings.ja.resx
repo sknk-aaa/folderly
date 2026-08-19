@@ -157,7 +157,7 @@
   <data name="Clear" xml:space="preserve"><value>削除</value></data>
   <data name="AppliedAt" xml:space="preserve"><value>適用日時: {0}</value></data>
 
-  <!-- SettingsWindow -->
+  <!-- Main window settings/help tabs -->
   <data name="SettingsTitle" xml:space="preserve"><value>設定</value></data>
   <data name="LanguageSection" xml:space="preserve"><value>言語</value></data>
   <data name="LanguageSystem" xml:space="preserve"><value>システム言語に従う</value></data>
@@ -175,15 +175,7 @@
   <data name="SupportLink" xml:space="preserve"><value>サポートに連絡</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>ライセンス情報</value></data>
   <data name="RateReview" xml:space="preserve"><value>Storeで評価</value></data>
-  <data name="HelpWindowTitle" xml:space="preserve"><value>どのヘルプを開きますか？</value></data>
-  <data name="HelpWindowLead" xml:space="preserve"><value>具体的な不具合や質問はお問い合わせへ、よくあるアイコン表示の挙動はFAQで確認できます。</value></data>
-  <data name="SupportSection" xml:space="preserve"><value>サポートとフィードバック</value></data>
-  <data name="ContactSupportTitle" xml:space="preserve"><value>お問い合わせ</value></data>
-  <data name="ContactSupportDesc" xml:space="preserve"><value>不具合、質問、アイコンが変わらない問題などをフォームから送信できます。</value></data>
   <data name="FaqTitle" xml:space="preserve"><value>よくある質問</value></data>
-  <data name="FaqDesc" xml:space="preserve"><value>アイコンの更新、対応画像、元に戻す方法などのよくある質問を確認できます。</value></data>
-  <data name="RateReviewTitle" xml:space="preserve"><value>Folderly が役に立っていますか？</value></data>
-  <data name="RateReviewDesc" xml:space="preserve"><value>Microsoft Store での評価は、Folderly を必要な人に届ける助けになります。</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Folderlyを評価</value></data>
   <data name="ReviewPromptMessage" xml:space="preserve"><value>Folderlyがフォルダ整理に役立っていたら、Microsoft Storeで評価をお願いします。OKを押すとStoreの評価ページを開きます。</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>アイコンは保存されましたが、まだ表示を確認できません</value></data>
