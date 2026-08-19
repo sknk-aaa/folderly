@@ -9,6 +9,42 @@
         Background="{StaticResource SurfaceBrush}"
         FontFamily="Segoe UI Variable">
 
+    <Window.Resources>
+        <Style x:Key="HelpRowButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFF7F7F7"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#FFC8C8C8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFEFEFEF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -225,7 +261,132 @@
                                TextWrapping="Wrap"
                                Margin="22,0,0,0"/>
 
-                    <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
+                    <Border Margin="0,18,0,0"
+                            Padding="12,10"
+                            Background="#FFFFFAEA"
+                            BorderBrush="#FFFFD66B"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="22"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="*"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#FFB07A00"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding L[ReviewInlineText]}"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       Margin="4,0,16,0"/>
+                            <Button Grid.Column="2"
+                                    Content="{Binding L[ReviewAction]}"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="Review_Click"
+                                    FontSize="13"
+                                    Padding="12,5"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Grid x:Name="HelpPanel"
+                  Visibility="Collapsed"
+                  DataContext="{Binding SettingsContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                <StackPanel Margin="24,24,24,24"
+                            MaxWidth="560"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top">
+                    <Button Style="{StaticResource HelpRowButton}"
+                            Click="Support_Click"
+                            Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Width="30" Height="30"
+                                    Background="#FFEAF4FF"
+                                    CornerRadius="15"
+                                    VerticalAlignment="Center">
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Stroke="{StaticResource PrimaryBrush}"
+                                              StrokeThickness="2.2"
+                                              StrokeLineJoin="Round"
+                                              StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round"
+                                              Data="M4,5 H20 V16 H9 L4,20 V5 Z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding L[SupportLink]}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding L[HelpContactShort]}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2"
+                                       Text=">"
+                                       FontSize="18"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="16,0,0,0"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource HelpRowButton}"
+                            Click="Faq_Click"
+                            Margin="0,0,0,18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Width="30" Height="30"
+                                    Background="#FFFFF4D9"
+                                    CornerRadius="15"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="?"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#FF9A6A00"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding L[FaqTitle]}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding L[HelpFaqShort]}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2"
+                                       Text=">"
+                                       FontSize="18"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="16,0,0,0"/>
+                        </Grid>
+                    </Button>
+
+                    <Separator Margin="0,0,0,16" Background="{StaticResource BorderBrush}"/>
 
                     <TextBlock Text="{Binding L[AboutSection]}"
                                FontSize="12" FontWeight="SemiBold"
@@ -256,46 +417,12 @@
                                    FontSize="13" TextWrapping="Wrap"/>
                     </Grid>
 
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="{Binding L[LicenseInfo]}"
-                                Style="{StaticResource SecondaryButton}"
-                                Click="LicenseInfo_Click"
-                                FontSize="13" Padding="12,5"
-                                Margin="0,0,8,0"/>
-                        <Button Content="{Binding L[SupportLink]}"
-                                Style="{StaticResource SecondaryButton}"
-                                Click="Support_Click"
-                                FontSize="13" Padding="12,5"
-                                Margin="0,0,8,0"/>
-                        <Button Content="{Binding L[FaqTitle]}"
-                                Style="{StaticResource SecondaryButton}"
-                                Click="Faq_Click"
-                                FontSize="13" Padding="12,5"
-                                Margin="0,0,8,0"/>
-                        <Button Content="{Binding L[RateReview]}"
-                                Style="{StaticResource SecondaryButton}"
-                                Click="Review_Click"
-                                FontSize="13" Padding="12,5"/>
-                    </StackPanel>
-                </StackPanel>
-            </ScrollViewer>
-
-            <Grid x:Name="HelpPanel" Visibility="Collapsed">
-                <StackPanel Margin="24,24,24,24"
-                            Width="220"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top">
-                    <Button Content="{Binding L[SupportLink]}"
+                    <Button Content="{Binding L[LicenseInfo]}"
                             Style="{StaticResource SecondaryButton}"
-                            Click="Support_Click"
-                            Padding="16,9"
-                            HorizontalContentAlignment="Center"
-                            Margin="0,0,0,10"/>
-                    <Button Content="{Binding L[FaqTitle]}"
-                            Style="{StaticResource SecondaryButton}"
-                            Click="Faq_Click"
-                            Padding="16,9"
-                            HorizontalContentAlignment="Center"/>
+                            Click="LicenseInfo_Click"
+                            FontSize="13"
+                            Padding="12,5"
+                            HorizontalAlignment="Left"/>
                 </StackPanel>
             </Grid>
         </Grid>
