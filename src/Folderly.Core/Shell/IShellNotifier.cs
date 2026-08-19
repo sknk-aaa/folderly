@@ -11,4 +11,10 @@ public interface IShellNotifier
     /// </summary>
     void NotifyFolderChanged(string folderPath);
     void NotifyFolderReverted(string folderPath);
+
+    /// <summary>
+    /// Returns true when Windows Shell resolves the folder to the expected icon.
+    /// This is used only as a post-apply verification step; it must not modify user files.
+    /// </summary>
+    bool IsFolderIconApplied(string folderPath, string expectedIconPath);
 }

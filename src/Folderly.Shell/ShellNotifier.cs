@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using Folderly.Core.Shell;
 
@@ -89,6 +90,26 @@ public sealed class ShellNotifier : IShellNotifier
         ForceThumbnailExtraction(folderPath);
         ForceIconIndexUpdate(folderPath);
         RefreshExplorerWindows(folderPath);
+    }
+
+    public bool IsFolderIconApplied(string folderPath, string expectedIconPath)
+    {
+        if (!OperatingSystem.IsWindows())
+            return true;
+        if (!Directory.Exists(folderPath) || !File.Exists(expectedIconPath))
+            return false;
+
+        try
+        {
+            var folderIconHash = GetShellIconHash(folderPath);
+            var expectedIconHash = GetShellIconHash(expectedIconPath);
+            return !string.IsNullOrWhiteSpace(folderIconHash) &&
+                   string.Equals(folderIconHash, expectedIconHash, StringComparison.Ordinal);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static void RefreshExplorerWindows(string folderPath)
@@ -322,6 +343,30 @@ public sealed class ShellNotifier : IShellNotifier
             NativeMethods.SHCNF_DWORD | NativeMethods.SHCNF_FLUSH,
             nint.Zero,
             (nint)shfi.iIcon);
+    }
+
+    private static string? GetShellIconHash(string path)
+    {
+        var shfi = new NativeMethods.SHFILEINFOW();
+        var result = NativeMethods.SHGetFileInfo(
+            path, 0, ref shfi,
+            (uint)Marshal.SizeOf<NativeMethods.SHFILEINFOW>(),
+            NativeMethods.SHGFI_ICON);
+        if (result == nint.Zero || shfi.hIcon == nint.Zero)
+            return null;
+
+        try
+        {
+            using var icon = (System.Drawing.Icon)System.Drawing.Icon.FromHandle(shfi.hIcon).Clone();
+            using var bitmap = icon.ToBitmap();
+            using var stream = new MemoryStream();
+            bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            return Convert.ToHexString(SHA256.HashData(stream.ToArray()));
+        }
+        finally
+        {
+            NativeMethods.DestroyIcon(shfi.hIcon);
+        }
     }
 
     private static unsafe void NotifyPath(string path, uint eventId)

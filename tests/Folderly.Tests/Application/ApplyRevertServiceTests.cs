@@ -15,10 +15,18 @@ internal sealed class NoOpShellNotifier : IShellNotifier
 {
     public List<string> NotifiedPaths { get; } = new();
     public List<string> RevertedPaths { get; } = new();
+    public bool IconApplied { get; set; } = true;
+    public int VerificationCount { get; private set; }
+
     public void NotifyFolderChanged(string folderPath)
         => NotifiedPaths.Add(folderPath);
     public void NotifyFolderReverted(string folderPath)
         => RevertedPaths.Add(folderPath);
+    public bool IsFolderIconApplied(string folderPath, string expectedIconPath)
+    {
+        VerificationCount++;
+        return IconApplied;
+    }
 }
 
 public class ApplyRevertServiceTests : IDisposable
@@ -237,6 +245,27 @@ public class ApplyRevertServiceTests : IDisposable
 
         Assert.True(result.IsSuccess);
         Assert.False(result.IsWarning);
+        Assert.True(result.IconVerified);
+    }
+
+    [Fact]
+    public async Task ApplyAsync_WhenShellDoesNotResolveIcon_ReturnsSuccessButUnverified()
+    {
+        _notifier.IconApplied = false;
+        var service = new ApplyService(
+            _repo,
+            _notifier,
+            folderlyDataDir: _folderlyDataDir,
+            iconVerificationDelayMs: [0]);
+
+        var result = await service.ApplyAsync(MakeRequest());
+
+        Assert.True(result.IsSuccess);
+        Assert.False(result.IsWarning);
+        Assert.False(result.IconVerified);
+        Assert.NotNull(result.Message);
+        Assert.True(_notifier.NotifiedPaths.Count >= 2);
+        Assert.True(_notifier.VerificationCount >= 4);
     }
 
     [Fact]

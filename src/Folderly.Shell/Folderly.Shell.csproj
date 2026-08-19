@@ -10,4 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Folderly.Core\Folderly.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+  </ItemGroup>
 </Project>

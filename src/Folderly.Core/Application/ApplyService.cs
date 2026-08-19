@@ -26,12 +26,20 @@ public record ApplyRequest(
     int TagIconIndex = -1,
     bool ShowTagIconOnIcon = false);
 
-public record ApplyResult(bool IsSuccess, bool IsWarning, string? Message, string? IconPath)
+public record ApplyResult(
+    bool IsSuccess,
+    bool IsWarning,
+    string? Message,
+    string? IconPath,
+    bool IconVerified = true)
 {
-    public static ApplyResult Success(string iconPath) =>
-        new(true,  false, null,    iconPath);
+    public static ApplyResult Success(
+        string iconPath,
+        bool iconVerified = true,
+        string? message = null) =>
+        new(true, false, message, iconPath, iconVerified);
     public static ApplyResult Warning(string reason) =>
-        new(false, true,  reason, null);
+        new(false, true, reason, null, false);
 }
 
 /// <summary>
@@ -44,12 +52,14 @@ public sealed class ApplyService
     private readonly IShellNotifier _shellNotifier;
     private readonly ILogger<ApplyService> _logger;
     private readonly string _folderlyDataDir;
+    private readonly IReadOnlyList<int> _iconVerificationDelayMs;
 
     public ApplyService(
         HistoryRepository historyRepository,
         IShellNotifier shellNotifier,
         ILogger<ApplyService>? logger = null,
-        string? folderlyDataDir = null)
+        string? folderlyDataDir = null,
+        IReadOnlyList<int>? iconVerificationDelayMs = null)
     {
         _history = historyRepository;
         _shellNotifier = shellNotifier;
@@ -58,6 +68,7 @@ public sealed class ApplyService
             ?? Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Folderly");
+        _iconVerificationDelayMs = iconVerificationDelayMs ?? [150, 350, 700];
     }
 
     public async Task<ApplyResult> ApplyAsync(
@@ -132,6 +143,15 @@ public sealed class ApplyService
 
         // 10. Shell 通知
         _shellNotifier.NotifyFolderChanged(folderPath);
+        var iconVerified = await WaitForIconVerificationAsync(folderPath, localIcoPath);
+        if (!iconVerified)
+        {
+            _logger.LogWarning(
+                "Windows Shell did not resolve the expected icon after initial apply for {FolderPath}. Retrying refresh.",
+                folderPath);
+            _shellNotifier.NotifyFolderChanged(folderPath);
+            iconVerified = await WaitForIconVerificationAsync(folderPath, localIcoPath);
+        }
 
         // 11. 履歴保存
         var mode = request.AdjustParams.Mode switch
@@ -166,8 +186,17 @@ public sealed class ApplyService
             _history.GetAll(),
             _logger);
 
-        _logger.LogInformation("Applied successfully to {FolderPath}", folderPath);
-        return ApplyResult.Success(centralIcoPath);
+        _logger.LogInformation(
+            "Applied successfully to {FolderPath}. IconVerified={IconVerified}",
+            folderPath,
+            iconVerified);
+
+        return ApplyResult.Success(
+            centralIcoPath,
+            iconVerified,
+            iconVerified
+                ? null
+                : "Folderly saved the icon files, but Windows did not report the new icon as active. This can happen for cloud, network, special, or untrusted folders, or after recent Windows security updates.");
     }
 
     private static string ComputeHash(byte[] icoBytes)
@@ -231,5 +260,24 @@ public sealed class ApplyService
         await File.WriteAllBytesAsync(localPath, icoBytes, ct);
 
         return (centralPath, localPath);
+    }
+
+    private async Task<bool> WaitForIconVerificationAsync(
+        string folderPath,
+        string expectedIconPath)
+    {
+        if (_shellNotifier.IsFolderIconApplied(folderPath, expectedIconPath))
+            return true;
+
+        foreach (var delayMs in _iconVerificationDelayMs)
+        {
+            if (delayMs > 0)
+                await Task.Delay(delayMs);
+
+            if (_shellNotifier.IsFolderIconApplied(folderPath, expectedIconPath))
+                return true;
+        }
+
+        return false;
     }
 }

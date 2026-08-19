@@ -705,7 +705,19 @@ public partial class ApplyWindow : Window
                 await ExecuteScriptSafeAsync(
                     $"document.getElementById('btn-apply').textContent={JsonSerializer.Serialize("✓ " + AppServices.Localize["ApplyCompleted"])};");
 
-                ShowReviewPromptIfNeeded();
+                if (result.IconVerified)
+                {
+                    ShowReviewPromptIfNeeded();
+                }
+                else
+                {
+                    MessageBox.Show(
+                        AppServices.Localize["ApplyVerificationWarningMessage"],
+                        AppServices.Localize["ApplyVerificationWarningTitle"],
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+
                 Hide();
                 if (ShouldReopenExplorer())
                     await ReopenExplorerWindowsAsync(_vm.FolderPath);
