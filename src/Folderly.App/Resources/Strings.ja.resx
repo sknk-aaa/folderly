@@ -90,7 +90,6 @@
   <data name="EditingTag" xml:space="preserve"><value>「{0}」を編集中</value></data>
   <data name="TagColorLabel" xml:space="preserve"><value>カラー</value></data>
   <data name="TagIconLabel" xml:space="preserve"><value>アイコン</value></data>
-  <data name="TagDeleteBtn" xml:space="preserve"><value>削除</value></data>
   <data name="NewTagBtn" xml:space="preserve"><value>新規タグを追加</value></data>
   <data name="FolderPreviewTitle" xml:space="preserve"><value>フォルダプレビュー</value></data>
   <data name="FolderPreviewAlt" xml:space="preserve"><value>フォルダプレビュー</value></data>

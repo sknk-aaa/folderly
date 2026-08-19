@@ -17,10 +17,16 @@ public sealed class SettingsViewModel : ViewModelBase
         get => _selectedLang;
         set
         {
-            SetField(ref _selectedLang, value);
+            if (_selectedLang == value)
+                return;
+
+            _selectedLang = value;
+            Notify();
             Notify(nameof(IsSystemLang));
             Notify(nameof(IsJaLang));
             Notify(nameof(IsEnLang));
+            AppServices.History.SetSetting("language", _selectedLang);
+            AppServices.Localize.SetLanguage(_selectedLang);
         }
     }
 

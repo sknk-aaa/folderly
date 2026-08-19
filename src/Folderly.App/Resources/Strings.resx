@@ -90,7 +90,6 @@
   <data name="EditingTag" xml:space="preserve"><value>Editing &quot;{0}&quot;</value></data>
   <data name="TagColorLabel" xml:space="preserve"><value>Color</value></data>
   <data name="TagIconLabel" xml:space="preserve"><value>Icon</value></data>
-  <data name="TagDeleteBtn" xml:space="preserve"><value>Delete tag</value></data>
   <data name="NewTagBtn" xml:space="preserve"><value>Add new tag</value></data>
   <data name="FolderPreviewTitle" xml:space="preserve"><value>Folder preview</value></data>
   <data name="FolderPreviewAlt" xml:space="preserve"><value>Folder preview</value></data>

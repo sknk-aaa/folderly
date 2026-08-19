@@ -185,7 +185,7 @@ Explorer windows may briefly reopen after applying. This is intentional and refr
 
 - [ ] Privacy/support URL is public: `https://folderlyapp.com/privacy/`.
 - [ ] Support section is public: `https://folderlyapp.com/privacy/#support`.
-- [ ] App contact form opens: `https://tally.so/r/PdZEN0`.
+- [ ] App contact form opens JP `https://tally.so/r/q48Bqk`, EN `https://tally.so/r/PdZEN0`.
 - [ ] Partner Center category is set to `Utilities & tools`.
 - [ ] Device family is `Windows 10/11 Desktop` only.
 - [ ] Price/trial/market settings are completed.

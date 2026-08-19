@@ -4,14 +4,15 @@
 
 ### Current Store Submission
 
-- Store candidate version: `1.5.0.0`
-- Store upload candidate: `_out\Folderly_1.5.0.0_x64_store.msix`
+- Store candidate version: `1.6.0.0`
+- Store upload candidate: `_out\Folderly_1.6.0.0_x64_store.msix`
 - Local verification builds used: `_out\Folderly_1.4.2.0_x64_local_sideload.msix`, `_out\Folderly_1.4.3.0_x64_local_sideload.msix`
 - Main changes:
   - Help and Settings now open as main-window tabs instead of separate modal windows.
   - Help tab now has compact Contact Support / FAQ rows and an About Folderly section.
   - Settings tab now keeps only a subtle inline Store rating prompt at the bottom.
   - Support form and FAQ links remain language-aware.
+  - v1.6 fixes immediate language switching, passes the selected language to the contact form, and improves clickable blue UI states.
   - Prior v1.4 icon, Japanese Store screenshot, language, purchase link, and review request improvements are retained.
 
 ### Store Review Count Issue
@@ -76,10 +77,10 @@ After the Store update is live, check:
 | Package family name | `KanekoApps.Folderly_q8156m1pgwn5a` |
 | Store ID | `9N99JH5H91H8` |
 | Store URL | `https://apps.microsoft.com/detail/9N99JH5H91H8` |
-| Current version | `1.5.0.0`（アプリ表示 `1.5.0`） |
+| Current version | `1.6.0.0`（アプリ表示 `1.6.0`） |
 | Min OS | Windows 10 1809 (`10.0.17763.0`) |
 
-バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.5.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースも 4 桁目 0。
+バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`1.6.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースも 4 桁目 0。
 
 ## Key URLs
 
@@ -87,7 +88,7 @@ After the Store update is live, check:
 |---|---|
 | Privacy Policy | `https://folderlyapp.com/privacy/` |
 | Partner Center Support | `https://folderlyapp.com/privacy/#support` |
-| App Settings Contact Support | `https://tally.so/r/PdZEN0` |
+| App Settings Contact Support | JP `https://tally.so/r/q48Bqk` / EN `https://tally.so/r/PdZEN0` |
 
 プライバシーポリシー/FAQ/サポートの公開ページは `folderly-web` の `/privacy/`。アプリ内の問い合わせ導線は Tally フォーム、FAQ 導線は言語別に `/privacy/#faq-ja` または `/privacy/#faq`。
 
@@ -113,7 +114,7 @@ Visual Studio がこの環境で Publish / Store / Create App Packages を表示
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$version = '1.5.0.0'
+$version = '1.6.0.0'
 $root = (Resolve-Path .).Path
 $outDir = Join-Path $root '_out'
 $stage = Join-Path $outDir "store_msix_stage_$version"
@@ -136,8 +137,8 @@ $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeapp
 MSIX 内容確認：
 
 ```powershell
-$msix = '_out\Folderly_1.5.0.0_x64_store.msix'
-$verify = '_out\verify_store_msix_manifest_1.5.0.0'
+$msix = '_out\Folderly_1.6.0.0_x64_store.msix'
+$verify = '_out\verify_store_msix_manifest_1.6.0.0'
 $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe'
 Remove-Item -LiteralPath $verify -Recurse -Force -ErrorAction SilentlyContinue
 & $makeappx unpack /p $msix /d $verify
@@ -150,15 +151,15 @@ Get-Content (Join-Path $verify 'AppxManifest.xml')
 
 Store 用パッケージ（Partner Center へアップロードするもの）はローカルに直接インストールできない。ローカルテスト用にはコピーに署名した sideload パッケージを使う。
 
-- Store upload: `_out\Folderly_1.5.0.0_x64_store.msix`（署名なし）
-- Local install: `_out\Folderly_1.5.0.0_x64_sideload.msix`（署名済み）
+- Store upload: `_out\Folderly_1.6.0.0_x64_store.msix`（署名なし）
+- Local install: `_out\Folderly_1.6.0.0_x64_sideload.msix`（署名済み）
 
 ```powershell
 $ErrorActionPreference = 'Stop'
 $publisher = 'CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E'
 $root = (Resolve-Path .).Path
-$storeMsix = Join-Path $root '_out\Folderly_1.5.0.0_x64_store.msix'
-$sideloadMsix = Join-Path $root '_out\Folderly_1.5.0.0_x64_sideload.msix'
+$storeMsix = Join-Path $root '_out\Folderly_1.6.0.0_x64_store.msix'
+$sideloadMsix = Join-Path $root '_out\Folderly_1.6.0.0_x64_sideload.msix'
 $certPath = Join-Path $root '_out\Folderly_LocalSideload.cer'
 
 $cert = Get-ChildItem Cert:\CurrentUser\My |
@@ -356,7 +357,7 @@ Improved review discovery after users successfully apply folder icons.
 5. 提出した MSIX のファイル名と SHA-256
 
 ```powershell
-Get-FileHash .\_out\Folderly_1.5.0.0_x64_store.msix -Algorithm SHA256
+Get-FileHash .\_out\Folderly_1.6.0.0_x64_store.msix -Algorithm SHA256
 ```
 
 ### 指摘別の切り分け

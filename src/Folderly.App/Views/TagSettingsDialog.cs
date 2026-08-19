@@ -561,21 +561,7 @@ public sealed class TagSettingsDialog : Window
         footer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         border.Child = footer;
-
-        // 削除ボタン（非機能 UI）
-        var deleteBtn = new Button
-        {
-            Content   = L["TagDeleteBtn"],
-            IsEnabled = false,
-            Padding   = new Thickness(14, 7, 14, 7),
-            MinWidth  = 80,
-            Foreground = new SolidColorBrush(Color.FromRgb(196, 43, 28)),
-            Style     = (Style?)Application.Current.TryFindResource("SecondaryButton"),
-        };
-        Grid.SetColumn(deleteBtn, 0);
-        footer.Children.Add(deleteBtn);
 
         var cancel = new Button
         {
@@ -586,7 +572,7 @@ public sealed class TagSettingsDialog : Window
             MinWidth = 80,
         };
         cancel.Click += (_, _) => Close();
-        Grid.SetColumn(cancel, 2);
+        Grid.SetColumn(cancel, 1);
         footer.Children.Add(cancel);
 
         var save = new Button
@@ -597,7 +583,7 @@ public sealed class TagSettingsDialog : Window
             MinWidth = 80,
         };
         save.Click += (_, _) => SaveAndClose();
-        Grid.SetColumn(save, 3);
+        Grid.SetColumn(save, 2);
         footer.Children.Add(save);
 
         return border;

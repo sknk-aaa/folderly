@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Brand Colors (SPEC Section 1.6 / 4.5) -->
-    <Color x:Key="PrimaryColor">#FF0078D4</Color>
+    <Color x:Key="PrimaryColor">#FF1665B8</Color>
     <Color x:Key="AccentColor">#FFFFB900</Color>
     <Color x:Key="ErrorColor">#FFC42B1C</Color>
     <Color x:Key="SurfaceColor">#FFFAFAFA</Color>
@@ -26,7 +26,7 @@
         <Setter Property="Background"   Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="Foreground"   Value="White"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding"      Value="16,6"/>
+        <Setter Property="Padding"      Value="16,7"/>
         <Setter Property="FontFamily"   Value="Segoe UI Variable"/>
         <Setter Property="FontSize"     Value="13"/>
         <Setter Property="Cursor"       Value="Hand"/>
@@ -35,16 +35,19 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Border"
                             Background="{TemplateBinding Background}"
+                            BorderBrush="#22000000"
+                            BorderThickness="1"
                             CornerRadius="4"
-                            Padding="{TemplateBinding Padding}">
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FF106EBE"/>
+                            <Setter TargetName="Border" Property="Background" Value="#FF0F5FAA"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FF005A9E"/>
+                            <Setter TargetName="Border" Property="Background" Value="#FF0B4E8F"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Border" Property="Background" Value="#FFB0B0B0"/>
@@ -59,7 +62,7 @@
     <Style x:Key="SecondaryButton" TargetType="Button">
         <Setter Property="Background"      Value="White"/>
         <Setter Property="Foreground"      Value="{StaticResource TextPrimaryBrush}"/>
-        <Setter Property="BorderBrush"     Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderBrush"     Value="#FFC8CED8"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding"         Value="16,6"/>
         <Setter Property="FontFamily"      Value="Segoe UI Variable"/>
@@ -78,10 +81,11 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FFF3F3F3"/>
+                            <Setter TargetName="Border" Property="Background" Value="#FFF5F9FF"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="#FF9DB7D8"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FFE8E8E8"/>
+                            <Setter TargetName="Border" Property="Background" Value="#FFEAF2FF"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

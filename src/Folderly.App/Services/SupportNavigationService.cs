@@ -5,7 +5,7 @@ namespace Folderly.App.Services;
 
 public static class SupportNavigationService
 {
-    private const string ContactFormJa = "https://tally.so/r/PdZEN0";
+    private const string ContactFormJa = "https://tally.so/r/q48Bqk";
     private const string ContactFormEn = "https://tally.so/r/PdZEN0";
     private const string FaqJa = "https://folderlyapp.com/privacy/#faq-ja";
     private const string FaqEn = "https://folderlyapp.com/privacy/#faq";
