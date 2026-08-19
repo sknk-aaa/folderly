@@ -87,9 +87,9 @@ After the Store update is live, check:
 |---|---|
 | Privacy Policy | `https://folderlyapp.com/privacy/` |
 | Partner Center Support | `https://folderlyapp.com/privacy/#support` |
-| App Settings Contact Support | `https://github.com/sknk-aaa/folderly/issues` |
+| App Settings Contact Support | `https://tally.so/r/PdZEN0` |
 
-プライバシーポリシー/FAQ/サポートの公開ページは `folderly-web` の `/privacy/`。
+プライバシーポリシー/FAQ/サポートの公開ページは `folderly-web` の `/privacy/`。アプリ内の問い合わせ導線は Tally フォーム、FAQ 導線は言語別に `/privacy/#faq-ja` または `/privacy/#faq`。
 
 ## Build
 

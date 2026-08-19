@@ -10,7 +10,7 @@ Current candidate:
 - Store candidate package: `_out/Folderly_1.3.0.0_x64_store.msix`
 - SHA-256: `7E1F6A4B07402B62690F905686FA7283E478A8740879142304536A4EF7A85E7A`
 - Architecture: x64
-- Automated tests: `137` passed
+- Automated tests: `138` passed
 - Feature verification: 1.3.0 の変更点（Store `CLR_EXCEPTION_80131600` 対策・ヘルプURL差し替え）をコード/パッケージ内容で確認済み
 - Pending: Partner Center へのアップロード、必要に応じたパッケージ形態でのフル手動チェックリスト
 
@@ -185,6 +185,7 @@ Explorer windows may briefly reopen after applying. This is intentional and refr
 
 - [ ] Privacy/support URL is public: `https://folderlyapp.com/privacy/`.
 - [ ] Support section is public: `https://folderlyapp.com/privacy/#support`.
+- [ ] App contact form opens: `https://tally.so/r/PdZEN0`.
 - [ ] Partner Center category is set to `Utilities & tools`.
 - [ ] Device family is `Windows 10/11 Desktop` only.
 - [ ] Price/trial/market settings are completed.

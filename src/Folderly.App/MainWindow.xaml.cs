@@ -48,12 +48,10 @@ public partial class MainWindow : Window
         _vm.Refresh();
     }
 
-    private const string FaqUrl = "https://folderlyapp.com/privacy/#faq";
-
     private void HelpTab_Click(object sender, RoutedEventArgs e)
     {
-        try { Process.Start(new ProcessStartInfo(FaqUrl) { UseShellExecute = true }); }
-        catch { /* サイレント無視 */ }
+        var win = new HelpWindow { Owner = this };
+        win.ShowDialog();
     }
 
     // ─── 履歴アクション ──────────────────────────────────────────────────────

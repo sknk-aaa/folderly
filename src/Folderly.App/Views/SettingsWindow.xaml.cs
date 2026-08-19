@@ -1,14 +1,12 @@
 using Folderly.App.Infrastructure;
 using Folderly.App.Services;
 using Folderly.App.ViewModels;
-using System.Diagnostics;
 using System.Windows;
 
 namespace Folderly.App.Views;
 
 public partial class SettingsWindow : Window
 {
-    private const string SupportUrl = "https://github.com/sknk-aaa/folderly/issues";
     private readonly SettingsViewModel _vm = new();
 
     public SettingsWindow()
@@ -34,8 +32,12 @@ public partial class SettingsWindow : Window
 
     private void Support_Click(object sender, RoutedEventArgs e)
     {
-        try { Process.Start(new ProcessStartInfo(SupportUrl) { UseShellExecute = true }); }
-        catch { /* サイレント無視 */ }
+        SupportNavigationService.OpenContactForm();
+    }
+
+    private void Faq_Click(object sender, RoutedEventArgs e)
+    {
+        SupportNavigationService.OpenFaq();
     }
 
     private void LicenseInfo_Click(object sender, RoutedEventArgs e)
