@@ -2,6 +2,67 @@
 
 ## 2026-08-20 Handoff
 
+### Latest Web/Marketing Update
+
+- `folderly-web` was updated and pushed.
+  - Latest pushed commit: `c8ff440 検索流入向けLPとメタ情報を改善`
+- GSC showed the highest-click pages are:
+  - `/blog/folder-icon-not-changing/`
+  - `/en/blog/folder-icon-not-changing/`
+  - `/`
+  - `/en/`
+  - `/blog/windows-folder-icon-change/`
+- The top two "folder icon not changing" pages were improved from ordinary articles into search-intent landing pages:
+  - clear symptom-first answer near the top
+  - symptom shortcut links
+  - stronger explanation of cache, `desktop.ini`, `.ico`, OneDrive, and network folders
+  - Store CTA at the end
+  - FAQPage JSON-LD added
+- Other major pages had title/description/OG/JSON-LD copy adjusted toward search intent:
+  - JP/EN LP
+  - JP/EN blog index
+  - JP/EN "how to change folder icons" articles
+  - JP/EN "how to use Folderly" articles
+- Validation done for the web update:
+  - `git diff --check` passed.
+  - JSON-LD parsed successfully across all 11 `index.html` files.
+  - Chrome/Playwright checked the top two pages on desktop and mobile.
+  - Mobile horizontal overflow was found in long command snippets and fixed.
+- `folderly-web` still has local uncommitted image diffs that were intentionally not included:
+  - `assets/raw/step1.png`
+  - `assets/raw/step2.png`
+
+### URLs To Check For Web Update
+
+- JP top search landing page:
+  - `https://folderlyapp.com/blog/folder-icon-not-changing/?v=c8ff440`
+  - Check because it is currently the largest GSC click source and should now route high-intent visitors toward Folderly/Store.
+- EN top search landing page:
+  - `https://folderlyapp.com/en/blog/folder-icon-not-changing/?v=c8ff440`
+  - Check because it is the strongest English search page and a likely overseas entry point.
+- JP LP:
+  - `https://folderlyapp.com/?v=c8ff440`
+  - Check because title/description now target "folder icon changer using photos/images" and sale price copy.
+- EN LP:
+  - `https://folderlyapp.com/en/?v=c8ff440`
+  - Check because English metadata now targets "Folder Icon Changer for Windows 11" and "$1.49 until Sep 2".
+- JP how-to article:
+  - `https://folderlyapp.com/blog/windows-folder-icon-change/?v=c8ff440`
+  - Check because title/description now target "フォルダアイコンの変更方法" rather than a narrower "できない" intent.
+
+### Expected Impact
+
+- The update is mainly for improving conversion from existing high-intent search traffic, not for immediate large exposure growth.
+- Expected improvements:
+  - better search-result CTR from clearer title/description
+  - better Store click-through from the two highest-intent article pages
+  - more query coverage around "反映されない", "元に戻る", `desktop.ini`, icon cache, `.ico`, OneDrive, and network folders
+- Measure after 2-6 weeks in GSC:
+  - CTR on the top two article URLs
+  - impressions/clicks by query
+  - Store CTA clicks if analytics can capture them
+  - Store page views and purchases during the sale period
+
 ### Current State
 
 - Latest source version: `1.6.3.0`（アプリ表示 `1.6.3`）

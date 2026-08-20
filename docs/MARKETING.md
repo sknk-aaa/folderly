@@ -2,6 +2,39 @@
 
 ## 2026-07-30 Update: LP/SEO/Store Growth Plan
 
+### 2026-08-20 Update: GSC上位ページのLP化とメタ改善
+
+- `folderly-web` は `c8ff440 検索流入向けLPとメタ情報を改善` まで push 済み。
+- GSCでは上位クリックが以下に集中しているため、まずこの順で改善した。
+  - `/blog/folder-icon-not-changing/`
+  - `/en/blog/folder-icon-not-changing/`
+  - `/`
+  - `/en/`
+  - `/blog/windows-folder-icon-change/`
+- 上位2記事は「読むだけの記事」ではなく、困って検索した人をFolderly/Storeへ送る検索流入LPとして改善した。
+  - 冒頭に症状別の結論を追加。
+  - 「反映されない」「元に戻る」「画像が選べない」「ネットワークフォルダ」の近道を追加。
+  - アイコンキャッシュ、`desktop.ini`、`.ico`、OneDrive、ネットワークフォルダの説明を強化。
+  - 記事末尾のCTAをMicrosoft Storeへ寄せた。
+  - FAQPage構造化データを追加。
+- その他の主要ページは title / description / OGP / JSON-LD の文言を、実際の検索意図に寄せた。
+  - JP LP: 「フォルダアイコン変更アプリ」「画像・写真」「見分けやすく」
+  - EN LP: "Folder Icon Changer for Windows 11", "Photos & Color Tags"
+  - JP how-to: 「フォルダアイコンの変更方法」「画像・写真を使う手順」
+  - EN how-to: "How to Change Folder Icons on Windows 11/10 Using Pictures"
+- 検証:
+  - `git diff --check` OK。
+  - 11個の `index.html` のJSON-LD parse OK。
+  - Chromeで上位2記事のPC/スマホ表示を確認。
+  - 長いコマンド表記によるスマホ横スクロールを修正済み。
+- 期待する効果:
+  - 既存の高意図流入からStoreへの遷移率改善。
+  - 検索結果でのCTR改善。
+  - 「反映されない」「元に戻る」「desktop.ini」「icon cache」「network folder」など周辺クエリの拾い直し。
+- 効果測定は2-6週間後。
+  - GSCで上位2記事のCTR、表示回数、クエリ増加を見る。
+  - Storeのページビュー、購入、レビュー増加と合わせて判断する。
+
 ### 今日の結論
 
 - 日本語流入が現状の主戦場。GSCではクリックの大半が日本から来ているため、まず日本語LPと日本語SEO記事を強くする。
