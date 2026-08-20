@@ -48,11 +48,10 @@ public class FolderProtectionTests : IDisposable
     [Theory]
     [InlineData(@"C:\Dropbox\Projects")]
     [InlineData(@"D:\Users\test\Dropbox\Work")]
-    public void CheckPath_DropboxPath_IsWarning(string path)
+    public void CheckPath_DropboxPath_DoesNotWarn(string path)
     {
         var result = FolderProtection.CheckPath(path);
-        // Dropbox は Warning（書き込み権限なしで Denied になる可能性もある）
-        Assert.True(result.Level is ProtectionLevel.Warning or ProtectionLevel.Denied);
+        Assert.NotEqual(ProtectionLevel.Warning, result.Level);
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public class FolderProtectionTests : IDisposable
     }
 
     [Fact]
-    public void CheckPath_OneDrivePath_IsWarning()
+    public void CheckPath_OneDrivePath_IsAllowed()
     {
         var originalOneDrive = Environment.GetEnvironmentVariable("OneDrive");
         try
@@ -82,7 +81,7 @@ public class FolderProtectionTests : IDisposable
             Directory.CreateDirectory(subPath);
 
             var result = FolderProtection.CheckPath(subPath);
-            Assert.Equal(ProtectionLevel.Warning, result.Level);
+            Assert.Equal(ProtectionLevel.Allowed, result.Level);
         }
         finally
         {

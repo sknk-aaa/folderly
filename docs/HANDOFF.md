@@ -1,5 +1,44 @@
 # Folderly Handoff
 
+## 2026-08-20 Handoff
+
+### Current State
+
+- Latest source version: `1.6.2.0`（アプリ表示 `1.6.2`）
+- Previous Store submission: `1.6.1.0` was submitted by the user.
+- Next Store candidate should be built as `_out\Folderly_1.6.2.0_x64_store.msix` if this network-folder update is submitted.
+
+### Done Today
+
+- Network folder handling was adjusted without changing the normal local-folder apply flow.
+- OneDrive, Dropbox, and long paths no longer show pre-apply warning dialogs.
+- UNC network paths such as `\\server\share\folder` still show a network-specific warning.
+- Mapped network drives such as `Z:\folder` are now detected via `DriveInfo.DriveType.Network`.
+- Network warning is shown only once after the user continues. The app stores this in `network_folder_warning_seen`.
+- Apply-result diagnostics were added for cases where files are saved but Explorer does not show the icon.
+- Network-specific verification failure message now includes diagnostic details:
+  - path type
+  - whether `_folderly` exists
+  - whether the expected icon file exists
+  - whether `desktop.ini` exists
+  - whether `desktop.ini` references the icon
+  - `desktop.ini` Hidden/System attributes
+  - folder ReadOnly/System attributes
+  - Explorer verification result
+
+### Validation
+
+- `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
+  - Passed: 138 tests.
+- `dotnet build .\Folderly.sln`
+  - Passed.
+
+### Follow-Up
+
+- Build and install `1.6.2.0` locally before submitting if the user wants to verify the new network-folder messages.
+- If the customer replies with `\\server\share` vs mapped drive and server/NAS type, use the diagnostics to decide whether this is Windows trust policy, server attribute support, or Explorer verification only.
+- Do not add registry/Group Policy/Trusted Sites automation. Those are security-sensitive and should remain manual guidance only.
+
 ## 2026-08-19 Handoff
 
 ### Current State

@@ -23,6 +23,8 @@ namespace Folderly.App.Views;
 
 public partial class ApplyWindow : Window
 {
+    private const string NetworkWarningSeenSettingKey = "network_folder_warning_seen";
+
     private readonly ApplyViewModel _vm;
     private bool _webViewReady;
     private static readonly Dictionary<string, string> CachedHtmlByLanguage = new(StringComparer.OrdinalIgnoreCase);
@@ -664,12 +666,24 @@ public partial class ApplyWindow : Window
         if (protection.IsWarning)
         {
             var L   = AppServices.Localize;
-            var msg = FolderProtection.IsOneDrivePath(_vm.FolderPath)
-                ? L["OneDriveWarningMessage"]
-                : string.Format(L["WarningGenericMessage"], protection.Reason);
-            var res = MessageBox.Show(msg, L["WarningGenericTitle"],
-                MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-            if (res != MessageBoxResult.OK) return;
+            var isNetwork = FolderProtection.IsNetworkPath(_vm.FolderPath);
+            var shouldShowWarning = !isNetwork ||
+                                    AppServices.History.GetSetting(NetworkWarningSeenSettingKey) != "1";
+            if (shouldShowWarning)
+            {
+                var title = isNetwork
+                    ? L["NetworkFolderWarningTitle"]
+                    : L["WarningGenericTitle"];
+                var msg = isNetwork
+                    ? L["NetworkFolderWarningMessage"]
+                    : string.Format(L["WarningGenericMessage"], protection.Reason);
+                var res = MessageBox.Show(msg, title,
+                    MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (res != MessageBoxResult.OK) return;
+
+                if (isNetwork)
+                    AppServices.History.SetSetting(NetworkWarningSeenSettingKey, "1");
+            }
         }
 
         _vm.IsApplying = true;
@@ -711,8 +725,9 @@ public partial class ApplyWindow : Window
                 }
                 else
                 {
+                    var warningMessage = BuildApplyVerificationWarningMessage(result);
                     MessageBox.Show(
-                        AppServices.Localize["ApplyVerificationWarningMessage"],
+                        warningMessage,
                         AppServices.Localize["ApplyVerificationWarningTitle"],
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
@@ -741,6 +756,38 @@ public partial class ApplyWindow : Window
             _vm.IsApplying = false;
             await ExecuteScriptSafeAsync("window.folderlySetApplying(false)");
         }
+    }
+
+    private static string BuildApplyVerificationWarningMessage(ApplyResult result)
+    {
+        var L = AppServices.Localize;
+        if (result.Diagnostics?.IsNetwork == true)
+        {
+            return string.Format(
+                L["ApplyVerificationNetworkWarningMessage"],
+                FormatDiagnostics(result.Diagnostics));
+        }
+
+        return L["ApplyVerificationWarningMessage"];
+    }
+
+    private static string FormatDiagnostics(ApplyDiagnostics diagnostics)
+    {
+        static string YesNo(bool value) => value ? "yes" : "no";
+
+        return string.Join(Environment.NewLine, new[]
+        {
+            $"Path type: {diagnostics.LocationKind}",
+            $"Folderly folder saved: {YesNo(diagnostics.FolderlyDirectoryExists)}",
+            $"Icon file saved: {YesNo(diagnostics.ExpectedIconFileExists)}",
+            $"desktop.ini saved: {YesNo(diagnostics.DesktopIniExists)}",
+            $"desktop.ini references icon: {YesNo(diagnostics.DesktopIniReferencesExpectedIcon)}",
+            $"desktop.ini Hidden: {YesNo(diagnostics.DesktopIniHidden)}",
+            $"desktop.ini System: {YesNo(diagnostics.DesktopIniSystem)}",
+            $"Folder ReadOnly: {YesNo(diagnostics.FolderReadOnly)}",
+            $"Folder System: {YesNo(diagnostics.FolderSystem)}",
+            $"Explorer verification: {YesNo(diagnostics.IconVerified)}",
+        });
     }
 
     private void ShowReviewPromptIfNeeded()

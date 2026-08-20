@@ -26,20 +26,39 @@ public record ApplyRequest(
     int TagIconIndex = -1,
     bool ShowTagIconOnIcon = false);
 
+public sealed record ApplyDiagnostics(
+    string FolderPath,
+    FolderLocationKind LocationKind,
+    bool IsNetwork,
+    bool IsOneDrive,
+    bool IsDropbox,
+    bool IsLongPath,
+    bool FolderlyDirectoryExists,
+    bool ExpectedIconFileExists,
+    bool DesktopIniExists,
+    bool DesktopIniReferencesExpectedIcon,
+    bool DesktopIniHidden,
+    bool DesktopIniSystem,
+    bool FolderReadOnly,
+    bool FolderSystem,
+    bool IconVerified);
+
 public record ApplyResult(
     bool IsSuccess,
     bool IsWarning,
     string? Message,
     string? IconPath,
-    bool IconVerified = true)
+    bool IconVerified = true,
+    ApplyDiagnostics? Diagnostics = null)
 {
     public static ApplyResult Success(
         string iconPath,
         bool iconVerified = true,
-        string? message = null) =>
-        new(true, false, message, iconPath, iconVerified);
+        string? message = null,
+        ApplyDiagnostics? diagnostics = null) =>
+        new(true, false, message, iconPath, iconVerified, diagnostics);
     public static ApplyResult Warning(string reason) =>
-        new(false, true, reason, null, false);
+        new(false, true, reason, null, false, null);
 }
 
 /// <summary>
@@ -191,12 +210,19 @@ public sealed class ApplyService
             folderPath,
             iconVerified);
 
+        var diagnostics = BuildDiagnostics(
+            folderPath,
+            localIcoPath,
+            iconResourcePath,
+            iconVerified);
+
         return ApplyResult.Success(
             centralIcoPath,
             iconVerified,
             iconVerified
                 ? null
-                : "Folderly saved the icon files, but Windows did not report the new icon as active. This can happen for cloud, network, special, or untrusted folders, or after recent Windows security updates.");
+                : "Folderly saved the icon files, but Windows did not report the new icon as active. This can happen for network, special, or untrusted folders, or after recent Windows security updates.",
+            diagnostics);
     }
 
     private static string ComputeHash(byte[] icoBytes)
@@ -279,5 +305,51 @@ public sealed class ApplyService
         }
 
         return false;
+    }
+
+    private static ApplyDiagnostics BuildDiagnostics(
+        string folderPath,
+        string expectedIconPath,
+        string iconResourcePath,
+        bool iconVerified)
+    {
+        var location = FolderProtection.GetLocationInfo(folderPath);
+        var folderlyDir = Path.Combine(folderPath, FolderlyConstants.FolderlyDirectoryName);
+        var iniPath = Path.Combine(folderPath, "desktop.ini");
+        var desktopIniContent = DesktopIniManager.Read(folderPath);
+
+        var folderAttributes = TryGetAttributes(folderPath);
+        var iniAttributes = TryGetAttributes(iniPath);
+
+        return new ApplyDiagnostics(
+            FolderPath: folderPath,
+            LocationKind: location.Kind,
+            IsNetwork: location.IsNetwork,
+            IsOneDrive: location.IsOneDrive,
+            IsDropbox: location.IsDropbox,
+            IsLongPath: location.IsLongPath,
+            FolderlyDirectoryExists: Directory.Exists(folderlyDir),
+            ExpectedIconFileExists: File.Exists(expectedIconPath),
+            DesktopIniExists: File.Exists(iniPath),
+            DesktopIniReferencesExpectedIcon: desktopIniContent?.Contains(
+                iconResourcePath,
+                StringComparison.OrdinalIgnoreCase) == true,
+            DesktopIniHidden: iniAttributes?.HasFlag(FileAttributes.Hidden) == true,
+            DesktopIniSystem: iniAttributes?.HasFlag(FileAttributes.System) == true,
+            FolderReadOnly: folderAttributes?.HasFlag(FileAttributes.ReadOnly) == true,
+            FolderSystem: folderAttributes?.HasFlag(FileAttributes.System) == true,
+            IconVerified: iconVerified);
+    }
+
+    private static FileAttributes? TryGetAttributes(string path)
+    {
+        try
+        {
+            return File.GetAttributes(path);
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

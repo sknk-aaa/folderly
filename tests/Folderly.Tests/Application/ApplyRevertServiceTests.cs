@@ -264,6 +264,11 @@ public class ApplyRevertServiceTests : IDisposable
         Assert.False(result.IsWarning);
         Assert.False(result.IconVerified);
         Assert.NotNull(result.Message);
+        Assert.NotNull(result.Diagnostics);
+        Assert.True(result.Diagnostics!.DesktopIniExists);
+        Assert.True(result.Diagnostics.ExpectedIconFileExists);
+        Assert.True(result.Diagnostics.DesktopIniReferencesExpectedIcon);
+        Assert.False(result.Diagnostics.IconVerified);
         Assert.True(_notifier.NotifiedPaths.Count >= 2);
         Assert.True(_notifier.VerificationCount >= 4);
     }
@@ -278,7 +283,7 @@ public class ApplyRevertServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ApplyAsync_OneDrivePath_WithoutForce_ReturnsWarning()
+    public async Task ApplyAsync_OneDrivePath_WithoutForce_Succeeds()
     {
         var originalOneDrive = Environment.GetEnvironmentVariable("OneDrive");
         try
@@ -291,8 +296,8 @@ public class ApplyRevertServiceTests : IDisposable
             var req = MakeRequest(folderPath: subPath, forceApply: false);
             var result = await _applyService.ApplyAsync(req);
 
-            Assert.True(result.IsWarning);
-            Assert.False(result.IsSuccess);
+            Assert.True(result.IsSuccess);
+            Assert.False(result.IsWarning);
         }
         finally
         {

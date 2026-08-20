@@ -9,9 +9,22 @@ public record ProtectionResult(ProtectionLevel Level, string? Reason)
     public bool IsDenied  => Level == ProtectionLevel.Denied;
 }
 
-/// <summary>
-/// フォルダへの適用可否を判定する（SPEC.md Section 8.3 準拠）。
-/// </summary>
+public enum FolderLocationKind
+{
+    Local,
+    NetworkUnc,
+    NetworkDrive,
+}
+
+public sealed record FolderLocationInfo(
+    FolderLocationKind Kind,
+    bool IsOneDrive,
+    bool IsDropbox,
+    bool IsLongPath)
+{
+    public bool IsNetwork => Kind is FolderLocationKind.NetworkUnc or FolderLocationKind.NetworkDrive;
+}
+
 public static class FolderProtection
 {
     private static readonly Lazy<string[]> DeniedSystemRoots = new(() =>
@@ -32,50 +45,70 @@ public static class FolderProtection
 
     public static ProtectionResult CheckPath(string path)
     {
-        // UNC パスは Path.GetFullPath 前にチェック（Linux では変形されるため）
-        if (path.StartsWith(@"\\", StringComparison.Ordinal))
-            return Warning("ネットワークパスです");
+        var location = GetLocationInfo(path);
+        if (location.IsNetwork)
+            return Warning("ネットワークフォルダです");
 
         var normalized = Path.GetFullPath(path).TrimEnd(
             Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-        // ① ドライブルート（C:\, D:\ 等）
         var root = Path.GetPathRoot(normalized);
         if (root is not null && string.Equals(
-                normalized, root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                normalized,
+                root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
                 StringComparison.OrdinalIgnoreCase))
-            return Denied("ドライブルートには適用できません");
+            return Denied("ドライブのルートには適用できません");
 
-        // ② システムフォルダ配下（Windows, Program Files 等）
         foreach (var sysRoot in DeniedSystemRoots.Value)
         {
             if (IsSubPathOf(normalized, sysRoot))
-                return Denied($"システムフォルダ配下のため適用できません");
+                return Denied("システムフォルダ配下のため適用できません");
         }
 
-        // ③ ユーザープロファイルルート直下（直下のみ拒否、サブフォルダは可）
         var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         if (!string.IsNullOrEmpty(userProfile) && IsDirectChildOf(normalized, userProfile))
-            return Denied("ユーザープロファイルのルートフォルダ直下には適用できません");
+            return Denied("ユーザープロファイル直下のフォルダには適用できません");
 
-        // ④ 書き込み権限なし
         if (!HasWriteAccess(normalized))
             return Denied("書き込み権限がありません");
 
-        // ⑤ 警告: OneDrive 配下
-        if (IsOneDrivePath(normalized))
-            return Warning("OneDrive フォルダです。変更は他のデバイスにも同期される可能性があります");
-
-        // ⑥ 警告: Dropbox 配下（パス文字列判定、保守的実装）
-        if (normalized.Contains("Dropbox", StringComparison.OrdinalIgnoreCase))
-            return Warning("Dropbox フォルダです");
-
-        // ⑦ 警告: 260 文字超
-        if (normalized.Length > 260)
-            return Warning("パスが 260 文字を超えています");
-
         return new ProtectionResult(ProtectionLevel.Allowed, null);
     }
+
+    public static FolderLocationInfo GetLocationInfo(string path)
+    {
+        var normalized = path;
+        try
+        {
+            normalized = Path.GetFullPath(path).TrimEnd(
+                Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+        catch
+        {
+            normalized = path.TrimEnd(
+                Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+
+        var kind = FolderLocationKind.Local;
+        if (path.StartsWith(@"\\", StringComparison.Ordinal) ||
+            normalized.StartsWith(@"\\", StringComparison.Ordinal))
+        {
+            kind = FolderLocationKind.NetworkUnc;
+        }
+        else if (IsMappedNetworkDrive(normalized))
+        {
+            kind = FolderLocationKind.NetworkDrive;
+        }
+
+        return new FolderLocationInfo(
+            kind,
+            IsOneDrivePath(normalized),
+            normalized.Contains("Dropbox", StringComparison.OrdinalIgnoreCase),
+            normalized.Length > 260);
+    }
+
+    public static bool IsNetworkPath(string path)
+        => GetLocationInfo(path).IsNetwork;
 
     public static bool IsOneDrivePath(string path)
     {
@@ -123,6 +156,22 @@ public static class FolderProtection
             File.WriteAllText(testFile, string.Empty);
             File.Delete(testFile);
             return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool IsMappedNetworkDrive(string path)
+    {
+        try
+        {
+            var root = Path.GetPathRoot(path);
+            if (string.IsNullOrWhiteSpace(root))
+                return false;
+
+            return new DriveInfo(root).DriveType == DriveType.Network;
         }
         catch
         {
