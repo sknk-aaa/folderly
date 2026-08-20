@@ -77,8 +77,8 @@
   <data name="OneDriveWarningMessage" xml:space="preserve"><value>This folder is synchronized by OneDrive. Changes may sync to other devices.&#x0a;&#x0a;Continue?</value></data>
   <data name="WarningGenericTitle" xml:space="preserve"><value>Warning</value></data>
   <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;Continue?</value></data>
-  <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>Network folder</value></data>
-  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>This folder is on a network drive or shared location. Folderly will save the icon files, but Windows may not display them depending on Explorer security or server settings.&#x0a;&#x0a;Continue?</value></data>
+  <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>Network folders have limited support</value></data>
+  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>Folderly works best with local folders. For network drives, NAS, and shared folders, Folderly can save the icon files, but Windows Explorer may not display them depending on Windows security or file server settings.&#x0a;&#x0a;Continue?</value></data>
   <data name="Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="OK" xml:space="preserve"><value>OK</value></data>
   <data name="SelectImageTitle" xml:space="preserve"><value>Select an image</value></data>
@@ -185,6 +185,6 @@
   <data name="ReviewPromptMessage" xml:space="preserve"><value>If Folderly is helping you organize folders, please rate it on Microsoft Store. Choose OK to open the Store review page.</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Icon saved, but not visible yet</value></data>
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows did not report the new icon as active. This can happen with special or untrusted folders, sync delays, or recent Windows security updates. If it still does not appear, contact support from Settings with your Windows version and folder location type.</value></data>
-  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows Explorer did not display the new icon. This folder is on a network location, so Windows or the file server may be ignoring desktop.ini folder customizations.&#x0a;&#x0a;If you contact support, include this diagnostic:&#x0a;{0}</value></data>
+  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows Explorer did not display the new icon. Network drives, NAS, and shared folders have limited support because Windows or the file server can ignore desktop.ini folder customizations. Local folders are recommended.&#x0a;&#x0a;If you contact support, include the information below so we can tell whether Folderly could save the files or Explorer/server settings blocked the display.&#x0a;{0}</value></data>
   <data name="Close" xml:space="preserve"><value>Close</value></data>
 </root>

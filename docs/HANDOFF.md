@@ -4,9 +4,10 @@
 
 ### Current State
 
-- Latest source version: `1.6.2.0`（アプリ表示 `1.6.2`）
+- Latest source version: `1.6.3.0`（アプリ表示 `1.6.3`）
 - Previous Store submission: `1.6.1.0` was submitted by the user.
-- Next Store candidate should be built as `_out\Folderly_1.6.2.0_x64_store.msix` if this network-folder update is submitted.
+- Previous built candidate: `_out\Folderly_1.6.2.0_x64_store.msix`
+- Next Store candidate should be built as `_out\Folderly_1.6.3.0_x64_store.msix` if this network-folder copy update is submitted.
 
 ### Done Today
 
@@ -16,6 +17,8 @@
 - Mapped network drives such as `Z:\folder` are now detected via `DriveInfo.DriveType.Network`.
 - Network warning is shown only once after the user continues. The app stores this in `network_folder_warning_seen`.
 - Apply-result diagnostics were added for cases where files are saved but Explorer does not show the icon.
+- Network-folder UI copy now says "limited support" instead of implying full support.
+- Help/FAQ copy now explains that local folders are recommended and network drives, NAS, and shared folders may not display custom icons depending on Windows or server settings.
 - Network-specific verification failure message now includes diagnostic details:
   - path type
   - whether `_folderly` exists
@@ -35,7 +38,7 @@
 
 ### Follow-Up
 
-- Build and install `1.6.2.0` locally before submitting if the user wants to verify the new network-folder messages.
+- Build and install `1.6.3.0` locally before submitting if the user wants to verify the new network-folder messages.
 - If the customer replies with `\\server\share` vs mapped drive and server/NAS type, use the diagnostics to decide whether this is Windows trust policy, server attribute support, or Explorer verification only.
 - Do not add registry/Group Policy/Trusted Sites automation. Those are security-sensitive and should remain manual guidance only.
 

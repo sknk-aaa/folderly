@@ -77,8 +77,8 @@
   <data name="OneDriveWarningMessage" xml:space="preserve"><value>このフォルダは OneDrive で同期されています。Folderly の変更は他のデバイスにも同期される可能性があります。&#x0a;&#x0a;続行しますか？</value></data>
   <data name="WarningGenericTitle" xml:space="preserve"><value>確認</value></data>
   <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;続行しますか？</value></data>
-  <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>ネットワークフォルダです</value></data>
-  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>このフォルダはネットワークドライブまたは共有フォルダ上にあります。Folderly はアイコンファイルを保存しますが、Explorer のセキュリティ設定やサーバー設定によっては表示されない場合があります。&#x0a;&#x0a;続行しますか？</value></data>
+  <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>ネットワークフォルダは制限付き対応です</value></data>
+  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>Folderly はローカルフォルダでの利用を推奨しています。ネットワークドライブ、NAS、共有フォルダでは、Folderly がアイコンファイルを保存できても、Windows のセキュリティ設定やファイルサーバー設定によって Explorer に表示されない場合があります。&#x0a;&#x0a;続行しますか？</value></data>
   <data name="Continue" xml:space="preserve"><value>続行</value></data>
   <data name="OK" xml:space="preserve"><value>OK</value></data>
   <data name="SelectImageTitle" xml:space="preserve"><value>画像を選択してください</value></data>
@@ -185,6 +185,6 @@
   <data name="ReviewPromptMessage" xml:space="preserve"><value>Folderlyがフォルダ整理に役立っていたら、Microsoft Storeで評価をお願いします。OKを押すとStoreの評価ページを開きます。</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>アイコンは保存されましたが、まだ表示を確認できません</value></data>
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows からは新しいアイコンが有効になったことを確認できませんでした。特殊フォルダ、信頼されていない場所、同期の遅れ、または最近の Windows セキュリティ更新が影響している可能性があります。しばらくしても表示されない場合は、設定画面のサポートから Windows バージョンとフォルダの場所の種類をお知らせください。</value></data>
-  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows Explorer では新しいアイコンが表示されませんでした。このフォルダはネットワーク上にあるため、Windows またはファイルサーバーが desktop.ini によるフォルダ表示のカスタマイズを無視している可能性があります。&#x0a;&#x0a;サポートへ連絡する場合は、次の診断情報を含めてください。&#x0a;{0}</value></data>
+  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows Explorer では新しいアイコンが表示されませんでした。ネットワークドライブ、NAS、共有フォルダは制限付き対応です。Windows またはファイルサーバーが desktop.ini によるフォルダ表示のカスタマイズを無視する場合があります。ローカルフォルダでの利用を推奨します。&#x0a;&#x0a;サポートへ連絡する場合は、Folderly がファイルを保存できたのか、Explorer やサーバー設定で表示がブロックされたのかを確認するため、次の情報を送ってください。&#x0a;{0}</value></data>
   <data name="Close" xml:space="preserve"><value>閉じる</value></data>
 </root>
