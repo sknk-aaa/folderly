@@ -744,7 +744,7 @@ public partial class ApplyWindow : Window
 
                 if (reviewPromptApplyCount is not null)
                 {
-                    await Task.Delay(5000);
+                    await Task.Delay(3000);
                     ShowReviewPrompt(reviewPromptApplyCount.Value);
                 }
 
@@ -804,11 +804,7 @@ public partial class ApplyWindow : Window
 
     private void ShowReviewPrompt(int applyCount)
     {
-        var result = MessageBox.Show(
-            AppServices.Localize["ReviewPromptMessage"],
-            AppServices.Localize["ReviewPromptTitle"],
-            MessageBoxButton.OKCancel,
-            MessageBoxImage.Question);
+        var result = ShowForegroundReviewMessageBox();
 
         if (result == MessageBoxResult.OK)
         {
@@ -818,6 +814,41 @@ public partial class ApplyWindow : Window
         else
         {
             ReviewPromptService.MarkPromptSkipped(applyCount);
+        }
+    }
+
+    private static MessageBoxResult ShowForegroundReviewMessageBox()
+    {
+        var owner = new Window
+        {
+            Width = 1,
+            Height = 1,
+            Left = SystemParameters.WorkArea.Left + SystemParameters.WorkArea.Width / 2,
+            Top = SystemParameters.WorkArea.Top + SystemParameters.WorkArea.Height / 2,
+            WindowStyle = WindowStyle.None,
+            ResizeMode = System.Windows.ResizeMode.NoResize,
+            ShowInTaskbar = false,
+            ShowActivated = true,
+            Topmost = true,
+            Opacity = 0.01
+        };
+
+        try
+        {
+            owner.Show();
+            owner.Activate();
+            owner.Focus();
+
+            return MessageBox.Show(
+                owner,
+                AppServices.Localize["ReviewPromptMessage"],
+                AppServices.Localize["ReviewPromptTitle"],
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Question);
+        }
+        finally
+        {
+            owner.Close();
         }
     }
 
