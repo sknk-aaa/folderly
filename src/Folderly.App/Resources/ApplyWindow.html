@@ -114,6 +114,7 @@
     display:flex;align-items:center;justify-content:center;
     position:relative;
   }
+  .preview-card:not(.has-image){cursor:pointer}
   .preview-card.has-image{cursor:grab}
   .preview-card.has-image.dragging{cursor:grabbing}
 
@@ -1540,6 +1541,11 @@
     };
 
     if (previewCard && previewImg) {
+      previewCard.addEventListener('click', function() {
+        if (appState.hasImage) return;
+        postMsg({type:'selectImage'});
+      });
+
       previewCard.addEventListener('wheel', function(e) {
         if (!appState.hasImage) return;
         e.preventDefault();

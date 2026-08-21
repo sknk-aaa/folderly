@@ -555,6 +555,11 @@ public partial class ApplyWindow : Window
             Title  = AppServices.Localize["SelectImage"],
             Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp;*.webp|All Files|*.*",
         };
+        if (Directory.Exists(_vm.FolderPath))
+        {
+            dlg.InitialDirectory = _vm.FolderPath;
+        }
+
         if (dlg.ShowDialog(this) != true) return;
         LoadImage(dlg.FileName);
     }

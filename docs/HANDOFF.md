@@ -1,5 +1,12 @@
 # Folderly Handoff
 
+## 2026-08-21 Update
+
+- Latest source version: `1.6.4.0` (app display `1.6.4`).
+- Next Store candidate: `_out\Folderly_1.6.4.0_x64_store.msix`.
+- Empty preview card now opens the image picker when clicked. After an image is selected, the same card remains dedicated to drag position adjustment.
+- Image picker now starts in the target folder when that folder exists.
+
 ## 2026-08-20 Handoff
 
 ### Latest Web/Marketing Update
