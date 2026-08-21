@@ -182,7 +182,9 @@
   <data name="ReviewInlineText" xml:space="preserve"><value>If Folderly is useful, a Store rating helps others find it.</value></data>
   <data name="ReviewAction" xml:space="preserve"><value>Rate</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Rate Folderly</value></data>
-  <data name="ReviewPromptMessage" xml:space="preserve"><value>If Folderly is helping you organize folders, please rate it on Microsoft Store. Choose OK to open the Store review page.</value></data>
+  <data name="ReviewPromptMessage" xml:space="preserve"><value>If Folderly has helped you make folders easier to recognize, a quick Store rating would mean a lot.</value></data>
+  <data name="ReviewPromptThanks" xml:space="preserve"><value>Thanks for using Folderly.</value></data>
+  <data name="ReviewPromptLater" xml:space="preserve"><value>Later</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Icon saved, but not visible yet</value></data>
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows did not report the new icon as active. This can happen with special or untrusted folders, sync delays, or recent Windows security updates. If it still does not appear, contact support from Settings with your Windows version and folder location type.</value></data>
   <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows Explorer did not display the new icon. Network drives, NAS, and shared folders have limited support because Windows or the file server can ignore desktop.ini folder customizations. Local folders are recommended.&#x0a;&#x0a;If you contact support, include the information below so we can tell whether Folderly could save the files or Explorer/server settings blocked the display.&#x0a;{0}</value></data>

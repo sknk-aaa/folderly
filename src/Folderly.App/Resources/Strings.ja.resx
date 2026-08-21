@@ -182,7 +182,9 @@
   <data name="ReviewInlineText" xml:space="preserve"><value>Folderly が役に立っていたら、Storeでの評価をお願いします。</value></data>
   <data name="ReviewAction" xml:space="preserve"><value>評価する</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Folderlyを評価</value></data>
-  <data name="ReviewPromptMessage" xml:space="preserve"><value>Folderlyがフォルダ整理に役立っていたら、Microsoft Storeで評価をお願いします。OKを押すとStoreの評価ページを開きます。</value></data>
+  <data name="ReviewPromptMessage" xml:space="preserve"><value>Folderlyでフォルダを見分けやすくできていたら、Storeで評価してもらえると励みになります。</value></data>
+  <data name="ReviewPromptThanks" xml:space="preserve"><value>Folderlyを使ってくれてありがとうございます。</value></data>
+  <data name="ReviewPromptLater" xml:space="preserve"><value>あとで</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>アイコンは保存されましたが、まだ表示を確認できません</value></data>
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows からは新しいアイコンが有効になったことを確認できませんでした。特殊フォルダ、信頼されていない場所、同期の遅れ、または最近の Windows セキュリティ更新が影響している可能性があります。しばらくしても表示されない場合は、設定画面のサポートから Windows バージョンとフォルダの場所の種類をお知らせください。</value></data>
   <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows Explorer では新しいアイコンが表示されませんでした。ネットワークドライブ、NAS、共有フォルダは制限付き対応です。Windows またはファイルサーバーが desktop.ini によるフォルダ表示のカスタマイズを無視する場合があります。ローカルフォルダでの利用を推奨します。&#x0a;&#x0a;サポートへ連絡する場合は、Folderly がファイルを保存できたのか、Explorer やサーバー設定で表示がブロックされたのかを確認するため、次の情報を送ってください。&#x0a;{0}</value></data>

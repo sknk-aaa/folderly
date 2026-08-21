@@ -804,9 +804,9 @@ public partial class ApplyWindow : Window
 
     private void ShowReviewPrompt(int applyCount)
     {
-        var result = ShowForegroundReviewMessageBox();
+        var shouldOpenReview = ShowForegroundReviewDialog();
 
-        if (result == MessageBoxResult.OK)
+        if (shouldOpenReview)
         {
             ReviewPromptService.MarkReviewOpened();
             StoreNavigationService.OpenReviewPage();
@@ -817,7 +817,7 @@ public partial class ApplyWindow : Window
         }
     }
 
-    private static MessageBoxResult ShowForegroundReviewMessageBox()
+    private static bool ShowForegroundReviewDialog()
     {
         var owner = new Window
         {
@@ -839,12 +839,7 @@ public partial class ApplyWindow : Window
             owner.Activate();
             owner.Focus();
 
-            return MessageBox.Show(
-                owner,
-                AppServices.Localize["ReviewPromptMessage"],
-                AppServices.Localize["ReviewPromptTitle"],
-                MessageBoxButton.OKCancel,
-                MessageBoxImage.Question);
+            return ReviewPromptDialog.Show(owner);
         }
         finally
         {
