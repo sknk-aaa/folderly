@@ -11,7 +11,7 @@
     <ApplicationIcon>..\Folderly.Package\Images\FolderlyContext.ico</ApplicationIcon>
     <AssemblyName>Folderly</AssemblyName>
     <RootNamespace>Folderly.App</RootNamespace>
-    <Version>1.6.4</Version>
+    <Version>1.6.5</Version>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)' == '' and '$(Platform)' == 'ARM64' ">win-arm64</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)' == '' and '$(Platform)' != 'ARM64' ">win-x64</RuntimeIdentifier>

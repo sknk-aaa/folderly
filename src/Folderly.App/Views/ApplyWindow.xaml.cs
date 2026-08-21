@@ -724,11 +724,11 @@ public partial class ApplyWindow : Window
                 await ExecuteScriptSafeAsync(
                     $"document.getElementById('btn-apply').textContent={JsonSerializer.Serialize("✓ " + AppServices.Localize["ApplyCompleted"])};");
 
-                if (result.IconVerified)
-                {
-                    ShowReviewPromptIfNeeded();
-                }
-                else
+                var reviewPromptApplyCount = result.IconVerified
+                    ? ReviewPromptService.RecordSuccessfulApplyAndGetPromptCount()
+                    : null;
+
+                if (!result.IconVerified)
                 {
                     var warningMessage = BuildApplyVerificationWarningMessage(result);
                     MessageBox.Show(
@@ -741,6 +741,13 @@ public partial class ApplyWindow : Window
                 Hide();
                 if (ShouldReopenExplorer())
                     await ReopenExplorerWindowsAsync(_vm.FolderPath);
+
+                if (reviewPromptApplyCount is not null)
+                {
+                    await Task.Delay(1200);
+                    ShowReviewPrompt(reviewPromptApplyCount.Value);
+                }
+
                 Close();
                 return;
             }
@@ -795,11 +802,8 @@ public partial class ApplyWindow : Window
         });
     }
 
-    private void ShowReviewPromptIfNeeded()
+    private void ShowReviewPrompt(int applyCount)
     {
-        var applyCount = ReviewPromptService.RecordSuccessfulApplyAndGetPromptCount();
-        if (applyCount is null) return;
-
         var result = MessageBox.Show(
             AppServices.Localize["ReviewPromptMessage"],
             AppServices.Localize["ReviewPromptTitle"],
@@ -813,7 +817,7 @@ public partial class ApplyWindow : Window
         }
         else
         {
-            ReviewPromptService.MarkPromptSkipped(applyCount.Value);
+            ReviewPromptService.MarkPromptSkipped(applyCount);
         }
     }
 
