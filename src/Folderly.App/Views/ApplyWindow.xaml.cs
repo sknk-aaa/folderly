@@ -744,7 +744,7 @@ public partial class ApplyWindow : Window
 
                 if (reviewPromptApplyCount is not null)
                 {
-                    await Task.Delay(1200);
+                    await Task.Delay(3000);
                     ShowReviewPrompt(reviewPromptApplyCount.Value);
                 }
 
