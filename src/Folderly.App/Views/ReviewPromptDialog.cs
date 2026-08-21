@@ -2,6 +2,7 @@ using Folderly.App.Infrastructure;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -34,6 +35,7 @@ public sealed class ReviewPromptDialog : Window
             BorderThickness = new Thickness(1),
             Padding = new Thickness(24),
         };
+        root.MouseLeftButtonDown += DragSurface_MouseLeftButtonDown;
         Content = root;
 
         var stack = new StackPanel();
@@ -154,6 +156,30 @@ public sealed class ReviewPromptDialog : Window
             BorderThickness = new Thickness(1),
             Cursor = System.Windows.Input.Cursors.Hand,
         };
+
+    private void DragSurface_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left ||
+            e.OriginalSource is not DependencyObject source ||
+            HasAncestor<Button>(source))
+        {
+            return;
+        }
+
+        DragMove();
+    }
+
+    private static bool HasAncestor<T>(DependencyObject source)
+        where T : DependencyObject
+    {
+        for (var current = source; current is not null; current = VisualTreeHelper.GetParent(current))
+        {
+            if (current is T)
+                return true;
+        }
+
+        return false;
+    }
 
     private static ImageSource? TryLoadAppIcon()
     {

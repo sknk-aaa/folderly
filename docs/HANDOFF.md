@@ -2,13 +2,14 @@
 
 ## 2026-08-21 Update
 
-- Latest source version: `1.6.11.0` (app display `1.6.11`).
-- Next Store candidate: `_out\Folderly_1.6.11.0_x64_store.msix`.
+- Latest source version: `1.6.12.0` (app display `1.6.12`).
+- Next Store candidate: `_out\Folderly_1.6.12.0_x64_store.msix`.
 - Empty preview card now opens the image picker when clicked. After an image is selected, the same card remains dedicated to drag position adjustment.
 - Image picker now starts in the target folder when that folder exists.
 - Review prompt is now shown on the 2nd successful apply, 3 seconds after the Explorer reopen flow, with a foreground owner so it does not appear behind Explorer.
 - Review prompt now uses a branded Folderly dialog with the app icon and clear Store rating / Later actions instead of the default system MessageBox.
 - Review prompt primary button now uses a lighter blue background so black system button text remains readable.
+- Review prompt can now be dragged by the card surface while keeping button clicks unaffected.
 
 ## 2026-08-20 Handoff
 
