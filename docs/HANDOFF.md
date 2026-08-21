@@ -2,11 +2,11 @@
 
 ## 2026-08-21 Update
 
-- Latest source version: `1.6.5.0` (app display `1.6.5`).
-- Next Store candidate: `_out\Folderly_1.6.5.0_x64_store.msix`.
+- Latest source version: `1.6.6.0` (app display `1.6.6`).
+- Next Store candidate: `_out\Folderly_1.6.6.0_x64_store.msix`.
 - Empty preview card now opens the image picker when clicked. After an image is selected, the same card remains dedicated to drag position adjustment.
 - Image picker now starts in the target folder when that folder exists.
-- Review prompt is now shown after the Explorer reopen flow instead of blocking before the user can see the applied icon.
+- Review prompt is now shown 3 seconds after the Explorer reopen flow instead of blocking before the user can see the applied icon.
 
 ## 2026-08-20 Handoff
 
