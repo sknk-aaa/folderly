@@ -4,12 +4,32 @@
 
 - Latest source version: `1.6.12.0` (app display `1.6.12`).
 - Next Store candidate: `_out\Folderly_1.6.12.0_x64_store.msix`.
+- Store candidate SHA-256: `07C66B79BC358DDC771BE89707EF0C0E40CD838B1768A58EB923C7670EC38949`.
+- Local install candidate: `_out\Folderly_1.6.12.0_x64_sideload.msix`.
+- Installed locally: `KanekoApps.Folderly 1.6.12.0`.
+- Latest pushed commit: `0c304b0`.
 - Empty preview card now opens the image picker when clicked. After an image is selected, the same card remains dedicated to drag position adjustment.
 - Image picker now starts in the target folder when that folder exists.
 - Review prompt is now shown on the 2nd successful apply, 3 seconds after the Explorer reopen flow, with a foreground owner so it does not appear behind Explorer.
 - Review prompt now uses a branded Folderly dialog with the app icon and clear Store rating / Later actions instead of the default system MessageBox.
 - Review prompt primary button now uses a lighter blue background so black system button text remains readable.
 - Review prompt can now be dragged by the card surface while keeping button clicks unaffected.
+
+### Submit/Check Notes
+
+- This build is OK to submit if the user confirms the review prompt visually one last time.
+- Main manual checks before/after submission:
+  - review prompt appears after the 2nd successful apply, after Explorer reopen + about 3 seconds
+  - prompt appears in front of Explorer
+  - `Storeで評価` / `Rate` button text is readable on the light blue background
+  - card surface can be dragged
+  - `Storeで評価` / `Rate` and `あとで` / `Later` clicks are not affected by drag handling
+- Review prompt test state was reset locally to `review_prompt.apply_count=1`, so the next successful apply should show the prompt.
+- Validation done:
+  - `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"` passed: 138 tests.
+  - Release MSBuild for `Folderly.Package.wapproj` passed with the known NU1702 warning only.
+  - Store MSIX was built.
+  - Sideload MSIX was signed, verified, and installed locally.
 
 ## 2026-08-20 Handoff
 
