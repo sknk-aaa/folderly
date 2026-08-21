@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  IgnorableNamespaces="rescap desktop4 desktop5 com">
+
+  <!--
+    Publisher: Partner Center 縺ｮ Product identity 縺ｨ荳閾ｴ縺輔○繧九％縺ｨ縲・    Version:   繝ｪ繝ｪ繝ｼ繧ｹ縺斐→縺ｫ 4 譯∫岼 0 縺ｮ蠖｢蠑上〒繧､繝ｳ繧ｯ繝ｪ繝｡繝ｳ繝医☆繧九・  -->
+  <Identity
+    Name="KanekoApps.Folderly"
+    Publisher="CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E"
+    Version="1.4.1.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Folderly</DisplayName>
+    <PublisherDisplayName>Kaneko Apps</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily
+      Name="Windows.Desktop"
+      MinVersion="10.0.17763.0"
+      MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-US" />
+    <Resource Language="ja-JP" />
+  </Resources>
+
+  <Applications>
+    <Application
+      Id="App"
+      Executable="Folderly.exe"
+      EntryPoint="Windows.FullTrustApplication">
+
+      <uap:VisualElements
+        DisplayName="Folderly"
+        Description="繝輔か繝ｫ繝縺ｮ隕九◆逶ｮ繧定｡ｨ邏咏判蜒上→濶ｲ繧ｿ繧ｰ縺ｧ繧ｫ繧ｹ繧ｿ繝槭う繧ｺ"
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png">
+        <uap:DefaultTile
+          Wide310x150Logo="Images\Wide310x150Logo.png"
+          ShortName="Folderly" />
+        <uap:SplashScreen Image="Images\SplashScreen.png" />
+      </uap:VisualElements>
+
+      <Extensions>
+
+        <!--
+          Self-contained out-of-process COM server for Explorer.
+          Folderly.exe implements IExplorerCommand in COM server mode.
+          Clsid: {2A7A05DA-70D8-4302-8B23-AE8D79D801B6}
+        -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer
+              Executable="Folderly.exe"
+              DisplayName="Folderly Context Menu Handler"
+              Arguments="--com-server">
+              <com:Class
+                Id="2A7A05DA-70D8-4302-8B23-AE8D79D801B6"
+                DisplayName="Folderly.ContextMenuHandler" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <!--
+          繝輔か繝ｫ繝蜿ｳ繧ｯ繝ｪ繝・け繝｡繝九Η繝ｼ逋ｻ骭ｲ・・PEC Section 10.1, F-01・峨・          Type="Directory" 縺ｧ繝輔か繝ｫ繝縺ｮ縺ｿ縺ｫ陦ｨ遉ｺ縺輔ｌ繧九・          Verb Id 縺ｯ Explorer 縺ｮ繝｡繝九Η繝ｼ隴伜挨蟄撰ｼ・縲・2譁・ｭ励∬恭謨ｰ蟄励・縺ｿ・峨・        -->
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+            <desktop5:ItemType Type="Directory">
+              <desktop5:Verb
+                Id="Folderly"
+                Clsid="2A7A05DA-70D8-4302-8B23-AE8D79D801B6" />
+            </desktop5:ItemType>
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- 繝・せ繧ｯ繝医ャ繝励い繝励Μ縺ｨ縺励※螳悟・菫｡鬆ｼ縺ｧ螳溯｡後☆繧九◆繧√・蛻ｶ髯蝉ｻ倥″繧ｱ繝ｼ繝代ン繝ｪ繝・ぅ -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+
+</Package>
+
