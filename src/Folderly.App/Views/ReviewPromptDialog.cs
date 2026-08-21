@@ -144,12 +144,12 @@ public sealed class ReviewPromptDialog : Window
             Padding = new Thickness(16, 9, 16, 9),
             FontSize = 13.5,
             FontWeight = primary ? FontWeights.SemiBold : FontWeights.Normal,
-            Foreground = primary ? Brushes.White : new SolidColorBrush(Color.FromRgb(30, 41, 59)),
+            Foreground = new SolidColorBrush(Color.FromRgb(15, 23, 42)),
             Background = primary
-                ? new SolidColorBrush(Color.FromRgb(18, 122, 219))
+                ? new SolidColorBrush(Color.FromRgb(219, 234, 254))
                 : new SolidColorBrush(Color.FromRgb(248, 250, 252)),
             BorderBrush = primary
-                ? new SolidColorBrush(Color.FromRgb(18, 122, 219))
+                ? new SolidColorBrush(Color.FromRgb(147, 197, 253))
                 : new SolidColorBrush(Color.FromRgb(203, 213, 225)),
             BorderThickness = new Thickness(1),
             Cursor = System.Windows.Input.Cursors.Hand,
