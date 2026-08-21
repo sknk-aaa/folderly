@@ -20,3 +20,10 @@ Thumbs.db
 ## Logs
 logs/
 *.log
+
+## Local agent settings
+.claude/settings.local.json
+
+## Crash dumps / memory dumps
+*.dmp
+*.mdmp
