@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+
+  <!-- ApplyWindow -->
+  <data name="ApplyWindowTitle" xml:space="preserve"><value>Folderly</value></data>
+  <data name="TargetFolder" xml:space="preserve"><value>Pasta de destino</value></data>
+  <data name="SelectImage" xml:space="preserve"><value>Selecionar imagem...</value></data>
+  <data name="DropImageHere" xml:space="preserve"><value>ou arraste uma imagem aqui</value></data>
+  <data name="PreviewPlaceholder" xml:space="preserve"><value>Selecione uma imagem para visualizar</value></data>
+  <data name="ScaleLabel" xml:space="preserve"><value>Escala</value></data>
+  <data name="ResetPosition" xml:space="preserve"><value>Redefinir posição</value></data>
+  <data name="CropCenter" xml:space="preserve"><value>Sem margens</value></data>
+  <data name="CropFitWidth" xml:space="preserve"><value>Ajustar à largura</value></data>
+  <data name="CropFitHeight" xml:space="preserve"><value>Ajustar à altura</value></data>
+  <data name="TagLabel" xml:space="preserve"><value>Etiqueta</value></data>
+  <data name="TagNone" xml:space="preserve"><value>Nenhuma</value></data>
+  <data name="TagBlue" xml:space="preserve"><value>Azul&#x0a;Desenvolvimento</value></data>
+  <data name="TagGreen" xml:space="preserve"><value>Verde&#x0a;Universidade</value></data>
+  <data name="TagOrange" xml:space="preserve"><value>Laranja&#x0a;Vídeo</value></data>
+  <data name="TagPurple" xml:space="preserve"><value>Roxo&#x0a;Design</value></data>
+  <data name="TagRed" xml:space="preserve"><value>Vermelho&#x0a;Importante</value></data>
+  <data name="TagGray" xml:space="preserve"><value>Cinza&#x0a;Arquivo</value></data>
+  <data name="ColorBlue" xml:space="preserve"><value>Azul</value></data>
+  <data name="ColorGreen" xml:space="preserve"><value>Verde</value></data>
+  <data name="ColorOrange" xml:space="preserve"><value>Laranja</value></data>
+  <data name="ColorPurple" xml:space="preserve"><value>Roxo</value></data>
+  <data name="ColorRed" xml:space="preserve"><value>Vermelho</value></data>
+  <data name="ColorGray" xml:space="preserve"><value>Cinza</value></data>
+  <data name="TagNamesSection" xml:space="preserve"><value>Etiquetas</value></data>
+  <data name="EditTagNames" xml:space="preserve"><value>Editar nomes das etiquetas</value></data>
+  <data name="ImageAdjustSection" xml:space="preserve"><value>Ajuste da imagem</value></data>
+  <data name="DisplayModeLabel" xml:space="preserve"><value>Modo de exibição</value></data>
+  <data name="DragHint" xml:space="preserve"><value>Arraste na prévia para ajustar a posição da imagem</value></data>
+  <data name="TagNameLabel" xml:space="preserve"><value>Nome da etiqueta</value></data>
+  <data name="TagSettingsTitle" xml:space="preserve"><value>Configurações de etiquetas</value></data>
+  <data name="ShowTagNameOnIcon" xml:space="preserve"><value>Mostrar nomes das etiquetas nos ícones das pastas</value></data>
+  <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>Nomes longos são redimensionados ou encurtados automaticamente para caber na área da etiqueta.</value></data>
+  <data name="ShowTagIconOnIcon" xml:space="preserve"><value>Mostrar ícones nos ícones das pastas</value></data>
+  <data name="ShowTagIconOnIconNote" xml:space="preserve"><value>Mostra o ícone escolhido para cada etiqueta na aba da pasta.</value></data>
+  <data name="Save" xml:space="preserve"><value>Salvar</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="Apply" xml:space="preserve"><value>Aplicar</value></data>
+  <data name="Applying" xml:space="preserve"><value>Aplicando...</value></data>
+  <data name="ApplySuccess" xml:space="preserve"><value>Capa da pasta aplicada!</value></data>
+  <data name="ApplyFailed" xml:space="preserve"><value>Falha ao aplicar: {0}</value></data>
+  <data name="ImageLoadError" xml:space="preserve"><value>Não foi possível carregar a imagem. Selecione outro arquivo.</value></data>
+  <data name="ProtectionDeniedTitle" xml:space="preserve"><value>Não é possível modificar esta pasta</value></data>
+  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}&#x0a;&#x0a;Selecione outra pasta.</value></data>
+  <data name="OneDriveWarningTitle" xml:space="preserve"><value>Pasta do OneDrive</value></data>
+  <data name="OneDriveWarningMessage" xml:space="preserve"><value>Esta pasta é sincronizada pelo OneDrive. As alterações podem ser sincronizadas com outros dispositivos.&#x0a;&#x0a;Continuar?</value></data>
+  <data name="WarningGenericTitle" xml:space="preserve"><value>Aviso</value></data>
+  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;Continuar?</value></data>
+  <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>Pastas de rede têm suporte limitado</value></data>
+  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>O Folderly funciona melhor com pastas locais. Em unidades de rede, NAS e pastas compartilhadas, o Folderly pode salvar os arquivos de ícone, mas o Windows Explorer pode não exibi-los dependendo das configurações de segurança do Windows ou do servidor de arquivos.&#x0a;&#x0a;Continuar?</value></data>
+  <data name="Continue" xml:space="preserve"><value>Continuar</value></data>
+  <data name="OK" xml:space="preserve"><value>OK</value></data>
+  <data name="SelectImageTitle" xml:space="preserve"><value>Selecionar uma imagem</value></data>
+  <data name="DndSubtext" xml:space="preserve"><value>ou arraste e solte uma imagem aqui</value></data>
+  <data name="SelectFileBtn" xml:space="preserve"><value>Procurar arquivos</value></data>
+  <data name="HintTitle" xml:space="preserve"><value>Dica</value></data>
+  <data name="HintPreviewRange" xml:space="preserve"><value>A borda pontilhada na prévia mostra a área real de exibição</value></data>
+  <data name="TagEditTitle" xml:space="preserve"><value>Editar etiquetas</value></data>
+  <data name="TagEditDesc" xml:space="preserve"><value>Personalize nomes e ícones de etiquetas</value></data>
+  <data name="TagEditHeadTitle" xml:space="preserve"><value>Editar etiqueta</value></data>
+  <data name="EditingTag" xml:space="preserve"><value>Editando &quot;{0}&quot;</value></data>
+  <data name="TagColorLabel" xml:space="preserve"><value>Cor</value></data>
+  <data name="TagIconLabel" xml:space="preserve"><value>Ícone</value></data>
+  <data name="NewTagBtn" xml:space="preserve"><value>Adicionar nova etiqueta</value></data>
+  <data name="FolderPreviewTitle" xml:space="preserve"><value>Prévia da pasta</value></data>
+  <data name="FolderPreviewAlt" xml:space="preserve"><value>Prévia da pasta</value></data>
+  <data name="PreviewSubtext" xml:space="preserve"><value>Sua imagem selecionada aparecerá aqui</value></data>
+  <data name="ResetImage" xml:space="preserve"><value>Redefinir imagem</value></data>
+  <data name="PositionAdjustment" xml:space="preserve"><value>Posição</value></data>
+  <data name="XPosition" xml:space="preserve"><value>Posição X</value></data>
+  <data name="YPosition" xml:space="preserve"><value>Posição Y</value></data>
+  <data name="MoveLeft" xml:space="preserve"><value>Mover para a esquerda</value></data>
+  <data name="MoveRight" xml:space="preserve"><value>Mover para a direita</value></data>
+  <data name="MoveUp" xml:space="preserve"><value>Mover para cima</value></data>
+  <data name="MoveDown" xml:space="preserve"><value>Mover para baixo</value></data>
+  <data name="TagSelectTitle" xml:space="preserve"><value>Selecionar etiqueta</value></data>
+  <data name="TagSelectDesc" xml:space="preserve"><value>Use cores para identificar tipos de pastas</value></data>
+  <data name="TagListTitle" xml:space="preserve"><value>Etiquetas</value></data>
+  <data name="ClickToEdit" xml:space="preserve"><value>Clique para editar</value></data>
+  <data name="Back" xml:space="preserve"><value>Voltar</value></data>
+  <data name="EditingSuffix" xml:space="preserve"><value>Editando</value></data>
+  <data name="PreviewOnFolderTab" xml:space="preserve"><value>Prévia - mostrada na aba da pasta</value></data>
+  <data name="TagNamePlaceholder" xml:space="preserve"><value>Digite o nome da etiqueta</value></data>
+  <data name="ShowTagNameOffNote" xml:space="preserve"><value>Quando desativado, somente o ícone e a cor são mostrados na aba.</value></data>
+  <data name="SaveChangesHint" xml:space="preserve"><value>As alterações só são aplicadas depois que você pressiona Salvar</value></data>
+  <data name="ApplyCompleted" xml:space="preserve"><value>Aplicado</value></data>
+  <data name="IconEdit" xml:space="preserve"><value>Editar</value></data>
+  <data name="IconMedia" xml:space="preserve"><value>Mídia</value></data>
+  <data name="IconWork" xml:space="preserve"><value>Trabalho</value></data>
+  <data name="IconDocument" xml:space="preserve"><value>Documento</value></data>
+  <data name="IconDownload" xml:space="preserve"><value>Download</value></data>
+  <data name="IconOther" xml:space="preserve"><value>Outro</value></data>
+  <data name="IconPhoto" xml:space="preserve"><value>Foto</value></data>
+  <data name="IconMusic" xml:space="preserve"><value>Música</value></data>
+  <data name="IconGame" xml:space="preserve"><value>Jogo</value></data>
+  <data name="IconStudy" xml:space="preserve"><value>Estudo</value></data>
+  <data name="IconDesign" xml:space="preserve"><value>Design</value></data>
+  <data name="IconImportant" xml:space="preserve"><value>Importante</value></data>
+  <data name="IconPrivate" xml:space="preserve"><value>Privado</value></data>
+
+  <!-- MainWindow -->
+  <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>
+  <data name="HistoryTab" xml:space="preserve"><value>Histórico</value></data>
+  <data name="SettingsTab" xml:space="preserve"><value>Configurações</value></data>
+  <data name="HelpTab" xml:space="preserve"><value>Ajuda</value></data>
+  <data name="RecentFolders" xml:space="preserve"><value>Pastas modificadas recentemente</value></data>
+  <data name="OpenFolder" xml:space="preserve"><value>Abrir</value></data>
+  <data name="RevertFolder" xml:space="preserve"><value>Reverter</value></data>
+  <data name="ClearAllHistory" xml:space="preserve"><value>Reverter todas as pastas</value></data>
+  <data name="NoHistory" xml:space="preserve"><value>Ainda não há histórico. Clique com o botão direito em uma pasta para começar.</value></data>
+  <data name="RevertConfirmTitle" xml:space="preserve"><value>Reverter pasta?</value></data>
+  <data name="RevertConfirmMessage" xml:space="preserve"><value>Isso removerá a imagem de capa e a etiqueta de:&#x0a;{0}&#x0a;&#x0a;A pasta será restaurada ao estado original.</value></data>
+  <data name="RevertButton" xml:space="preserve"><value>Reverter</value></data>
+  <data name="RevertFailed" xml:space="preserve"><value>Falha ao reverter: {0}</value></data>
+  <data name="FolderMovedTitle" xml:space="preserve"><value>Pasta não encontrada</value></data>
+  <data name="FolderMovedMessage" xml:space="preserve"><value>O caminho desta pasta mudou; ela pode ter sido movida ou renomeada:&#x0a;{0}&#x0a;&#x0a;O que você deseja fazer?</value></data>
+  <data name="FolderMovedLocate" xml:space="preserve"><value>Localizar pasta e reverter (recomendado)</value></data>
+  <data name="FolderMovedHistoryOnly" xml:space="preserve"><value>Remover apenas do histórico</value></data>
+  <data name="FolderMovedLocateTitle" xml:space="preserve"><value>Selecione a pasta para reverter</value></data>
+  <data name="FolderMismatchTitle" xml:space="preserve"><value>Pasta diferente</value></data>
+  <data name="FolderMismatchMessage" xml:space="preserve"><value>A pasta selecionada pode não corresponder a este item do histórico. Reverter mesmo assim?</value></data>
+  <data name="TrialBanner" xml:space="preserve"><value>Teste gratuito: restam {0} dias</value></data>
+  <data name="BuyNow" xml:space="preserve"><value>Comprar na Microsoft Store</value></data>
+  <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>Reverter todas as pastas?</value></data>
+  <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>Todos os ícones de pasta aplicados serão revertidos e o histórico será apagado. Esta ação não pode ser desfeita.</value></data>
+  <data name="RevertAllPartialFailed" xml:space="preserve"><value>Não foi possível reverter {0} pasta(s) em lote; elas podem ter sido movidas ou renomeadas. Elas permanecem na lista — reverta-as individualmente.</value></data>
+  <data name="Clear" xml:space="preserve"><value>Limpar</value></data>
+  <data name="AppliedAt" xml:space="preserve"><value>Aplicado: {0}</value></data>
+
+  <!-- Main window settings/help tabs -->
+  <data name="SettingsTitle" xml:space="preserve"><value>Configurações</value></data>
+  <data name="LanguageSection" xml:space="preserve"><value>Idioma</value></data>
+  <data name="LanguageSystem" xml:space="preserve"><value>Usar idioma do sistema</value></data>
+  <data name="LanguageJapanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
+  <data name="LanguagePortugueseBrazil" xml:space="preserve"><value>Português (Brasil)</value></data>
+  <data name="LanguageChineseSimplified" xml:space="preserve"><value>简体中文</value></data>
+  <data name="HistorySection" xml:space="preserve"><value>Histórico</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>Reverter todas as pastas</value></data>
+  <data name="RefreshSection" xml:space="preserve"><value>Atualização do Explorer</value></data>
+  <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>Reabrir janelas do Explorer depois de aplicar ícones de pasta</value></data>
+  <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>Faz com que as alterações de ícone apareçam imediatamente ao reabrir a janela do Explorer afetada. A barra de tarefas e o menu Iniciar não são reiniciados.</value></data>
+  <data name="AboutSection" xml:space="preserve"><value>Sobre o Folderly</value></data>
+  <data name="VersionLabel" xml:space="preserve"><value>Versão</value></data>
+  <data name="LicenseLabel" xml:space="preserve"><value>Licença</value></data>
+  <data name="LicenseFull" xml:space="preserve"><value>Licenciado</value></data>
+  <data name="LicenseTrial" xml:space="preserve"><value>Teste gratuito ({0} dias restantes)</value></data>
+  <data name="SupportLink" xml:space="preserve"><value>Entrar em contato com o suporte</value></data>
+  <data name="LicenseInfo" xml:space="preserve"><value>Informações da licença</value></data>
+  <data name="RateReview" xml:space="preserve"><value>Avaliar na Store</value></data>
+  <data name="FaqTitle" xml:space="preserve"><value>FAQ</value></data>
+  <data name="HelpContactShort" xml:space="preserve"><value>Enviar um bug ou pergunta</value></data>
+  <data name="HelpFaqShort" xml:space="preserve"><value>Atualização de ícones e problemas comuns</value></data>
+  <data name="OnboardingHelpTitle" xml:space="preserve"><value>Como usar</value></data>
+  <data name="OnboardingHelpShort" xml:space="preserve"><value>Clique direito, ajuste, aplique e gerencie ícones</value></data>
+  <data name="OnboardingTitle" xml:space="preserve"><value>Como usar o Folderly</value></data>
+  <data name="OnboardingStep1Title" xml:space="preserve"><value>Clique com o botão direito em uma pasta</value></data>
+  <data name="OnboardingStep1Body" xml:space="preserve"><value>Escolha Personalizar com Folderly no menu de contexto da pasta. Ele aparece depois que o Folderly é instalado.</value></data>
+  <data name="OnboardingStep2Title" xml:space="preserve"><value>Escolha uma imagem e aplique</value></data>
+  <data name="OnboardingStep2Body" xml:space="preserve"><value>Selecione uma imagem, ajuste a posição e o tamanho na prévia e aplique.</value></data>
+  <data name="OnboardingStep3Title" xml:space="preserve"><value>Gerenciar ou reverter</value></data>
+  <data name="OnboardingStep3Body" xml:space="preserve"><value>Abra o Folderly para editar pastas recentes novamente ou revertê-las pelo histórico.</value></data>
+  <data name="OnboardingPrevious" xml:space="preserve"><value>Anterior</value></data>
+  <data name="OnboardingNext" xml:space="preserve"><value>Avançar</value></data>
+  <data name="OnboardingStart" xml:space="preserve"><value>Começar</value></data>
+  <data name="OnboardingSkip" xml:space="preserve"><value>Pular</value></data>
+  <data name="ReviewInlineText" xml:space="preserve"><value>Se o Folderly é útil para você, uma avaliação na Store ajuda outras pessoas a encontrá-lo.</value></data>
+  <data name="ReviewAction" xml:space="preserve"><value>Avaliar</value></data>
+  <data name="ReviewPromptTitle" xml:space="preserve"><value>Avalie o Folderly</value></data>
+  <data name="ReviewPromptMessage" xml:space="preserve"><value>Se o Folderly ajudou você a reconhecer melhor suas pastas, uma avaliação rápida na Store seria muito importante.</value></data>
+  <data name="ReviewPromptThanks" xml:space="preserve"><value>Obrigado por usar o Folderly.</value></data>
+  <data name="ReviewPromptLater" xml:space="preserve"><value>Mais tarde</value></data>
+  <data name="PurchasePromptTitle" xml:space="preserve"><value>Continue usando o Folderly</value></data>
+  <data name="PurchasePromptMessage" xml:space="preserve"><value>Continue usando o Folderly após o teste gratuito comprando-o na Microsoft Store.</value></data>
+  <data name="PurchasePromptThanks" xml:space="preserve"><value>O ícone da sua pasta foi salvo.</value></data>
+  <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Ícone salvo, mas ainda não visível</value></data>
+  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Windows não informou que o novo ícone está ativo. Isso pode acontecer com pastas especiais ou não confiáveis, atrasos de sincronização ou atualizações recentes de segurança do Windows. Se ele ainda não aparecer, entre em contato com o suporte em Configurações com sua versão do Windows e o tipo de local da pasta.</value></data>
+  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Windows Explorer não exibiu o novo ícone. Unidades de rede, NAS e pastas compartilhadas têm suporte limitado porque o Windows ou o servidor de arquivos podem ignorar personalizações de pasta via desktop.ini. Pastas locais são recomendadas.&#x0a;&#x0a;Se você entrar em contato com o suporte, inclua as informações abaixo para que possamos verificar se o Folderly conseguiu salvar os arquivos ou se as configurações do Explorer/servidor bloquearam a exibição.&#x0a;{0}</value></data>
+  <data name="Close" xml:space="preserve"><value>Fechar</value></data>
+</root>

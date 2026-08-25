@@ -30,6 +30,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
     [
         new("en", "en", "LanguageEnglish", "Customize with Folderly"),
         new("es", "es", "LanguageSpanish", "Personalizar con Folderly"),
+        new("pt-BR", "pt-BR", "LanguagePortugueseBrazil", "Personalizar com Folderly"),
+        new("zh-Hans", "zh-Hans", "LanguageChineseSimplified", "使用 Folderly 自定义"),
         new("ja", "ja", "LanguageJapanese", "Folderly でカスタマイズ"),
     ];
 
