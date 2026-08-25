@@ -74,7 +74,7 @@ Arquivo</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancelar</value></data>
   <data name="Apply" xml:space="preserve"><value>Aplicar</value></data>
   <data name="Applying" xml:space="preserve"><value>Aplicando...</value></data>
-  <data name="ApplySuccess" xml:space="preserve"><value>Capa da pasta aplicada!</value></data>
+  <data name="ApplySuccess" xml:space="preserve"><value>Ícone da pasta aplicado!</value></data>
   <data name="ApplyFailed" xml:space="preserve"><value>Falha ao aplicar: {0}</value></data>
   <data name="ImageLoadError" xml:space="preserve"><value>Não foi possível carregar a imagem. Selecione outro arquivo.</value></data>
   <data name="ProtectionDeniedTitle" xml:space="preserve"><value>Não é possível modificar esta pasta</value></data>
@@ -228,10 +228,20 @@ O que você deseja fazer?</value></data>
   <data name="PurchasePromptMessage" xml:space="preserve"><value>Continue usando o Folderly após o teste gratuito comprando-o na Microsoft Store.</value></data>
   <data name="PurchasePromptThanks" xml:space="preserve"><value>O ícone da sua pasta foi salvo.</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Ícone salvo, mas ainda não visível</value></data>
-  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Windows não informou que o novo ícone está ativo. Isso pode acontecer com pastas especiais ou não confiáveis, atrasos de sincronização ou atualizações recentes de segurança do Windows. Se ele ainda não aparecer, entre em contato com o suporte em Configurações com sua versão do Windows e o tipo de local da pasta.</value></data>
+  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Explorador de Arquivos ainda não mostrou o novo ícone. Isso pode acontecer com pastas especiais ou não confiáveis, atrasos de sincronização ou atualizações recentes de segurança do Windows. Se ele ainda não aparecer, entre em contato com o suporte em Configurações com sua versão do Windows e o tipo de local da pasta.</value></data>
   <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Explorador de Arquivos não exibiu o novo ícone. Unidades de rede, NAS e pastas compartilhadas têm suporte limitado porque o Windows ou o servidor de arquivos podem ignorar personalizações de pasta via desktop.ini. Pastas locais são recomendadas.
 
 Se você entrar em contato com o suporte, inclua as informações abaixo para que possamos verificar se o Folderly conseguiu salvar os arquivos ou se as configurações do Explorador de Arquivos/servidor bloquearam a exibição.
 {0}</value></data>
   <data name="Close" xml:space="preserve"><value>Fechar</value></data>
+  <data name="WebViewInitFailed" xml:space="preserve"><value>Não foi possível inicializar o WebView2.&#x0a;{0}</value></data>
+  <data name="WindowMinimize" xml:space="preserve"><value>Minimizar</value></data>
+  <data name="WindowMaximize" xml:space="preserve"><value>Maximizar</value></data>
+  <data name="WindowClose" xml:space="preserve"><value>Fechar</value></data>
+  <data name="IconHome" xml:space="preserve"><value>Início</value></data>
+  <data name="IconFolder" xml:space="preserve"><value>Pasta</value></data>
+  <data name="IconTag" xml:space="preserve"><value>Etiqueta</value></data>
+  <data name="IconPlace" xml:space="preserve"><value>Local</value></data>
+  <data name="IconCalendar" xml:space="preserve"><value>Calendário</value></data>
+  <data name="IconFlag" xml:space="preserve"><value>Bandeira</value></data>
 </root>

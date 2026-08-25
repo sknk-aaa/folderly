@@ -210,4 +210,14 @@
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows からは新しいアイコンが有効になったことを確認できませんでした。特殊フォルダ、信頼されていない場所、同期の遅れ、または最近の Windows セキュリティ更新が影響している可能性があります。しばらくしても表示されない場合は、設定画面のサポートから Windows バージョンとフォルダの場所の種類をお知らせください。</value></data>
   <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly はアイコンファイルを保存しましたが、Windows Explorer では新しいアイコンが表示されませんでした。ネットワークドライブ、NAS、共有フォルダは制限付き対応です。Windows またはファイルサーバーが desktop.ini によるフォルダ表示のカスタマイズを無視する場合があります。ローカルフォルダでの利用を推奨します。&#x0a;&#x0a;サポートへ連絡する場合は、Folderly がファイルを保存できたのか、Explorer やサーバー設定で表示がブロックされたのかを確認するため、次の情報を送ってください。&#x0a;{0}</value></data>
   <data name="Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="WebViewInitFailed" xml:space="preserve"><value>WebView2 の初期化に失敗しました。&#x0a;{0}</value></data>
+  <data name="WindowMinimize" xml:space="preserve"><value>最小化</value></data>
+  <data name="WindowMaximize" xml:space="preserve"><value>最大化</value></data>
+  <data name="WindowClose" xml:space="preserve"><value>閉じる</value></data>
+  <data name="IconHome" xml:space="preserve"><value>ホーム</value></data>
+  <data name="IconFolder" xml:space="preserve"><value>フォルダ</value></data>
+  <data name="IconTag" xml:space="preserve"><value>タグ</value></data>
+  <data name="IconPlace" xml:space="preserve"><value>場所</value></data>
+  <data name="IconCalendar" xml:space="preserve"><value>カレンダー</value></data>
+  <data name="IconFlag" xml:space="preserve"><value>フラグ</value></data>
 </root>

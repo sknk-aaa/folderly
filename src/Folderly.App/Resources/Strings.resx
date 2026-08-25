@@ -68,7 +68,7 @@
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Apply" xml:space="preserve"><value>Apply</value></data>
   <data name="Applying" xml:space="preserve"><value>Applying...</value></data>
-  <data name="ApplySuccess" xml:space="preserve"><value>Folder cover applied!</value></data>
+  <data name="ApplySuccess" xml:space="preserve"><value>Folder icon applied!</value></data>
   <data name="ApplyFailed" xml:space="preserve"><value>Failed to apply: {0}</value></data>
   <data name="ImageLoadError" xml:space="preserve"><value>Failed to load image. Please select a different file.</value></data>
   <data name="ProtectionDeniedTitle" xml:space="preserve"><value>Cannot modify this folder</value></data>
@@ -207,7 +207,17 @@
   <data name="PurchasePromptMessage" xml:space="preserve"><value>Continue using Folderly after the free trial by purchasing it on Microsoft Store.</value></data>
   <data name="PurchasePromptThanks" xml:space="preserve"><value>Your folder icon has been saved.</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Icon saved, but not visible yet</value></data>
-  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows did not report the new icon as active. This can happen with special or untrusted folders, sync delays, or recent Windows security updates. If it still does not appear, contact support from Settings with your Windows version and folder location type.</value></data>
+  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows Explorer has not shown the new icon yet. This can happen with special or untrusted folders, sync delays, or recent Windows security updates. If it still does not appear, contact support from Settings with your Windows version and folder location type.</value></data>
   <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly saved the icon files, but Windows Explorer did not display the new icon. Network drives, NAS, and shared folders have limited support because Windows or the file server can ignore desktop.ini folder customizations. Local folders are recommended.&#x0a;&#x0a;If you contact support, include the information below so we can tell whether Folderly could save the files or Explorer/server settings blocked the display.&#x0a;{0}</value></data>
   <data name="Close" xml:space="preserve"><value>Close</value></data>
+  <data name="WebViewInitFailed" xml:space="preserve"><value>Failed to initialize WebView2.&#x0a;{0}</value></data>
+  <data name="WindowMinimize" xml:space="preserve"><value>Minimize</value></data>
+  <data name="WindowMaximize" xml:space="preserve"><value>Maximize</value></data>
+  <data name="WindowClose" xml:space="preserve"><value>Close</value></data>
+  <data name="IconHome" xml:space="preserve"><value>Home</value></data>
+  <data name="IconFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="IconTag" xml:space="preserve"><value>Tag</value></data>
+  <data name="IconPlace" xml:space="preserve"><value>Location</value></data>
+  <data name="IconCalendar" xml:space="preserve"><value>Calendar</value></data>
+  <data name="IconFlag" xml:space="preserve"><value>Flag</value></data>
 </root>

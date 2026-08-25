@@ -36,6 +36,7 @@ public partial class ApplyWindow : Window
     public ApplyWindow(string folderPath)
     {
         InitializeComponent();
+        Title = AppServices.Localize["ApplyWindowTitle"];
         _vm = new ApplyViewModel(folderPath);
         TryRestoreExistingCustomization();
 
@@ -68,7 +69,7 @@ public partial class ApplyWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"WebView2 の初期化に失敗しました。\n{ex.Message}",
+                string.Format(AppServices.Localize["WebViewInitFailed"], ex.Message),
                 "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
             Close();
         }
@@ -94,10 +95,15 @@ public partial class ApplyWindow : Window
         var L = AppServices.Localize;
         static string Html(string value) => WebUtility.HtmlEncode(value);
         string T(string key) => Html(L[key]);
+        string DefaultTagName(string key) =>
+            Html(L[key].Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?.Trim() ?? L[key]);
 
         var replacements = new (string From, string To)[]
         {
             ("対象フォルダ", T("TargetFolder")),
+            ("最小化", T("WindowMinimize")),
+            ("最大化", T("WindowMaximize")),
+            ("閉じる", T("WindowClose")),
             ("フォルダプレビュー", T("FolderPreviewTitle")),
             ("画像を選択するとここに表示されます", T("PreviewSubtext")),
             ("画像をドラッグ&ドロップ", T("DndSubtext")),
@@ -142,6 +148,7 @@ public partial class ApplyWindow : Window
             ("アイコン", T("TagIconLabel")),
             ("変更は「保存」を押すまで反映されません", T("SaveChangesHint")),
             ("保存", T("Save")),
+            ("開発", DefaultTagName("TagBlue")),
             ("編集", T("IconEdit")),
             ("メディア", T("IconMedia")),
             ("仕事", T("IconWork")),
@@ -155,6 +162,12 @@ public partial class ApplyWindow : Window
             ("デザイン", T("IconDesign")),
             ("重要", T("IconImportant")),
             ("プライベート", T("IconPrivate")),
+            ("ホーム", T("IconHome")),
+            ("フォルダ", T("IconFolder")),
+            ("タグ", T("IconTag")),
+            ("場所", T("IconPlace")),
+            ("カレンダー", T("IconCalendar")),
+            ("フラグ", T("IconFlag")),
         };
 
         foreach (var (from, to) in replacements)

@@ -68,7 +68,7 @@
   <data name="Cancel" xml:space="preserve"><value>Cancelar</value></data>
   <data name="Apply" xml:space="preserve"><value>Aplicar</value></data>
   <data name="Applying" xml:space="preserve"><value>Aplicando...</value></data>
-  <data name="ApplySuccess" xml:space="preserve"><value>¡Portada de carpeta aplicada!</value></data>
+  <data name="ApplySuccess" xml:space="preserve"><value>¡Icono de carpeta aplicado!</value></data>
   <data name="ApplyFailed" xml:space="preserve"><value>Error al aplicar: {0}</value></data>
   <data name="ImageLoadError" xml:space="preserve"><value>No se pudo cargar la imagen. Selecciona otro archivo.</value></data>
   <data name="ProtectionDeniedTitle" xml:space="preserve"><value>No se puede modificar esta carpeta</value></data>
@@ -208,7 +208,17 @@
   <data name="PurchasePromptMessage" xml:space="preserve"><value>Continúa usando Folderly después de la prueba gratuita comprándolo en Microsoft Store.</value></data>
   <data name="PurchasePromptThanks" xml:space="preserve"><value>Tu icono de carpeta se ha guardado.</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Icono guardado, pero aún no visible</value></data>
-  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly guardó los archivos de icono, pero Windows no informó que el nuevo icono esté activo. Esto puede ocurrir con carpetas especiales o no confiables, retrasos de sincronización o actualizaciones recientes de seguridad de Windows. Si sigue sin aparecer, contacta con soporte desde Configuración e incluye tu versión de Windows y el tipo de ubicación de la carpeta.</value></data>
+  <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly guardó los archivos de icono, pero el Explorador de archivos aún no muestra el nuevo icono. Esto puede ocurrir con carpetas especiales o no confiables, retrasos de sincronización o actualizaciones recientes de seguridad de Windows. Si sigue sin aparecer, contacta con soporte desde Configuración e incluye tu versión de Windows y el tipo de ubicación de la carpeta.</value></data>
   <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly guardó los archivos de icono, pero el Explorador de archivos no mostró el nuevo icono. Las unidades de red, NAS y carpetas compartidas tienen soporte limitado porque Windows o el servidor de archivos pueden ignorar las personalizaciones de carpetas mediante desktop.ini. Se recomiendan carpetas locales.&#x0a;&#x0a;Si contactas con soporte, incluye la información siguiente para que podamos saber si Folderly pudo guardar los archivos o si la configuración del Explorador de archivos o del servidor bloqueó la visualización.&#x0a;{0}</value></data>
   <data name="Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="WebViewInitFailed" xml:space="preserve"><value>No se pudo inicializar WebView2.&#x0a;{0}</value></data>
+  <data name="WindowMinimize" xml:space="preserve"><value>Minimizar</value></data>
+  <data name="WindowMaximize" xml:space="preserve"><value>Maximizar</value></data>
+  <data name="WindowClose" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="IconHome" xml:space="preserve"><value>Inicio</value></data>
+  <data name="IconFolder" xml:space="preserve"><value>Carpeta</value></data>
+  <data name="IconTag" xml:space="preserve"><value>Etiqueta</value></data>
+  <data name="IconPlace" xml:space="preserve"><value>Ubicación</value></data>
+  <data name="IconCalendar" xml:space="preserve"><value>Calendario</value></data>
+  <data name="IconFlag" xml:space="preserve"><value>Bandera</value></data>
 </root>
