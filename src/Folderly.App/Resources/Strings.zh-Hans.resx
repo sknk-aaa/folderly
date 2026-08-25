@@ -41,12 +41,18 @@
   <data name="CropFitHeight" xml:space="preserve"><value>适合高度</value></data>
   <data name="TagLabel" xml:space="preserve"><value>标签</value></data>
   <data name="TagNone" xml:space="preserve"><value>无</value></data>
-  <data name="TagBlue" xml:space="preserve"><value>蓝色&#x0a;开发</value></data>
-  <data name="TagGreen" xml:space="preserve"><value>绿色&#x0a;大学</value></data>
-  <data name="TagOrange" xml:space="preserve"><value>橙色&#x0a;视频</value></data>
-  <data name="TagPurple" xml:space="preserve"><value>紫色&#x0a;设计</value></data>
-  <data name="TagRed" xml:space="preserve"><value>红色&#x0a;重要</value></data>
-  <data name="TagGray" xml:space="preserve"><value>灰色&#x0a;归档</value></data>
+  <data name="TagBlue" xml:space="preserve"><value>蓝色
+开发</value></data>
+  <data name="TagGreen" xml:space="preserve"><value>绿色
+大学</value></data>
+  <data name="TagOrange" xml:space="preserve"><value>橙色
+视频</value></data>
+  <data name="TagPurple" xml:space="preserve"><value>紫色
+设计</value></data>
+  <data name="TagRed" xml:space="preserve"><value>红色
+重要</value></data>
+  <data name="TagGray" xml:space="preserve"><value>灰色
+归档</value></data>
   <data name="ColorBlue" xml:space="preserve"><value>蓝色</value></data>
   <data name="ColorGreen" xml:space="preserve"><value>绿色</value></data>
   <data name="ColorOrange" xml:space="preserve"><value>橙色</value></data>
@@ -62,8 +68,8 @@
   <data name="TagSettingsTitle" xml:space="preserve"><value>标签设置</value></data>
   <data name="ShowTagNameOnIcon" xml:space="preserve"><value>在文件夹图标上显示标签名称</value></data>
   <data name="ShowTagNameOnIconNote" xml:space="preserve"><value>较长名称会自动缩小或省略，以适应标签区域。</value></data>
-  <data name="ShowTagIconOnIcon" xml:space="preserve"><value>在文件夹图标上显示图标</value></data>
-  <data name="ShowTagIconOnIconNote" xml:space="preserve"><value>在文件夹标签页上显示所选标签图标。</value></data>
+  <data name="ShowTagIconOnIcon" xml:space="preserve"><value>显示标签图标</value></data>
+  <data name="ShowTagIconOnIconNote" xml:space="preserve"><value>在文件夹标签区域显示所选标签图标。</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>
   <data name="Cancel" xml:space="preserve"><value>取消</value></data>
   <data name="Apply" xml:space="preserve"><value>应用</value></data>
@@ -72,13 +78,21 @@
   <data name="ApplyFailed" xml:space="preserve"><value>应用失败：{0}</value></data>
   <data name="ImageLoadError" xml:space="preserve"><value>无法加载图片。请选择其他文件。</value></data>
   <data name="ProtectionDeniedTitle" xml:space="preserve"><value>无法修改此文件夹</value></data>
-  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}&#x0a;&#x0a;请选择其他文件夹。</value></data>
+  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}
+
+请选择其他文件夹。</value></data>
   <data name="OneDriveWarningTitle" xml:space="preserve"><value>OneDrive 文件夹</value></data>
-  <data name="OneDriveWarningMessage" xml:space="preserve"><value>此文件夹由 OneDrive 同步。更改可能会同步到其他设备。&#x0a;&#x0a;继续吗？</value></data>
+  <data name="OneDriveWarningMessage" xml:space="preserve"><value>此文件夹由 OneDrive 同步。更改可能会同步到其他设备。
+
+继续吗？</value></data>
   <data name="WarningGenericTitle" xml:space="preserve"><value>警告</value></data>
-  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;继续吗？</value></data>
+  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}
+
+继续吗？</value></data>
   <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>网络文件夹支持有限</value></data>
-  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>Folderly 最适合本地文件夹。对于网络驱动器、NAS 和共享文件夹，Folderly 可以保存图标文件，但 Windows Explorer 是否显示取决于 Windows 安全设置或文件服务器设置。&#x0a;&#x0a;继续吗？</value></data>
+  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>Folderly 最适合本地文件夹。对于网络驱动器、NAS 和共享文件夹，Folderly 可以保存图标文件，但文件资源管理器是否显示取决于 Windows 安全设置或文件服务器设置。
+
+继续吗？</value></data>
   <data name="Continue" xml:space="preserve"><value>继续</value></data>
   <data name="OK" xml:space="preserve"><value>确定</value></data>
   <data name="SelectImageTitle" xml:space="preserve"><value>选择图片</value></data>
@@ -110,9 +124,9 @@
   <data name="ClickToEdit" xml:space="preserve"><value>点击编辑</value></data>
   <data name="Back" xml:space="preserve"><value>返回</value></data>
   <data name="EditingSuffix" xml:space="preserve"><value>正在编辑</value></data>
-  <data name="PreviewOnFolderTab" xml:space="preserve"><value>预览 - 显示在文件夹标签页上</value></data>
+  <data name="PreviewOnFolderTab" xml:space="preserve"><value>预览 - 显示在文件夹标签区域</value></data>
   <data name="TagNamePlaceholder" xml:space="preserve"><value>输入标签名称</value></data>
-  <data name="ShowTagNameOffNote" xml:space="preserve"><value>关闭后，标签页只显示图标和颜色。</value></data>
+  <data name="ShowTagNameOffNote" xml:space="preserve"><value>关闭后，标签区域只显示图标和颜色。</value></data>
   <data name="SaveChangesHint" xml:space="preserve"><value>按下保存后，更改才会应用</value></data>
   <data name="ApplyCompleted" xml:space="preserve"><value>已应用</value></data>
   <data name="IconEdit" xml:space="preserve"><value>编辑</value></data>
@@ -131,7 +145,7 @@
 
   <!-- MainWindow -->
   <data name="MainWindowTitle" xml:space="preserve"><value>Folderly</value></data>
-  <data name="HistoryTab" xml:space="preserve"><value>历史</value></data>
+  <data name="HistoryTab" xml:space="preserve"><value>历史记录</value></data>
   <data name="SettingsTab" xml:space="preserve"><value>设置</value></data>
   <data name="HelpTab" xml:space="preserve"><value>帮助</value></data>
   <data name="RecentFolders" xml:space="preserve"><value>最近修改的文件夹</value></data>
@@ -140,11 +154,17 @@
   <data name="ClearAllHistory" xml:space="preserve"><value>还原所有文件夹</value></data>
   <data name="NoHistory" xml:space="preserve"><value>还没有历史记录。右键单击文件夹即可开始。</value></data>
   <data name="RevertConfirmTitle" xml:space="preserve"><value>还原文件夹？</value></data>
-  <data name="RevertConfirmMessage" xml:space="preserve"><value>这会移除以下文件夹的封面图片和标签：&#x0a;{0}&#x0a;&#x0a;该文件夹将恢复为原始状态。</value></data>
+  <data name="RevertConfirmMessage" xml:space="preserve"><value>这会移除以下文件夹的封面图片和标签：
+{0}
+
+该文件夹将恢复为原始状态。</value></data>
   <data name="RevertButton" xml:space="preserve"><value>还原</value></data>
   <data name="RevertFailed" xml:space="preserve"><value>还原失败：{0}</value></data>
   <data name="FolderMovedTitle" xml:space="preserve"><value>找不到文件夹</value></data>
-  <data name="FolderMovedMessage" xml:space="preserve"><value>此文件夹的路径已更改；它可能已被移动或重命名：&#x0a;{0}&#x0a;&#x0a;你想怎么处理？</value></data>
+  <data name="FolderMovedMessage" xml:space="preserve"><value>此文件夹的路径已更改；它可能已被移动或重命名：
+{0}
+
+你想怎么处理？</value></data>
   <data name="FolderMovedLocate" xml:space="preserve"><value>定位文件夹并还原（推荐）</value></data>
   <data name="FolderMovedHistoryOnly" xml:space="preserve"><value>仅从历史记录中移除</value></data>
   <data name="FolderMovedLocateTitle" xml:space="preserve"><value>选择要还原的文件夹</value></data>
@@ -167,11 +187,11 @@
   <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
   <data name="LanguagePortugueseBrazil" xml:space="preserve"><value>Português (Brasil)</value></data>
   <data name="LanguageChineseSimplified" xml:space="preserve"><value>简体中文</value></data>
-  <data name="HistorySection" xml:space="preserve"><value>历史</value></data>
+  <data name="HistorySection" xml:space="preserve"><value>历史记录</value></data>
   <data name="DeleteHistory" xml:space="preserve"><value>还原所有文件夹</value></data>
-  <data name="RefreshSection" xml:space="preserve"><value>Explorer 刷新</value></data>
-  <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>应用文件夹图标后重新打开 Explorer 窗口</value></data>
-  <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>通过重新打开受影响的 Explorer 窗口，让图标更改立即显示。不会重启任务栏或开始菜单。</value></data>
+  <data name="RefreshSection" xml:space="preserve"><value>文件资源管理器刷新</value></data>
+  <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>应用文件夹图标后重新打开文件资源管理器窗口</value></data>
+  <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>通过重新打开受影响的文件资源管理器窗口，让图标更改立即显示。不会重启任务栏或开始菜单。</value></data>
   <data name="AboutSection" xml:space="preserve"><value>关于 Folderly</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>版本</value></data>
   <data name="LicenseLabel" xml:space="preserve"><value>许可证</value></data>
@@ -179,7 +199,7 @@
   <data name="LicenseTrial" xml:space="preserve"><value>免费试用（剩余 {0} 天）</value></data>
   <data name="SupportLink" xml:space="preserve"><value>联系支持</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>许可证信息</value></data>
-  <data name="RateReview" xml:space="preserve"><value>在 Store 评价</value></data>
+  <data name="RateReview" xml:space="preserve"><value>在 Microsoft Store 评价</value></data>
   <data name="FaqTitle" xml:space="preserve"><value>常见问题</value></data>
   <data name="HelpContactShort" xml:space="preserve"><value>发送问题或反馈</value></data>
   <data name="HelpFaqShort" xml:space="preserve"><value>图标刷新和常见问题</value></data>
@@ -196,10 +216,10 @@
   <data name="OnboardingNext" xml:space="preserve"><value>下一步</value></data>
   <data name="OnboardingStart" xml:space="preserve"><value>开始</value></data>
   <data name="OnboardingSkip" xml:space="preserve"><value>跳过</value></data>
-  <data name="ReviewInlineText" xml:space="preserve"><value>如果 Folderly 对你有帮助，在 Store 评价可以帮助更多人发现它。</value></data>
+  <data name="ReviewInlineText" xml:space="preserve"><value>如果 Folderly 对你有帮助，在 Microsoft Store 评价可以帮助更多人发现它。</value></data>
   <data name="ReviewAction" xml:space="preserve"><value>评价</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>评价 Folderly</value></data>
-  <data name="ReviewPromptMessage" xml:space="preserve"><value>如果 Folderly 帮你更容易识别文件夹，花一点时间在 Store 评价会很有帮助。</value></data>
+  <data name="ReviewPromptMessage" xml:space="preserve"><value>如果 Folderly 帮你更容易识别文件夹，花一点时间在 Microsoft Store 评价会很有帮助。</value></data>
   <data name="ReviewPromptThanks" xml:space="preserve"><value>感谢使用 Folderly。</value></data>
   <data name="ReviewPromptLater" xml:space="preserve"><value>稍后</value></data>
   <data name="PurchasePromptTitle" xml:space="preserve"><value>继续使用 Folderly</value></data>
@@ -207,6 +227,9 @@
   <data name="PurchasePromptThanks" xml:space="preserve"><value>你的文件夹图标已保存。</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>图标已保存，但尚未显示</value></data>
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>Folderly 已保存图标文件，但 Windows 未报告新图标处于活动状态。这可能发生在特殊或不受信任的文件夹、同步延迟，或最近的 Windows 安全更新之后。如果仍未显示，请在设置中联系支持，并提供你的 Windows 版本和文件夹位置类型。</value></data>
-  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly 已保存图标文件，但 Windows Explorer 未显示新图标。网络驱动器、NAS 和共享文件夹支持有限，因为 Windows 或文件服务器可能会忽略通过 desktop.ini 进行的文件夹自定义。建议使用本地文件夹。&#x0a;&#x0a;如果你联系支持，请附上以下信息，以便我们判断 Folderly 是否成功保存了文件，或是否被 Explorer/服务器设置阻止显示。&#x0a;{0}</value></data>
+  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>Folderly 已保存图标文件，但文件资源管理器未显示新图标。网络驱动器、NAS 和共享文件夹支持有限，因为 Windows 或文件服务器可能会忽略通过 desktop.ini 进行的文件夹自定义。建议使用本地文件夹。
+
+如果你联系支持，请附上以下信息，以便我们判断 Folderly 是否成功保存了文件，或是否被文件资源管理器/服务器设置阻止显示。
+{0}</value></data>
   <data name="Close" xml:space="preserve"><value>关闭</value></data>
 </root>

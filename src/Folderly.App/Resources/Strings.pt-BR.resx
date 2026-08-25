@@ -41,12 +41,18 @@
   <data name="CropFitHeight" xml:space="preserve"><value>Ajustar à altura</value></data>
   <data name="TagLabel" xml:space="preserve"><value>Etiqueta</value></data>
   <data name="TagNone" xml:space="preserve"><value>Nenhuma</value></data>
-  <data name="TagBlue" xml:space="preserve"><value>Azul&#x0a;Desenvolvimento</value></data>
-  <data name="TagGreen" xml:space="preserve"><value>Verde&#x0a;Universidade</value></data>
-  <data name="TagOrange" xml:space="preserve"><value>Laranja&#x0a;Vídeo</value></data>
-  <data name="TagPurple" xml:space="preserve"><value>Roxo&#x0a;Design</value></data>
-  <data name="TagRed" xml:space="preserve"><value>Vermelho&#x0a;Importante</value></data>
-  <data name="TagGray" xml:space="preserve"><value>Cinza&#x0a;Arquivo</value></data>
+  <data name="TagBlue" xml:space="preserve"><value>Azul
+Desenvolvimento</value></data>
+  <data name="TagGreen" xml:space="preserve"><value>Verde
+Universidade</value></data>
+  <data name="TagOrange" xml:space="preserve"><value>Laranja
+Vídeo</value></data>
+  <data name="TagPurple" xml:space="preserve"><value>Roxo
+Design</value></data>
+  <data name="TagRed" xml:space="preserve"><value>Vermelho
+Importante</value></data>
+  <data name="TagGray" xml:space="preserve"><value>Cinza
+Arquivo</value></data>
   <data name="ColorBlue" xml:space="preserve"><value>Azul</value></data>
   <data name="ColorGreen" xml:space="preserve"><value>Verde</value></data>
   <data name="ColorOrange" xml:space="preserve"><value>Laranja</value></data>
@@ -72,13 +78,21 @@
   <data name="ApplyFailed" xml:space="preserve"><value>Falha ao aplicar: {0}</value></data>
   <data name="ImageLoadError" xml:space="preserve"><value>Não foi possível carregar a imagem. Selecione outro arquivo.</value></data>
   <data name="ProtectionDeniedTitle" xml:space="preserve"><value>Não é possível modificar esta pasta</value></data>
-  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}&#x0a;&#x0a;Selecione outra pasta.</value></data>
+  <data name="ProtectionDeniedDetail" xml:space="preserve"><value>{0}
+
+Selecione outra pasta.</value></data>
   <data name="OneDriveWarningTitle" xml:space="preserve"><value>Pasta do OneDrive</value></data>
-  <data name="OneDriveWarningMessage" xml:space="preserve"><value>Esta pasta é sincronizada pelo OneDrive. As alterações podem ser sincronizadas com outros dispositivos.&#x0a;&#x0a;Continuar?</value></data>
+  <data name="OneDriveWarningMessage" xml:space="preserve"><value>Esta pasta é sincronizada pelo OneDrive. As alterações podem ser sincronizadas com outros dispositivos.
+
+Continuar?</value></data>
   <data name="WarningGenericTitle" xml:space="preserve"><value>Aviso</value></data>
-  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}&#x0a;&#x0a;Continuar?</value></data>
+  <data name="WarningGenericMessage" xml:space="preserve"><value>{0}
+
+Continuar?</value></data>
   <data name="NetworkFolderWarningTitle" xml:space="preserve"><value>Pastas de rede têm suporte limitado</value></data>
-  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>O Folderly funciona melhor com pastas locais. Em unidades de rede, NAS e pastas compartilhadas, o Folderly pode salvar os arquivos de ícone, mas o Windows Explorer pode não exibi-los dependendo das configurações de segurança do Windows ou do servidor de arquivos.&#x0a;&#x0a;Continuar?</value></data>
+  <data name="NetworkFolderWarningMessage" xml:space="preserve"><value>O Folderly funciona melhor com pastas locais. Em unidades de rede, NAS e pastas compartilhadas, o Folderly pode salvar os arquivos de ícone, mas o Explorador de Arquivos pode não exibi-los dependendo das configurações de segurança do Windows ou do servidor de arquivos.
+
+Continuar?</value></data>
   <data name="Continue" xml:space="preserve"><value>Continuar</value></data>
   <data name="OK" xml:space="preserve"><value>OK</value></data>
   <data name="SelectImageTitle" xml:space="preserve"><value>Selecionar uma imagem</value></data>
@@ -89,7 +103,7 @@
   <data name="TagEditTitle" xml:space="preserve"><value>Editar etiquetas</value></data>
   <data name="TagEditDesc" xml:space="preserve"><value>Personalize nomes e ícones de etiquetas</value></data>
   <data name="TagEditHeadTitle" xml:space="preserve"><value>Editar etiqueta</value></data>
-  <data name="EditingTag" xml:space="preserve"><value>Editando &quot;{0}&quot;</value></data>
+  <data name="EditingTag" xml:space="preserve"><value>Editando "{0}"</value></data>
   <data name="TagColorLabel" xml:space="preserve"><value>Cor</value></data>
   <data name="TagIconLabel" xml:space="preserve"><value>Ícone</value></data>
   <data name="NewTagBtn" xml:space="preserve"><value>Adicionar nova etiqueta</value></data>
@@ -140,11 +154,17 @@
   <data name="ClearAllHistory" xml:space="preserve"><value>Reverter todas as pastas</value></data>
   <data name="NoHistory" xml:space="preserve"><value>Ainda não há histórico. Clique com o botão direito em uma pasta para começar.</value></data>
   <data name="RevertConfirmTitle" xml:space="preserve"><value>Reverter pasta?</value></data>
-  <data name="RevertConfirmMessage" xml:space="preserve"><value>Isso removerá a imagem de capa e a etiqueta de:&#x0a;{0}&#x0a;&#x0a;A pasta será restaurada ao estado original.</value></data>
+  <data name="RevertConfirmMessage" xml:space="preserve"><value>Isso removerá a imagem de capa e a etiqueta de:
+{0}
+
+A pasta será restaurada ao estado original.</value></data>
   <data name="RevertButton" xml:space="preserve"><value>Reverter</value></data>
   <data name="RevertFailed" xml:space="preserve"><value>Falha ao reverter: {0}</value></data>
   <data name="FolderMovedTitle" xml:space="preserve"><value>Pasta não encontrada</value></data>
-  <data name="FolderMovedMessage" xml:space="preserve"><value>O caminho desta pasta mudou; ela pode ter sido movida ou renomeada:&#x0a;{0}&#x0a;&#x0a;O que você deseja fazer?</value></data>
+  <data name="FolderMovedMessage" xml:space="preserve"><value>O caminho desta pasta mudou; ela pode ter sido movida ou renomeada:
+{0}
+
+O que você deseja fazer?</value></data>
   <data name="FolderMovedLocate" xml:space="preserve"><value>Localizar pasta e reverter (recomendado)</value></data>
   <data name="FolderMovedHistoryOnly" xml:space="preserve"><value>Remover apenas do histórico</value></data>
   <data name="FolderMovedLocateTitle" xml:space="preserve"><value>Selecione a pasta para reverter</value></data>
@@ -169,9 +189,9 @@
   <data name="LanguageChineseSimplified" xml:space="preserve"><value>简体中文</value></data>
   <data name="HistorySection" xml:space="preserve"><value>Histórico</value></data>
   <data name="DeleteHistory" xml:space="preserve"><value>Reverter todas as pastas</value></data>
-  <data name="RefreshSection" xml:space="preserve"><value>Atualização do Explorer</value></data>
-  <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>Reabrir janelas do Explorer depois de aplicar ícones de pasta</value></data>
-  <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>Faz com que as alterações de ícone apareçam imediatamente ao reabrir a janela do Explorer afetada. A barra de tarefas e o menu Iniciar não são reiniciados.</value></data>
+  <data name="RefreshSection" xml:space="preserve"><value>Atualização do Explorador de Arquivos</value></data>
+  <data name="ReopenExplorerWindowsAfterApply" xml:space="preserve"><value>Reabrir janelas do Explorador de Arquivos depois de aplicar ícones de pasta</value></data>
+  <data name="ReopenExplorerWindowsAfterApplyNote" xml:space="preserve"><value>Faz com que as alterações de ícone apareçam imediatamente ao reabrir a janela afetada do Explorador de Arquivos. A barra de tarefas e o menu Iniciar não são reiniciados.</value></data>
   <data name="AboutSection" xml:space="preserve"><value>Sobre o Folderly</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>Versão</value></data>
   <data name="LicenseLabel" xml:space="preserve"><value>Licença</value></data>
@@ -179,12 +199,12 @@
   <data name="LicenseTrial" xml:space="preserve"><value>Teste gratuito ({0} dias restantes)</value></data>
   <data name="SupportLink" xml:space="preserve"><value>Entrar em contato com o suporte</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>Informações da licença</value></data>
-  <data name="RateReview" xml:space="preserve"><value>Avaliar na Store</value></data>
-  <data name="FaqTitle" xml:space="preserve"><value>FAQ</value></data>
+  <data name="RateReview" xml:space="preserve"><value>Avaliar na Microsoft Store</value></data>
+  <data name="FaqTitle" xml:space="preserve"><value>Perguntas frequentes</value></data>
   <data name="HelpContactShort" xml:space="preserve"><value>Enviar um bug ou pergunta</value></data>
   <data name="HelpFaqShort" xml:space="preserve"><value>Atualização de ícones e problemas comuns</value></data>
   <data name="OnboardingHelpTitle" xml:space="preserve"><value>Como usar</value></data>
-  <data name="OnboardingHelpShort" xml:space="preserve"><value>Clique direito, ajuste, aplique e gerencie ícones</value></data>
+  <data name="OnboardingHelpShort" xml:space="preserve"><value>Clique com o botão direito, ajuste, aplique e gerencie ícones</value></data>
   <data name="OnboardingTitle" xml:space="preserve"><value>Como usar o Folderly</value></data>
   <data name="OnboardingStep1Title" xml:space="preserve"><value>Clique com o botão direito em uma pasta</value></data>
   <data name="OnboardingStep1Body" xml:space="preserve"><value>Escolha Personalizar com Folderly no menu de contexto da pasta. Ele aparece depois que o Folderly é instalado.</value></data>
@@ -196,10 +216,10 @@
   <data name="OnboardingNext" xml:space="preserve"><value>Avançar</value></data>
   <data name="OnboardingStart" xml:space="preserve"><value>Começar</value></data>
   <data name="OnboardingSkip" xml:space="preserve"><value>Pular</value></data>
-  <data name="ReviewInlineText" xml:space="preserve"><value>Se o Folderly é útil para você, uma avaliação na Store ajuda outras pessoas a encontrá-lo.</value></data>
+  <data name="ReviewInlineText" xml:space="preserve"><value>Se o Folderly é útil para você, uma avaliação na Microsoft Store ajuda outras pessoas a encontrá-lo.</value></data>
   <data name="ReviewAction" xml:space="preserve"><value>Avaliar</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Avalie o Folderly</value></data>
-  <data name="ReviewPromptMessage" xml:space="preserve"><value>Se o Folderly ajudou você a reconhecer melhor suas pastas, uma avaliação rápida na Store seria muito importante.</value></data>
+  <data name="ReviewPromptMessage" xml:space="preserve"><value>Se o Folderly ajudou você a reconhecer melhor suas pastas, uma avaliação rápida na Microsoft Store seria muito importante.</value></data>
   <data name="ReviewPromptThanks" xml:space="preserve"><value>Obrigado por usar o Folderly.</value></data>
   <data name="ReviewPromptLater" xml:space="preserve"><value>Mais tarde</value></data>
   <data name="PurchasePromptTitle" xml:space="preserve"><value>Continue usando o Folderly</value></data>
@@ -207,6 +227,9 @@
   <data name="PurchasePromptThanks" xml:space="preserve"><value>O ícone da sua pasta foi salvo.</value></data>
   <data name="ApplyVerificationWarningTitle" xml:space="preserve"><value>Ícone salvo, mas ainda não visível</value></data>
   <data name="ApplyVerificationWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Windows não informou que o novo ícone está ativo. Isso pode acontecer com pastas especiais ou não confiáveis, atrasos de sincronização ou atualizações recentes de segurança do Windows. Se ele ainda não aparecer, entre em contato com o suporte em Configurações com sua versão do Windows e o tipo de local da pasta.</value></data>
-  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Windows Explorer não exibiu o novo ícone. Unidades de rede, NAS e pastas compartilhadas têm suporte limitado porque o Windows ou o servidor de arquivos podem ignorar personalizações de pasta via desktop.ini. Pastas locais são recomendadas.&#x0a;&#x0a;Se você entrar em contato com o suporte, inclua as informações abaixo para que possamos verificar se o Folderly conseguiu salvar os arquivos ou se as configurações do Explorer/servidor bloquearam a exibição.&#x0a;{0}</value></data>
+  <data name="ApplyVerificationNetworkWarningMessage" xml:space="preserve"><value>O Folderly salvou os arquivos de ícone, mas o Explorador de Arquivos não exibiu o novo ícone. Unidades de rede, NAS e pastas compartilhadas têm suporte limitado porque o Windows ou o servidor de arquivos podem ignorar personalizações de pasta via desktop.ini. Pastas locais são recomendadas.
+
+Se você entrar em contato com o suporte, inclua as informações abaixo para que possamos verificar se o Folderly conseguiu salvar os arquivos ou se as configurações do Explorador de Arquivos/servidor bloquearam a exibição.
+{0}</value></data>
   <data name="Close" xml:space="preserve"><value>Fechar</value></data>
 </root>
