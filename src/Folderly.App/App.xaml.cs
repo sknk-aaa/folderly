@@ -45,6 +45,7 @@ public partial class App : Application
         }
 
         AppServices.Initialize();
+        _ = AppServices.License.InitializeAsync();
         AppServices.Logger<App>().LogInformation("Folderly started. Args: [{Args}]", string.Join(", ", e.Args));
 
         if (e.Args.Length > 0)

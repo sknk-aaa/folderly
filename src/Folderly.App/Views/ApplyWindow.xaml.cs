@@ -724,7 +724,14 @@ public partial class ApplyWindow : Window
                 await ExecuteScriptSafeAsync(
                     $"document.getElementById('btn-apply').textContent={JsonSerializer.Serialize("✓ " + AppServices.Localize["ApplyCompleted"])};");
 
-                var reviewPromptApplyCount = result.IconVerified
+                if (result.IconVerified)
+                    await AppServices.License.InitializeAsync();
+
+                var purchasePromptApplyCount = result.IconVerified && AppServices.License.IsActive && AppServices.License.IsTrial
+                    ? PurchasePromptService.RecordTrialSuccessfulApplyAndGetPromptCount()
+                    : null;
+
+                var reviewPromptApplyCount = result.IconVerified && AppServices.License.IsActive && !AppServices.License.IsTrial
                     ? ReviewPromptService.RecordSuccessfulApplyAndGetPromptCount()
                     : null;
 
@@ -742,7 +749,12 @@ public partial class ApplyWindow : Window
                 if (ShouldReopenExplorer())
                     await ReopenExplorerWindowsAsync(_vm.FolderPath);
 
-                if (reviewPromptApplyCount is not null)
+                if (purchasePromptApplyCount is not null)
+                {
+                    await Task.Delay(3000);
+                    ShowPurchasePrompt(purchasePromptApplyCount.Value);
+                }
+                else if (reviewPromptApplyCount is not null)
                 {
                     await Task.Delay(3000);
                     ShowReviewPrompt(reviewPromptApplyCount.Value);
@@ -817,7 +829,22 @@ public partial class ApplyWindow : Window
         }
     }
 
+    private void ShowPurchasePrompt(int applyCount)
+    {
+        var shouldOpenStore = ShowForegroundPurchaseDialog();
+        PurchasePromptService.MarkPromptHandled(applyCount);
+
+        if (shouldOpenStore)
+            StoreNavigationService.OpenProductPage();
+    }
+
     private static bool ShowForegroundReviewDialog()
+        => ShowForegroundDialog(ReviewPromptDialog.Show);
+
+    private static bool ShowForegroundPurchaseDialog()
+        => ShowForegroundDialog(PurchasePromptDialog.Show);
+
+    private static bool ShowForegroundDialog(Func<Window, bool> showDialog)
     {
         var owner = new Window
         {
@@ -839,7 +866,7 @@ public partial class ApplyWindow : Window
             owner.Activate();
             owner.Focus();
 
-            return ReviewPromptDialog.Show(owner);
+            return showDialog(owner);
         }
         finally
         {

@@ -11,6 +11,7 @@ public sealed class StoreLicenseService
 {
     private StoreContext? _context;
     private StoreAppLicense? _license;
+    private Task? _initializeTask;
 
     public bool IsTrial      { get; private set; } = true;
     public bool IsActive     { get; private set; } = true;
@@ -19,6 +20,18 @@ public sealed class StoreLicenseService
     public event EventHandler? LicenseChanged;
 
     public async Task InitializeAsync()
+    {
+        if (_initializeTask is not null)
+        {
+            await _initializeTask;
+            return;
+        }
+
+        _initializeTask = InitializeCoreAsync();
+        await _initializeTask;
+    }
+
+    private async Task InitializeCoreAsync()
     {
         try
         {

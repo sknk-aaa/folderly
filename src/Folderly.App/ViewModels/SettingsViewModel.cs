@@ -72,6 +72,9 @@ public sealed class SettingsViewModel : ViewModelBase
         }
     }
 
+    public bool ShowReviewRequest
+        => AppServices.License.IsActive && !AppServices.License.IsTrial;
+
     // ─── コンストラクタ ───────────────────────────────────────────────────────
 
     public SettingsViewModel()

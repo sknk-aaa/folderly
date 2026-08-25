@@ -7,7 +7,7 @@ public static class ReviewPromptService
     private const string ApplyCountKey = "review_prompt.apply_count";
     private const string LastPromptCountKey = "review_prompt.last_prompt_count";
     private const string ReviewOpenedKey = "review_prompt.review_opened";
-    private const int FirstPromptApplyCount = 2;
+    private const int FirstPromptApplyCount = 3;
     private const int RepeatPromptInterval = 10;
 
     public static int? RecordSuccessfulApplyAndGetPromptCount()
