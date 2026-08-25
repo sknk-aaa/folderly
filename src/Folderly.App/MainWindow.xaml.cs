@@ -10,6 +10,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Folderly.App;
 
@@ -18,6 +19,7 @@ public partial class MainWindow : Window
     private readonly MainViewModel _vm = new();
     private readonly SettingsViewModel _settingsVm = new();
     private MainTab _activeTab = MainTab.History;
+    private bool _hasCheckedFirstRunOnboarding;
 
     public SettingsViewModel SettingsContext => _settingsVm;
 
@@ -53,6 +55,7 @@ public partial class MainWindow : Window
         await AppServices.License.InitializeAsync();
         _vm.RefreshLicense();
         _settingsVm.Notify(nameof(_settingsVm.LicenseText));
+        ShowFirstRunOnboardingIfNeeded();
     }
 
     private void HistoryTab_Click(object sender, RoutedEventArgs e)
@@ -224,6 +227,12 @@ public partial class MainWindow : Window
         SupportNavigationService.OpenFaq();
     }
 
+    private void Onboarding_Click(object sender, RoutedEventArgs e)
+    {
+        SaveSettings();
+        OnboardingDialog.Show(this);
+    }
+
     private void LicenseInfo_Click(object sender, RoutedEventArgs e)
     {
         SaveSettings();
@@ -256,6 +265,22 @@ public partial class MainWindow : Window
         win.Topmost = true;
         win.Topmost = false;
         win.Focus();
+    }
+
+    private void ShowFirstRunOnboardingIfNeeded()
+    {
+        if (_hasCheckedFirstRunOnboarding || !OnboardingService.ShouldShowFirstRun())
+            return;
+
+        _hasCheckedFirstRunOnboarding = true;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (!IsVisible)
+                return;
+
+            OnboardingDialog.Show(this);
+            OnboardingService.MarkSeen();
+        }, DispatcherPriority.ApplicationIdle);
     }
 
     protected override void OnClosing(CancelEventArgs e)

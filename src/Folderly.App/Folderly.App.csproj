@@ -40,5 +40,6 @@
     <EmbeddedResource Include="Resources\ApplyWindow.html">
       <LogicalName>Folderly.App.Resources.ApplyWindow.html</LogicalName>
     </EmbeddedResource>
+    <Resource Include="Resources\Onboarding\*.png" />
   </ItemGroup>
 </Project>

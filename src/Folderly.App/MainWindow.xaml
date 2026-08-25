@@ -306,6 +306,45 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top">
                     <Button Style="{StaticResource HelpRowButton}"
+                            Click="Onboarding_Click"
+                            Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Width="30" Height="30"
+                                    Background="#FFEFF6FF"
+                                    CornerRadius="15"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="1"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding L[OnboardingHelpTitle]}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding L[OnboardingHelpShort]}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2"
+                                       Text="&#x203A;"
+                                       FontSize="18"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="16,0,0,0"/>
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource HelpRowButton}"
                             Click="Support_Click"
                             Margin="0,0,0,10">
                         <Grid>

@@ -179,6 +179,19 @@
   <data name="FaqTitle" xml:space="preserve"><value>FAQ</value></data>
   <data name="HelpContactShort" xml:space="preserve"><value>Send a bug report or question</value></data>
   <data name="HelpFaqShort" xml:space="preserve"><value>Icon refresh and common issues</value></data>
+  <data name="OnboardingHelpTitle" xml:space="preserve"><value>How to use</value></data>
+  <data name="OnboardingHelpShort" xml:space="preserve"><value>Right-click, adjust, apply, and manage icons</value></data>
+  <data name="OnboardingTitle" xml:space="preserve"><value>How to use Folderly</value></data>
+  <data name="OnboardingStep1Title" xml:space="preserve"><value>Right-click a folder</value></data>
+  <data name="OnboardingStep1Body" xml:space="preserve"><value>Choose Customize with Folderly from the folder context menu. It appears after Folderly is installed.</value></data>
+  <data name="OnboardingStep2Title" xml:space="preserve"><value>Choose an image and apply</value></data>
+  <data name="OnboardingStep2Body" xml:space="preserve"><value>Select an image, adjust its position and size in the preview, then apply it.</value></data>
+  <data name="OnboardingStep3Title" xml:space="preserve"><value>Manage or revert</value></data>
+  <data name="OnboardingStep3Body" xml:space="preserve"><value>Open Folderly to edit recent folders again or revert them from history.</value></data>
+  <data name="OnboardingPrevious" xml:space="preserve"><value>Previous</value></data>
+  <data name="OnboardingNext" xml:space="preserve"><value>Next</value></data>
+  <data name="OnboardingStart" xml:space="preserve"><value>Start</value></data>
+  <data name="OnboardingSkip" xml:space="preserve"><value>Skip</value></data>
   <data name="ReviewInlineText" xml:space="preserve"><value>If Folderly is useful, a Store rating helps others find it.</value></data>
   <data name="ReviewAction" xml:space="preserve"><value>Rate</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Rate Folderly</value></data>

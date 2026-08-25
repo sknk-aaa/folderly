@@ -179,6 +179,19 @@
   <data name="FaqTitle" xml:space="preserve"><value>よくある質問</value></data>
   <data name="HelpContactShort" xml:space="preserve"><value>不具合や質問を送る</value></data>
   <data name="HelpFaqShort" xml:space="preserve"><value>アイコンが変わらない時など</value></data>
+  <data name="OnboardingHelpTitle" xml:space="preserve"><value>使い方</value></data>
+  <data name="OnboardingHelpShort" xml:space="preserve"><value>右クリック、調整、適用、管理の流れ</value></data>
+  <data name="OnboardingTitle" xml:space="preserve"><value>Folderlyの使い方</value></data>
+  <data name="OnboardingStep1Title" xml:space="preserve"><value>フォルダを右クリック</value></data>
+  <data name="OnboardingStep1Body" xml:space="preserve"><value>フォルダの右クリックメニューから「Folderlyでカスタマイズ」を選びます。インストール後に表示されます。</value></data>
+  <data name="OnboardingStep2Title" xml:space="preserve"><value>画像を選んで適用</value></data>
+  <data name="OnboardingStep2Body" xml:space="preserve"><value>好きな画像を選び、プレビューで位置や大きさを調整してから適用します。</value></data>
+  <data name="OnboardingStep3Title" xml:space="preserve"><value>管理・取り消し</value></data>
+  <data name="OnboardingStep3Body" xml:space="preserve"><value>Folderlyを開くと、履歴から再編集や元に戻す操作ができます。</value></data>
+  <data name="OnboardingPrevious" xml:space="preserve"><value>前へ</value></data>
+  <data name="OnboardingNext" xml:space="preserve"><value>次へ</value></data>
+  <data name="OnboardingStart" xml:space="preserve"><value>はじめる</value></data>
+  <data name="OnboardingSkip" xml:space="preserve"><value>スキップ</value></data>
   <data name="ReviewInlineText" xml:space="preserve"><value>Folderly が役に立っていたら、Storeでの評価をお願いします。</value></data>
   <data name="ReviewAction" xml:space="preserve"><value>評価する</value></data>
   <data name="ReviewPromptTitle" xml:space="preserve"><value>Folderlyを評価</value></data>
