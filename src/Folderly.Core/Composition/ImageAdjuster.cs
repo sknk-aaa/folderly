@@ -65,7 +65,7 @@ public static class ImageAdjuster
 
     private static float ClampOffset(float offset, int resizedLength, int targetLength)
     {
-        var maxOffset = Math.Abs(resizedLength - targetLength) / 2f;
+        var maxOffset = Math.Max(targetLength, Math.Abs(resizedLength - targetLength) / 2f);
         return Math.Clamp(offset, -maxOffset, maxOffset);
     }
 

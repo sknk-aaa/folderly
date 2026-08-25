@@ -93,8 +93,8 @@ public class ImageAdjusterTests
             parameters: new ImageAdjustParams(Scale: 0.5f, OffsetX: 999, OffsetY: 999));
 
         Assert.Equal(0.5f, result.Scale);
-        Assert.Equal(40, result.OffsetX);
-        Assert.Equal(30, result.OffsetY);
+        Assert.Equal(160, result.OffsetX);
+        Assert.Equal(120, result.OffsetY);
     }
 
     [Fact]
@@ -107,8 +107,34 @@ public class ImageAdjusterTests
             parameters: new ImageAdjustParams(Scale: 0.5f, OffsetX: 999, OffsetY: -999));
 
         Assert.Equal(0.5f, result.Scale);
-        Assert.Equal(40, result.OffsetX);
-        Assert.Equal(-20, result.OffsetY);
+        Assert.Equal(160, result.OffsetX);
+        Assert.Equal(-120, result.OffsetY);
+    }
+
+    [Fact]
+    public void Normalize_FitWidth_AllowsHorizontalOffsetForIntentionalClipping()
+    {
+        var result = ImageAdjuster.Normalize(
+            sourceWidth: 400,
+            sourceHeight: 100,
+            targetSize: Target,
+            parameters: new ImageAdjustParams(OffsetX: 80, Mode: CropMode.FitWidth));
+
+        Assert.Equal(CropMode.FitWidth, result.Mode);
+        Assert.Equal(80, result.OffsetX);
+    }
+
+    [Fact]
+    public void Normalize_FitHeight_AllowsVerticalOffsetForIntentionalClipping()
+    {
+        var result = ImageAdjuster.Normalize(
+            sourceWidth: 100,
+            sourceHeight: 400,
+            targetSize: Target,
+            parameters: new ImageAdjustParams(OffsetY: -80, Mode: CropMode.FitHeight));
+
+        Assert.Equal(CropMode.FitHeight, result.Mode);
+        Assert.Equal(-80, result.OffsetY);
     }
 
     [Fact]
