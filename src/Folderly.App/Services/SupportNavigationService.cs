@@ -11,10 +11,18 @@ public static class SupportNavigationService
     private const string FaqEn = "https://folderlyapp.com/privacy/#faq";
 
     public static void OpenContactForm()
-        => Open(AppServices.Localize.CurrentLang == "ja" ? ContactFormJa : ContactFormEn);
+        => Open(AppServices.Localize.CurrentLang switch
+        {
+            "ja" => ContactFormJa,
+            _ => ContactFormEn,
+        });
 
     public static void OpenFaq()
-        => Open(AppServices.Localize.CurrentLang == "ja" ? FaqJa : FaqEn);
+        => Open(AppServices.Localize.CurrentLang switch
+        {
+            "ja" => FaqJa,
+            _ => FaqEn,
+        });
 
     private static void Open(string uri)
     {

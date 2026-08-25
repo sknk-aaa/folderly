@@ -11,7 +11,7 @@ Windows のフォルダアイコンを以下の組み合わせでカスタマイ
 - カラータグ
 - 任意のタグ名・タグアイコンオーバーレイ
 
-エントリポイントはエクスプローラーの右クリックメニュー「Customize with Folderly」（英語）および日本語相当のラベル。
+エントリポイントはエクスプローラーの右クリックメニュー「Customize with Folderly」および各対応言語相当のラベル。
 
 ## Target Platform
 
@@ -58,6 +58,14 @@ Windows のフォルダアイコンを以下の組み合わせでカスタマイ
 - self-contained `Folderly.exe --com-server` out-of-process packaged COM ハンドラで実装。
 - 旧 managed `Folderly.ContextMenu.comhost.dll` は削除済み（.NET COM hosting は self-contained 配布に非対応）。
 - コンテキストメニューアイコンは透過アプリ/コンテキストアイコンを使用（Store 専用アイコンは使わない）。
+
+## Localization
+
+- アプリ UI は `src/Folderly.App/Resources/Strings.resx` を英語デフォルトとして、`Strings.ja.resx` / `Strings.es.resx` などのサテライトリソースでローカライズする。
+- 設定の言語選択は `LocalizationService.SupportedLanguages` から生成する。
+- 保存値は `system` または言語コード（例: `en`, `ja`, `es`）。
+- `system` は Windows の UI カルチャを見て、対応済み言語ならその言語、未対応なら英語へフォールバックする。
+- 新言語を追加するときは、`.resx` の全キーと `{0}` プレースホルダーが一致していることを `LocalizationResourceTests` で確認する。
 
 ## Image Editor
 

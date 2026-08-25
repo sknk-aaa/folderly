@@ -4,6 +4,7 @@ using System.IO.Pipes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Folderly.App.Services;
 using Folderly.Core.History;
 
 namespace Folderly.App;
@@ -134,20 +135,7 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
     }
 
     private static string GetMenuTitle()
-        => UseJapaneseMenuTitle()
-            ? "Folderly でカスタマイズ"
-            : "Customize with Folderly";
-
-    private static bool UseJapaneseMenuTitle()
-    {
-        var language = ReadSavedLanguage();
-        return language switch
-        {
-            "ja" => true,
-            "en" => false,
-            _ => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja",
-        };
-    }
+        => LocalizationService.GetContextMenuTitle(ReadSavedLanguage(), CultureInfo.CurrentUICulture);
 
     private static string? ReadSavedLanguage()
     {

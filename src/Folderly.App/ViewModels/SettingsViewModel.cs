@@ -17,22 +17,26 @@ public sealed class SettingsViewModel : ViewModelBase
         get => _selectedLang;
         set
         {
-            if (_selectedLang == value)
+            var normalized = LocalizationService.NormalizeLanguageSetting(value);
+            if (_selectedLang == normalized)
                 return;
 
-            _selectedLang = value;
+            _selectedLang = normalized;
             Notify();
-            Notify(nameof(IsSystemLang));
-            Notify(nameof(IsJaLang));
-            Notify(nameof(IsEnLang));
+            Notify(nameof(LanguageOptions));
+            Notify(nameof(LicenseText));
             AppServices.History.SetSetting("language", _selectedLang);
             AppServices.Localize.SetLanguage(_selectedLang);
         }
     }
 
-    public bool IsSystemLang { get => SelectedLang == "system"; set { if (value) SelectedLang = "system"; } }
-    public bool IsJaLang     { get => SelectedLang == "ja";     set { if (value) SelectedLang = "ja";     } }
-    public bool IsEnLang     { get => SelectedLang == "en";     set { if (value) SelectedLang = "en";     } }
+    public IReadOnlyList<LanguageOptionViewModel> LanguageOptions
+        =>
+        [
+            new("system", L["LanguageSystem"]),
+            .. LocalizationService.SupportedLanguages
+                .Select(l => new LanguageOptionViewModel(l.Code, L[l.DisplayNameKey])),
+        ];
 
     // ─── 履歴 ─────────────────────────────────────────────────────────────────
 
@@ -76,7 +80,8 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public SettingsViewModel()
     {
-        _selectedLang    = AppServices.History.GetSetting("language") ?? "system";
+        _selectedLang = LocalizationService.NormalizeLanguageSetting(
+            AppServices.History.GetSetting("language"));
         _reopenExplorerWindowsAfterApply =
             AppServices.History.GetSetting("force_explorer_restart_on_reapply") != "false";
         _showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
@@ -96,3 +101,5 @@ public sealed class SettingsViewModel : ViewModelBase
         AppServices.Localize.SetLanguage(SelectedLang);
     }
 }
+
+public sealed record LanguageOptionViewModel(string Code, string DisplayName);

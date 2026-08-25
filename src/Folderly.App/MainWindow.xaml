@@ -189,15 +189,18 @@
                                Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,0,0,8"/>
 
-                    <RadioButton Content="{Binding L[LanguageSystem]}"
-                                 IsChecked="{Binding IsSystemLang}"
-                                 Margin="0,0,0,4" FontSize="13"/>
-                    <RadioButton Content="{Binding L[LanguageJapanese]}"
-                                 IsChecked="{Binding IsJaLang}"
-                                 Margin="0,0,0,4" FontSize="13"/>
-                    <RadioButton Content="{Binding L[LanguageEnglish]}"
-                                 IsChecked="{Binding IsEnLang}"
-                                 Margin="0,0,0,0" FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding LanguageOptions}"
+                              SelectedValue="{Binding SelectedLang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValuePath="Code"
+                              Width="260"
+                              HorizontalAlignment="Left"
+                              FontSize="13">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
                     <Separator Margin="0,16,0,16" Background="{StaticResource BorderBrush}"/>
 

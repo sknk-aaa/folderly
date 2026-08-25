@@ -33,6 +33,7 @@ public partial class MainWindow : Window
         {
             _vm.Notify(nameof(_vm.L));
             _settingsVm.Notify(nameof(_settingsVm.L));
+            _settingsVm.Notify(nameof(_settingsVm.LanguageOptions));
             _settingsVm.Notify(nameof(_settingsVm.LicenseText));
         };
         AppServices.License.LicenseChanged += (_, _) => Dispatcher.Invoke(() =>

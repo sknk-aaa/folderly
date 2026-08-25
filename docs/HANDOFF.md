@@ -14,6 +14,14 @@
 
 ### Done Today
 
+- Spanish localization groundwork was added:
+  - This is source-level preparation only; no new MSIX has been packaged or submitted for Spanish yet.
+  - `src/Folderly.App/Resources/Strings.es.resx` covers the full current app UI string set.
+  - Settings language selection is now data-driven instead of fixed `system/ja/en` radio buttons.
+  - `system` language detection now resolves Spanish Windows UI cultures to Spanish.
+  - Explorer context menu title now supports Spanish: `Personalizar con Folderly`.
+  - `Package.appxmanifest` now declares `es-ES`.
+  - `tests/Folderly.Tests/Resources/LocalizationResourceTests.cs` checks localized `.resx` files for missing keys, empty values, and missing `{0}` placeholders.
 - Version was bumped for Store submission:
   - `src/Folderly.App/Folderly.App.csproj`: `2.0`
   - `src/Folderly.Package/Package.appxmanifest`: `2.0.0.0`
@@ -76,7 +84,7 @@ Also improved image positioning behavior in Fit Width/Fit Height modes and added
 ### Validation Done
 
 - `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
-  - Passed: 143 tests.
+  - Passed: 148 tests.
 - `dotnet build .\src\Folderly.App\Folderly.App.csproj -c Release`
   - Passed.
 - Release MSBuild for `Folderly.Package.wapproj`
@@ -150,6 +158,14 @@ For each new language, ideally localize at least:
 - first Store screenshot text
 - FAQ/support copy
 - purchase/review/support prompts
+
+App implementation path for the next languages:
+
+- Add `Strings.pt-BR.resx` or `Strings.zh-Hans.resx` with the same keys as `Strings.resx`.
+- Add one `LocalizationService.SupportedLanguages` entry with the target code, culture name, display-name key, and context menu title.
+- Add the matching `<Resource Language="pt-BR" />` or `<Resource Language="zh-Hans" />` in `Package.appxmanifest`.
+- Run the localization resource tests before packaging. They intentionally fail if even one key or placeholder is missing.
+- Do not expose a new language in `SupportedLanguages` until its `.resx`, Store listing copy, and first Store screenshot text are ready enough to avoid a half-localized experience.
 
 After each language launch, compare Partner Center market-level `PV -> Trial -> Purchase` before adding many more languages.
 
