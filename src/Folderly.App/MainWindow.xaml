@@ -267,8 +267,7 @@
                             Background="#FFFFFAEA"
                             BorderBrush="#FFFFD66B"
                             BorderThickness="1"
-                            CornerRadius="6"
-                            Visibility="{Binding ShowReviewRequest, Converter={x:Static local:BoolToVisibility.Instance}}">
+                            CornerRadius="6">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="22"/>

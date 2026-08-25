@@ -32,13 +32,11 @@ public partial class MainWindow : Window
             _vm.Notify(nameof(_vm.L));
             _settingsVm.Notify(nameof(_settingsVm.L));
             _settingsVm.Notify(nameof(_settingsVm.LicenseText));
-            _settingsVm.Notify(nameof(_settingsVm.ShowReviewRequest));
         };
         AppServices.License.LicenseChanged += (_, _) => Dispatcher.Invoke(() =>
         {
             _vm.RefreshLicense();
             _settingsVm.Notify(nameof(_settingsVm.LicenseText));
-            _settingsVm.Notify(nameof(_settingsVm.ShowReviewRequest));
         });
     }
 
@@ -55,7 +53,6 @@ public partial class MainWindow : Window
         await AppServices.License.InitializeAsync();
         _vm.RefreshLicense();
         _settingsVm.Notify(nameof(_settingsVm.LicenseText));
-        _settingsVm.Notify(nameof(_settingsVm.ShowReviewRequest));
     }
 
     private void HistoryTab_Click(object sender, RoutedEventArgs e)
@@ -98,7 +95,6 @@ public partial class MainWindow : Window
         _settingsVm.Save();
         _vm.RefreshLicense();
         _settingsVm.Notify(nameof(_settingsVm.LicenseText));
-        _settingsVm.Notify(nameof(_settingsVm.ShowReviewRequest));
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
