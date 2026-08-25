@@ -271,7 +271,8 @@ public partial class ApplyWindow : Window
 
                     case "cropMode":
                         var modeStr = root.GetProperty("mode").GetString() ?? "Center";
-                        _vm.CropMode = ParseCropMode(modeStr);
+                        _vm.SetCropMode(ParseCropMode(modeStr), resetPosition: true);
+                        await SendTransformStateAsync();
                         await SendPreviewAsync();
                         break;
 

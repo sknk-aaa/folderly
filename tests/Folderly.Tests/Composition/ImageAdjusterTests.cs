@@ -16,12 +16,12 @@ public class ImageAdjusterTests
 
     private static readonly Size Target = new(160, 120);
 
-    private static void AssertWhite(Rgba32 px)
+    private static void AssertFolderColor(Rgba32 px)
     {
         Assert.Equal(255, px.A);
-        Assert.InRange(px.R, 248, 255);
-        Assert.InRange(px.G, 248, 255);
-        Assert.InRange(px.B, 248, 255);
+        Assert.Equal(255, px.R);
+        Assert.Equal(199, px.G);
+        Assert.Equal(44, px.B);
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public class ImageAdjusterTests
         using var src = CreateSolidImage(300, 300, r: 255, g: 0, b: 0);
         using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Scale: 0.5f));
 
-        AssertWhite(result[0, 0]);
-        AssertWhite(result[Target.Width - 1, Target.Height - 1]);
+        AssertFolderColor(result[0, 0]);
+        AssertFolderColor(result[Target.Width - 1, Target.Height - 1]);
 
         var centerPx = result[Target.Width / 2, Target.Height / 2];
         Assert.Equal(255, centerPx.A);
@@ -175,7 +175,7 @@ public class ImageAdjusterTests
 
         var topPx = result[Target.Width / 2, 0];
         var centerPx = result[Target.Width / 2, Target.Height / 2];
-        AssertWhite(topPx);
+        AssertFolderColor(topPx);
         Assert.Equal(255, centerPx.A);
     }
 
@@ -205,7 +205,7 @@ public class ImageAdjusterTests
 
         var leftPx = result[0, Target.Height / 2];
         var centerPx = result[Target.Width / 2, Target.Height / 2];
-        AssertWhite(leftPx);
+        AssertFolderColor(leftPx);
         Assert.Equal(255, centerPx.A);
     }
 

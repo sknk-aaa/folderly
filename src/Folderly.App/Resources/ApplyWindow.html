@@ -1505,8 +1505,14 @@
       mode.addEventListener('click', function() {
         var m = mode.dataset.mode;
         appState.cropMode = m;
+        appState.scale = 1.0;
+        appState.offsetX = 0;
+        appState.offsetY = 0;
+        if (sliders.scale) sliders.scale.set(appState.scale);
+        if (sliders.offsetX) sliders.offsetX.set(appState.offsetX);
+        if (sliders.offsetY) sliders.offsetY.set(appState.offsetY);
         refreshModeCards(m);
-        postTransformNow();
+        postMsg({type:'cropMode', mode:m});
       });
     });
 

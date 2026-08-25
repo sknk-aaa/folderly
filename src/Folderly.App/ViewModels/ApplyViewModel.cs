@@ -61,26 +61,25 @@ public sealed class ApplyViewModel : ViewModelBase
             Notify(nameof(IsCropCenter));
             Notify(nameof(IsCropFitWidth));
             Notify(nameof(IsCropFitHeight));
-            ResetPosition();
         }
     }
 
     public bool IsCropCenter
     {
         get => CropMode == CoreCropMode.Center;
-        set { if (value) CropMode = CoreCropMode.Center; }
+        set { if (value) SetCropMode(CoreCropMode.Center, resetPosition: true); }
     }
 
     public bool IsCropFitWidth
     {
         get => CropMode == CoreCropMode.FitWidth;
-        set { if (value) CropMode = CoreCropMode.FitWidth; }
+        set { if (value) SetCropMode(CoreCropMode.FitWidth, resetPosition: true); }
     }
 
     public bool IsCropFitHeight
     {
         get => CropMode == CoreCropMode.FitHeight;
-        set { if (value) CropMode = CoreCropMode.FitHeight; }
+        set { if (value) SetCropMode(CoreCropMode.FitHeight, resetPosition: true); }
     }
 
     // ─── タグ色 ───────────────────────────────────────────────────────────────
@@ -147,6 +146,13 @@ public sealed class ApplyViewModel : ViewModelBase
         Scale   = 1.0;
         OffsetX = 0.0;
         OffsetY = 0.0;
+    }
+
+    public void SetCropMode(CoreCropMode cropMode, bool resetPosition)
+    {
+        CropMode = cropMode;
+        if (resetPosition)
+            ResetPosition();
     }
 
     public ImageAdjustParams GetAdjustParams()

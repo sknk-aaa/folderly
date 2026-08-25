@@ -181,7 +181,7 @@ public static class ImageAdjuster
     private static Image<Rgba32> CreateResult(Size target)
     {
         var result = new Image<Rgba32>(target.Width, target.Height);
-        result.Mutate(ctx => ctx.BackgroundColor(Color.White));
+        result.Mutate(ctx => ctx.BackgroundColor(Color.ParseHex(FolderTemplate.FolderColorHex)));
         return result;
     }
 
