@@ -17,6 +17,38 @@ public record ImageAdjustParams(
 /// </summary>
 public static class ImageAdjuster
 {
+    public static ImageAdjustParams Normalize(
+        int sourceWidth,
+        int sourceHeight,
+        Size targetSize,
+        ImageAdjustParams? parameters = null)
+    {
+        var p = parameters ?? new ImageAdjustParams();
+        var sourceW = Math.Max(1, sourceWidth);
+        var sourceH = Math.Max(1, sourceHeight);
+        var targetW = Math.Max(1, targetSize.Width);
+        var targetH = Math.Max(1, targetSize.Height);
+        var scale = Math.Clamp(p.Scale, 0.5f, 3.0f);
+
+        if (p.Mode == CropMode.Center)
+            scale = Math.Max(1.0f, scale);
+
+        var baseScale = p.Mode switch
+        {
+            CropMode.FitWidth => (float)targetW / sourceW,
+            CropMode.FitHeight => (float)targetH / sourceH,
+            _ => Math.Max((float)targetW / sourceW, (float)targetH / sourceH),
+        };
+        var effectiveScale = Math.Max(baseScale * scale, 0.001f);
+        var resizedW = Math.Max(1, (int)Math.Round(sourceW * effectiveScale));
+        var resizedH = Math.Max(1, (int)Math.Round(sourceH * effectiveScale));
+
+        var offsetX = ClampOffset(p.OffsetX, resizedW, targetW);
+        var offsetY = ClampOffset(p.OffsetY, resizedH, targetH);
+
+        return new ImageAdjustParams(scale, offsetX, offsetY, p.Mode);
+    }
+
     /// <summary>
     /// Returns a new adjusted image. The caller owns the returned image and must dispose it.
     /// </summary>
@@ -25,13 +57,19 @@ public static class ImageAdjuster
         Size targetSize,
         ImageAdjustParams? parameters = null)
     {
-        var p = parameters ?? new ImageAdjustParams();
+        var p = Normalize(sourceImage.Width, sourceImage.Height, targetSize, parameters);
         return p.Mode switch
         {
             CropMode.FitWidth => ApplyFitWidthMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY),
             CropMode.FitHeight => ApplyFitHeightMode(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY),
             _ => ApplyCenterCrop(sourceImage, targetSize, p.Scale, p.OffsetX, p.OffsetY),
         };
+    }
+
+    private static float ClampOffset(float offset, int resizedLength, int targetLength)
+    {
+        var maxOffset = Math.Max(0f, (resizedLength - targetLength) / 2f);
+        return Math.Clamp(offset, -maxOffset, maxOffset);
     }
 
     private static Image<Rgba32> ApplyCenterCrop(

@@ -1068,6 +1068,20 @@
     refreshTagSelection();
   };
 
+  window.folderlySetTransform = function(json) {
+    var state = (typeof json === 'string') ? JSON.parse(json) : json;
+
+    appState.scale = state.scale !== undefined ? state.scale : appState.scale;
+    appState.offsetX = state.offsetX !== undefined ? state.offsetX : appState.offsetX;
+    appState.offsetY = state.offsetY !== undefined ? state.offsetY : appState.offsetY;
+    appState.cropMode = state.cropMode || appState.cropMode;
+
+    if (sliders.scale) sliders.scale.set(appState.scale);
+    if (sliders.offsetX) sliders.offsetX.set(appState.offsetX);
+    if (sliders.offsetY) sliders.offsetY.set(appState.offsetY);
+    refreshModeCards(appState.cropMode);
+  };
+
   window.folderlyUpdateTags = function(json) {
     var tags = (typeof json === 'string') ? JSON.parse(json) : json;
     tags.forEach(function(t) {

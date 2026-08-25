@@ -323,6 +323,8 @@ public partial class ApplyWindow : Window
     {
         if (!_webViewReady) return;
 
+        NormalizeViewModelAdjustParams();
+
         var tags = TagColors.All
             .Where(t => !t.IsNone)
             .Select(t => new
@@ -396,6 +398,9 @@ public partial class ApplyWindow : Window
         }
 
         // WPF レイアウトを強制更新してからレンダリング
+        if (NormalizeViewModelAdjustParams())
+            await SendTransformStateAsync();
+
         var pngBytes = exact
             ? await RenderExactPreviewPngAsync()
             : RenderFastPreviewPng();
@@ -443,10 +448,18 @@ public partial class ApplyWindow : Window
         stream.Position = 0;
 
         using var sourceImage = await SixLabors.ImageSharp.Image.LoadAsync(stream);
+        const int previewSize = 320;
+        var previewScale = previewSize / (double)FolderTemplate.BaseSize;
+        var previewParams = new ImageAdjustParams(
+            Scale: (float)_vm.Scale,
+            OffsetX: (float)(_vm.OffsetX * previewScale),
+            OffsetY: (float)(_vm.OffsetY * previewScale),
+            Mode: _vm.CropMode);
+
         using var adjustedImage = ImageAdjuster.Adjust(
             sourceImage,
-            FolderTemplate.GetImageRegionPixelSize(),
-            _vm.GetAdjustParams());
+            FolderTemplate.GetImageRegionPixelSize(previewSize),
+            previewParams);
 
         var tagNameForIcon = TagSettingsService.GetShowTagNameOnIcon()
             ? TagSettingsService.GetDisplayName(_vm.SelectedTagColor)
@@ -455,12 +468,10 @@ public partial class ApplyWindow : Window
         using var composed = TemplateRenderer.Render(
             adjustedImage,
             _vm.EffectiveSelectedTagColor,
-            FolderTemplate.BaseSize,
+            previewSize,
             tagNameForIcon,
             TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor),
             TagSettingsService.GetShowTagIconOnIcon());
-
-        composed.Mutate(ctx => ctx.Resize(320, 320));
 
         using var ms = new MemoryStream();
         composed.SaveAsPng(ms);
@@ -479,6 +490,46 @@ public partial class ApplyWindow : Window
             _vm.CropMode = ParseCropMode(cropMode.GetString());
         else if (root.TryGetProperty("mode", out var mode))
             _vm.CropMode = ParseCropMode(mode.GetString());
+    }
+
+    private bool NormalizeViewModelAdjustParams()
+    {
+        if (_vm.SourceImage is null) return false;
+
+        var current = _vm.GetAdjustParams();
+        var normalized = ImageAdjuster.Normalize(
+            _vm.SourceImage.PixelWidth,
+            _vm.SourceImage.PixelHeight,
+            FolderTemplate.GetImageRegionPixelSize(),
+            current);
+
+        var changed =
+            Math.Abs(normalized.Scale - current.Scale) > 0.0001f ||
+            Math.Abs(normalized.OffsetX - current.OffsetX) > 0.0001f ||
+            Math.Abs(normalized.OffsetY - current.OffsetY) > 0.0001f ||
+            normalized.Mode != current.Mode;
+
+        if (!changed)
+            return false;
+
+        _vm.Scale = normalized.Scale;
+        _vm.OffsetX = normalized.OffsetX;
+        _vm.OffsetY = normalized.OffsetY;
+        _vm.CropMode = normalized.Mode;
+        return true;
+    }
+
+    private async Task SendTransformStateAsync()
+    {
+        var state = new
+        {
+            scale = _vm.Scale,
+            offsetX = _vm.OffsetX,
+            offsetY = _vm.OffsetY,
+            cropMode = _vm.CropMode.ToString(),
+        };
+        var json = JsonSerializer.Serialize(state);
+        await ExecuteScriptSafeAsync($"window.folderlySetTransform && window.folderlySetTransform({json})");
     }
 
     private static CoreCropMode ParseCropMode(string? mode)
@@ -696,6 +747,8 @@ public partial class ApplyWindow : Window
 
         try
         {
+            NormalizeViewModelAdjustParams();
+
             using var stream = new MemoryStream();
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(_vm.SourceImage!));

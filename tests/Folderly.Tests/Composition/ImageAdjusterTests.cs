@@ -52,12 +52,41 @@ public class ImageAdjusterTests
         using var src = CreateSolidImage(300, 300, r: 255, g: 0, b: 0);
         using var result = ImageAdjuster.Adjust(src, Target, new ImageAdjustParams(Scale: 0.5f));
 
-        Assert.Equal(0, result[0, 0].A);
-        Assert.Equal(0, result[Target.Width - 1, Target.Height - 1].A);
+        Assert.Equal(255, result[0, 0].A);
+        Assert.Equal(255, result[Target.Width - 1, Target.Height - 1].A);
 
         var centerPx = result[Target.Width / 2, Target.Height / 2];
         Assert.Equal(255, centerPx.A);
         Assert.Equal(255, centerPx.R);
+    }
+
+    [Fact]
+    public void Adjust_CenterCrop_ExcessiveOffset_DoesNotExposeTransparentEdges()
+    {
+        using var src = CreateSolidImage(400, 100, r: 255, g: 0, b: 0);
+        using var result = ImageAdjuster.Adjust(
+            src,
+            Target,
+            new ImageAdjustParams(OffsetX: 999, OffsetY: 999, Mode: CropMode.Center));
+
+        Assert.Equal(255, result[0, 0].A);
+        Assert.Equal(255, result[Target.Width - 1, 0].A);
+        Assert.Equal(255, result[0, Target.Height - 1].A);
+        Assert.Equal(255, result[Target.Width - 1, Target.Height - 1].A);
+    }
+
+    [Fact]
+    public void Normalize_CenterCrop_ClampsScaleAndOffset()
+    {
+        var result = ImageAdjuster.Normalize(
+            sourceWidth: 400,
+            sourceHeight: 100,
+            targetSize: Target,
+            parameters: new ImageAdjustParams(Scale: 0.5f, OffsetX: 999, OffsetY: 999));
+
+        Assert.Equal(1.0f, result.Scale);
+        Assert.InRange(result.OffsetX, -160, 160);
+        Assert.Equal(0, result.OffsetY);
     }
 
     [Fact]
