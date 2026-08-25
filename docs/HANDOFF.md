@@ -1,5 +1,86 @@
 # Folderly Handoff
 
+## 2026-08-25 Update
+
+- Latest source version: `1.6.12.0` (app display `1.6.12`).
+- Next Store candidate: `_out\Folderly_1.6.12.0_x64_store.msix`.
+- Store candidate SHA-256: `DEE341B77C04EA4797B6083D5C0C8053313FFA5DFB722DB3FEFDB3443AFBBD13`.
+- Local install candidate: `_out\Folderly_1.6.12.0_x64_sideload.msix`.
+- Installed locally: `KanekoApps.Folderly 1.6.12.0`.
+- Latest local commit: `fbdc55b`.
+- A restore point tag exists before the preview work:
+  - `before-preview-fix-20260825` -> `f85829cbd5107d1c5f86660bf8e249ddd5723dd6`
+
+### Done Today
+
+- Preview image quality was improved:
+  - exact preview generation now renders at `640px` instead of `320px`
+  - image resizing now uses `KnownResamplers.Lanczos3`
+- Preview/final icon adjustment behavior was reworked:
+  - `Center` mode can scale below `100%` again
+  - empty image area is filled with the folder base color `#FFC72C`
+  - `FitWidth` / `FitHeight` remain active after dragging the preview image
+  - mode selection resets scale/offset only when the user explicitly changes mode
+  - C# state synchronization no longer resets scale/offset during preview dragging
+  - intentional clipping is now allowed even when the image is exactly fit to width/height
+- Local MSIX was rebuilt, signed, installed, and launched on this PC after the latest preview changes.
+- The user confirmed the current preview behavior feels good.
+
+### Important Implementation Notes
+
+- The edited shared rendering path is `src/Folderly.Core/Composition/ImageAdjuster.cs`.
+- `ImageAdjuster` affects both preview rendering and the final `.ico` generation. Do not treat these as preview-only changes.
+- Exact preview is generated in `src/Folderly.App/Views/ApplyWindow.xaml.cs` with `previewSize = 640`.
+- Mode-button behavior lives in `src/Folderly.App/Resources/ApplyWindow.html`.
+- Crop mode reset behavior is now explicit through `ApplyViewModel.SetCropMode(cropMode, resetPosition)`.
+- Keep preview and final icon geometry aligned through `FolderTemplate.GetImageRegionPixelSize()`.
+
+### Validation Done
+
+- `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
+  - Passed: 143 tests.
+- `dotnet build .\src\Folderly.App\Folderly.App.csproj -c Release`
+  - Passed.
+- Release MSBuild for `Folderly.Package.wapproj`
+  - Passed with the known NU1702 warning only.
+- Store MSIX was built.
+- Sideload MSIX was signed, verified, installed locally, and launched.
+
+### Manual Checks Before Store Submission
+
+- Test at least three image shapes:
+  - wide image
+  - tall image
+  - square image
+- For each, check:
+  - `Center`
+  - `FitWidth` / `横幅最大`
+  - `FitHeight` / `縦幅最大`
+  - drag after selecting `FitWidth` / `FitHeight`
+  - scale below `100%`
+  - intentional clipping beyond the visible region
+  - folder-color margin when image does not fill the whole image region
+- Apply the icon and confirm Explorer's actual folder icon matches the preview closely.
+- Scope that should be low-risk but still worth a smoke check:
+  - apply
+  - revert
+  - history/reapply
+  - right-click context menu launch
+
+### Current Product Discussion / Pending Idea
+
+- The user is considering a light first-run onboarding.
+- Preferred direction:
+  - 4 simple pages with image + one short sentence
+  - `Previous` / `Next` / `Start` / `Skip`
+  - available again from Help later
+- Draft page flow:
+  1. Right-click a folder and choose Folderly.
+  2. Select an image and adjust it in the preview.
+  3. Apply the image.
+  4. Open Folderly to manage history, edit again, or revert.
+- Images will be prepared by the user.
+
 ## 2026-08-21 Update
 
 - Latest source version: `1.6.12.0` (app display `1.6.12`).
