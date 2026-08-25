@@ -8,7 +8,7 @@
 - Local install candidate: `_out\Folderly_2.0.0.0_x64_sideload.msix`.
 - Local install candidate SHA-256: `F2612827AE35A012DF512132D4213F935D1518169DF5C9AC02EA0E6D03B2517C`.
 - Installed locally: `KanekoApps.Folderly 2.0.0.0`.
-- Latest local commit: `pending`.
+- Version/package commit: `4b266d2`.
 - A restore point tag exists before the preview work:
   - `before-preview-fix-20260825` -> `f85829cbd5107d1c5f86660bf8e249ddd5723dd6`
 
