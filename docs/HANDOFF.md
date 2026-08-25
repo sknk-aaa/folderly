@@ -2,18 +2,22 @@
 
 ## 2026-08-25 Update
 
-- Latest source version: `1.6.12.0` (app display `1.6.12`).
-- Next Store candidate: `_out\Folderly_1.6.12.0_x64_store.msix`.
-- Store candidate SHA-256: `5FF910718AF24BEFEED38BDFB71A2AD9098E756ECA0E6D4CFC98E8801B66865C`.
-- Local install candidate: `_out\Folderly_1.6.12.0_x64_sideload.msix`.
-- Local install candidate SHA-256: `7E66C2AD138C3A32C23ED5B3199E4D17EA0731CD3BCDA93C90606F837CEA984E`.
-- Installed locally: `KanekoApps.Folderly 1.6.12.0`.
-- Latest local commit: `bfed04f`.
+- Latest source version: `2.0.0.0` (app display `2.0`).
+- Next Store candidate: `_out\Folderly_2.0.0.0_x64_store.msix`.
+- Store candidate SHA-256: `DA8973ABD729C3CE8296A1B48FC0FED9B8B0E444A229C87F5726B62E189BE035`.
+- Local install candidate: `_out\Folderly_2.0.0.0_x64_sideload.msix`.
+- Local install candidate SHA-256: `F2612827AE35A012DF512132D4213F935D1518169DF5C9AC02EA0E6D03B2517C`.
+- Installed locally: `KanekoApps.Folderly 2.0.0.0`.
+- Latest local commit: `pending`.
 - A restore point tag exists before the preview work:
   - `before-preview-fix-20260825` -> `f85829cbd5107d1c5f86660bf8e249ddd5723dd6`
 
 ### Done Today
 
+- Version was bumped for Store submission:
+  - `src/Folderly.App/Folderly.App.csproj`: `2.0`
+  - `src/Folderly.Package/Package.appxmanifest`: `2.0.0.0`
+  - Release MSIX was rebuilt, packed, signed for local sideload verification, installed locally, and manifest-checked.
 - Onboarding was implemented and polished:
   - first-run onboarding uses three pages: right-click a folder, choose an image/apply, manage/revert
   - onboarding is available again from Help
@@ -40,6 +44,26 @@
 - Local MSIX was rebuilt, signed, installed, and launched on this PC after the latest changes.
 - The user confirmed the current preview behavior feels good.
 
+### Store Release Notes
+
+Japanese:
+
+```text
+Folderly 2.0
+
+プレビュー品質、初回ガイド、画像リセット、ヘルプ/設定、購入案内、レビュー依頼のタイミングを改善しました。
+また、横幅最大/縦幅最大で画像位置を調整したときの挙動や、Windows側でアイコン表示が反映されにくいフォルダ向けの案内も改善しています。
+```
+
+English:
+
+```text
+Folderly 2.0
+
+Improved preview quality, first-run onboarding, image reset/revert flow, Help/Settings, purchase guidance, and review prompt timing.
+Also improved image positioning behavior in Fit Width/Fit Height modes and added clearer guidance for folders where Windows may not immediately show icon changes.
+```
+
 ### Important Implementation Notes
 
 - The edited shared rendering path is `src/Folderly.Core/Composition/ImageAdjuster.cs`.
@@ -59,6 +83,10 @@
   - Passed with the known NU1702 warning only.
 - Store MSIX was built.
 - Sideload MSIX was signed, verified, installed locally, and launched.
+- Store MSIX manifest was unpacked and checked:
+  - Identity: `KanekoApps.Folderly`
+  - Version: `2.0.0.0`
+  - Required root files present: `WebView2Loader.dll`, `coreclr.dll`, `hostfxr.dll`, `PresentationNative_cor3.dll`, `Folderly.exe`
 
 ### Manual Checks Before Store Submission
 
