@@ -25,7 +25,7 @@ public sealed class PurchasePromptDialog : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
         Background = Brushes.Transparent;
-        FontFamily = new FontFamily("Segoe UI Variable");
+        FontFamily = new FontFamily("Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo");
 
         var root = new Border
         {

@@ -38,7 +38,7 @@ public sealed class OnboardingDialog : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
         Background = Brush(248, 250, 252);
-        FontFamily = new FontFamily("Segoe UI Variable");
+        FontFamily = new FontFamily("Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo");
 
         var root = new Grid { Background = Brush(248, 250, 252) };
         root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(212) });

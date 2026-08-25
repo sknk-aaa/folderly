@@ -41,7 +41,7 @@ public sealed class TagSettingsDialog : Window
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Background = (Brush)(Application.Current.TryFindResource("SurfaceBrush") ?? Brushes.White);
-        FontFamily = new FontFamily("Segoe UI Variable");
+        FontFamily = new FontFamily("Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo");
 
         _showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
         _showTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();

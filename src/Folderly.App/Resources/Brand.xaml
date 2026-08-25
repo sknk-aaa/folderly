@@ -27,7 +27,7 @@
         <Setter Property="Foreground"   Value="White"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding"      Value="16,7"/>
-        <Setter Property="FontFamily"   Value="Segoe UI Variable"/>
+        <Setter Property="FontFamily"   Value="Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo"/>
         <Setter Property="FontSize"     Value="13"/>
         <Setter Property="Cursor"       Value="Hand"/>
         <Setter Property="Template">
@@ -65,7 +65,7 @@
         <Setter Property="BorderBrush"     Value="#FFC8CED8"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding"         Value="16,6"/>
-        <Setter Property="FontFamily"      Value="Segoe UI Variable"/>
+        <Setter Property="FontFamily"      Value="Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo"/>
         <Setter Property="FontSize"        Value="13"/>
         <Setter Property="Cursor"          Value="Hand"/>
         <Setter Property="Template">
@@ -95,7 +95,7 @@
 
     <!-- Base TextBlock style -->
     <Style TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Variable"/>
+        <Setter Property="FontFamily" Value="Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo"/>
         <Setter Property="FontSize"   Value="13"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
     </Style>
