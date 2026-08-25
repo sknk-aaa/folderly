@@ -1,5 +1,107 @@
 # Folderly Handoff
 
+## 2026-08-25 Update - 2.1 Current
+
+- Latest source version: `2.1.0.0` (app display `2.1`).
+- Latest app commit: `a7d4d45 問い合わせフォームを多言語対応`.
+- Current branch state before this handoff update: `main` is ahead of `origin/main` by local commits. Push when the user asks.
+- Store candidate: `_out\Folderly_2.1.0.0_x64_store.msix`.
+- Store candidate SHA-256: `59F839465DD0A05EAB38B7238702EC59888351CD83AD31252CECB55CBE690ADD`.
+- Local install candidate: `_out\Folderly_2.1.0.0_x64_sideload.msix`.
+- Local install candidate SHA-256: `DCE08E2981F963280BC88579523ADE145FE8E9AA71CF3E8C899BECE4E3AF7D71`.
+- Installed locally: `KanekoApps.Folderly 2.1.0.0`.
+- Local package was rebuilt after adding the final multilingual Tally contact form URLs, signed, verified, installed, and launched on this PC.
+
+### Done Since 2.0
+
+- Completed the first localization batch in app code:
+  - English: `en`
+  - Japanese: `ja`
+  - Spanish: `es`
+  - Portuguese Brazil: `pt-BR`
+  - Simplified Chinese: `zh-Hans`
+- Added localized `.resx` files and kept all resource key sets aligned:
+  - `src/Folderly.App/Resources/Strings.es.resx`
+  - `src/Folderly.App/Resources/Strings.pt-BR.resx`
+  - `src/Folderly.App/Resources/Strings.zh-Hans.resx`
+- Added app/package language support:
+  - `LocalizationService.SupportedLanguages` includes `en`, `es`, `pt-BR`, `zh-Hans`, `ja`.
+  - Japanese appears last in the language picker.
+  - `system` language detection maps Spanish, Portuguese, and Simplified Chinese Windows UI cultures to the matching Folderly UI.
+  - `Package.appxmanifest` declares the new language resources.
+- Improved the language picker visual style so it no longer looks like an old dark native dropdown.
+- Adjusted non-Japanese UI wording after review:
+  - Chinese wording was made less literal in the visible Settings/Help areas.
+  - Trial license display no longer shows unrealistic huge remaining days.
+  - Review, purchase, help, onboarding, apply-success, warning, and icon/title tooltip strings are localized.
+- Added multilingual support form routing:
+  - Japanese: `https://tally.so/r/q48Bqk`
+  - English: `https://tally.so/r/PdZEN0`
+  - Spanish: `https://tally.so/r/1AoroW`
+  - Portuguese Brazil: `https://tally.so/r/yP5l54`
+  - Simplified Chinese: `https://tally.so/r/LZLdL1`
+- Added/kept font fallback for non-English UI:
+  - WPF/App: `Segoe UI Variable`, `Microsoft YaHei UI`, `Yu Gothic UI`, `Meiryo`.
+  - Apply WebView UI uses the same fallback family.
+
+### Validation Done
+
+- Resource parity check for all app resource files:
+  - `Strings.resx`, `Strings.ja.resx`, `Strings.es.resx`, `Strings.pt-BR.resx`, `Strings.zh-Hans.resx`
+  - Result before packaging: all had matching keys, no missing keys, no extra keys, no empty values.
+- Non-Japanese resource kana scan:
+  - No unexpected Japanese kana in `en`, `es`, `pt-BR`, `zh-Hans` except intentional language names such as `日本語`.
+- `dotnet build .\src\Folderly.App\Folderly.App.csproj -c Release`
+  - Passed.
+- `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
+  - Passed before the final Tally URL-only change.
+- Release MSBuild for `Folderly.Package.wapproj`
+  - Passed with the known `NU1702` warning only.
+- Sideload MSIX signing:
+  - `signtool verify` passed with `0` errors.
+- Local install:
+  - Existing `KanekoApps.Folderly` was removed, `_out\Folderly_2.1.0.0_x64_sideload.msix` was installed, and Folderly was launched.
+
+### Manual Checks Next
+
+- In Settings, switch language one by one:
+  - English
+  - Spanish
+  - Portuguese Brazil
+  - Simplified Chinese
+  - Japanese
+- For each language, check:
+  - tab labels
+  - Settings
+  - Help
+  - onboarding
+  - apply window
+  - purchase prompt
+  - review prompt
+  - warning/error text
+  - support/contact link opens the correct Tally form
+- For Chinese specifically, visually check whether `Microsoft YaHei UI` fallback looks acceptable on this PC.
+- Check that Help -> Contact opens:
+  - `es`: `https://tally.so/r/1AoroW`
+  - `pt-BR`: `https://tally.so/r/yP5l54`
+  - `zh-Hans`: `https://tally.so/r/LZLdL1`
+- If submitting 2.1 to Store, still prepare non-code Store work:
+  - localized Store title/description/keywords
+  - localized first screenshot text
+  - Store listing language setup in Partner Center
+  - screenshot assets for `es`, `pt-BR`, and `zh-Hans`
+
+### Localization Priority After 2.1
+
+The first batch (`Spanish`, `Portuguese Brazil`, `Chinese Simplified`) is now implemented in code. Do not add more languages until Store metadata/screenshots and basic conversion data for these three are checked.
+
+Next language candidates remain:
+
+- Group 2: `Turkish`, `Korean`, `Arabic`, `Thai`.
+- Group 3: `Vietnamese`, `Indonesian`, `French`, `Italian`, `Hindi`, `Chinese Traditional`.
+
+Recommended next step: finish Store listing assets and metadata for `Spanish`, `Portuguese Brazil`, and `Chinese Simplified`, then watch market-level `PV -> Trial -> Purchase` before expanding further.
+
 ## 2026-08-25 Update
 
 - Latest source version: `2.0.0.0` (app display `2.0`).
