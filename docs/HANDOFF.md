@@ -20,7 +20,7 @@
   - Settings language selection is now data-driven instead of fixed `system/ja/en` radio buttons.
   - `system` language detection now resolves Spanish Windows UI cultures to Spanish.
   - Explorer context menu title now supports Spanish: `Personalizar con Folderly`.
-  - `Package.appxmanifest` now declares `es-ES`.
+  - `Package.appxmanifest` now declares `es-ES` and `es-MX`.
   - `tests/Folderly.Tests/Resources/LocalizationResourceTests.cs` checks localized `.resx` files for missing keys, empty values, and missing `{0}` placeholders.
 - Version was bumped for Store submission:
   - `src/Folderly.App/Folderly.App.csproj`: `2.0`
