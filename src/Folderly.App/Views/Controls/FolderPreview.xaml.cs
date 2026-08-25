@@ -227,12 +227,14 @@ public partial class FolderPreview : UserControl
         {
             Placeholder.Visibility = Visibility.Visible;
             UserImage.Source = null;
+            UserImageBackground.Visibility = Visibility.Collapsed;
             RootCanvas.Cursor = Cursors.Arrow;
         }
         else
         {
             Placeholder.Visibility = Visibility.Collapsed;
             UserImage.Source = src;
+            UserImageBackground.Visibility = Visibility.Visible;
             RootCanvas.Cursor = Cursors.SizeAll;
             UpdateImageTransform(src);
         }
@@ -262,6 +264,13 @@ public partial class FolderPreview : UserControl
         // 画像を ImageCanvas 内の中央に配置し、ICO 座標系のオフセットをプレビュー座標に変換して加算
         double tx = (regionW - imgW * totalScale) / 2.0 + OffsetX * PreviewScale;
         double ty = (regionH - imgH * totalScale) / 2.0 + OffsetY * PreviewScale;
+
+        UserImageBackground.Width = imgW;
+        UserImageBackground.Height = imgH;
+        BgScale.ScaleX = totalScale;
+        BgScale.ScaleY = totalScale;
+        BgTranslate.X = tx;
+        BgTranslate.Y = ty;
 
         ImgScale.ScaleX = totalScale;
         ImgScale.ScaleY = totalScale;

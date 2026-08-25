@@ -47,6 +47,16 @@
                 ClipToBounds="True"
                 Background="Transparent"
                 IsHitTestVisible="False">
+            <Rectangle x:Name="UserImageBackground"
+                       Fill="White"
+                       Visibility="Collapsed">
+                <Rectangle.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="BgScale" ScaleX="1" ScaleY="1"/>
+                        <TranslateTransform x:Name="BgTranslate" X="0" Y="0"/>
+                    </TransformGroup>
+                </Rectangle.RenderTransform>
+            </Rectangle>
             <Image x:Name="UserImage"
                    Stretch="None"
                    RenderOptions.BitmapScalingMode="HighQuality">

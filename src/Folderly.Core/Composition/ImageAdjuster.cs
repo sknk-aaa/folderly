@@ -186,10 +186,24 @@ public static class ImageAdjuster
     }
 
     private static Image ResizeSource(Image source, int width, int height)
-        => source.Clone(ctx => ctx.Resize(new ResizeOptions
+    {
+        using var flattened = FlattenTransparency(source);
+        return flattened.Clone(ctx => ctx.Resize(new ResizeOptions
         {
             Size = new Size(width, height),
             Mode = ResizeMode.Stretch,
             Sampler = KnownResamplers.Lanczos3,
         }));
+    }
+
+    private static Image<Rgba32> FlattenTransparency(Image source)
+    {
+        var result = new Image<Rgba32>(source.Width, source.Height);
+        result.Mutate(ctx =>
+        {
+            ctx.BackgroundColor(Color.White);
+            ctx.DrawImage(source, new Point(0, 0), 1f);
+        });
+        return result;
+    }
 }
