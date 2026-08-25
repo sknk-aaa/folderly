@@ -151,6 +151,7 @@
   <data name="FolderMismatchTitle" xml:space="preserve"><value>フォルダが一致しません</value></data>
   <data name="FolderMismatchMessage" xml:space="preserve"><value>選択したフォルダは、この履歴のフォルダではない可能性があります。それでも解除しますか？</value></data>
   <data name="TrialBanner" xml:space="preserve"><value>無料試用：あと {0} 日</value></data>
+  <data name="TrialBannerNoDays" xml:space="preserve"><value>無料試用</value></data>
   <data name="BuyNow" xml:space="preserve"><value>Microsoft Store で購入する</value></data>
   <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>全フォルダを元に戻しますか？</value></data>
   <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>適用済みの全フォルダのアイコンを元に戻し、履歴を削除します。この操作は取り消せません。</value></data>
@@ -176,6 +177,7 @@
   <data name="LicenseLabel" xml:space="preserve"><value>ライセンス</value></data>
   <data name="LicenseFull" xml:space="preserve"><value>購入済み</value></data>
   <data name="LicenseTrial" xml:space="preserve"><value>無料試用（あと {0} 日）</value></data>
+  <data name="LicenseTrialNoDays" xml:space="preserve"><value>無料試用</value></data>
   <data name="SupportLink" xml:space="preserve"><value>サポートに連絡</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>ライセンス情報</value></data>
   <data name="RateReview" xml:space="preserve"><value>Storeで評価</value></data>

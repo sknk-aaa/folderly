@@ -171,6 +171,7 @@
   <data name="FolderMismatchTitle" xml:space="preserve"><value>文件夹不匹配</value></data>
   <data name="FolderMismatchMessage" xml:space="preserve"><value>所选文件夹可能与此历史记录不匹配。仍要还原吗？</value></data>
   <data name="TrialBanner" xml:space="preserve"><value>免费试用：剩余 {0} 天</value></data>
+  <data name="TrialBannerNoDays" xml:space="preserve"><value>免费试用</value></data>
   <data name="BuyNow" xml:space="preserve"><value>在 Microsoft Store 购买</value></data>
   <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>还原所有文件夹？</value></data>
   <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>所有已应用的文件夹图标都会被还原，历史记录也会被清除。此操作无法撤销。</value></data>
@@ -197,6 +198,7 @@
   <data name="LicenseLabel" xml:space="preserve"><value>许可证</value></data>
   <data name="LicenseFull" xml:space="preserve"><value>已授权</value></data>
   <data name="LicenseTrial" xml:space="preserve"><value>免费试用（剩余 {0} 天）</value></data>
+  <data name="LicenseTrialNoDays" xml:space="preserve"><value>免费试用</value></data>
   <data name="SupportLink" xml:space="preserve"><value>联系支持</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>许可证信息</value></data>
   <data name="RateReview" xml:space="preserve"><value>在 Microsoft Store 评价</value></data>

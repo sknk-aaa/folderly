@@ -72,6 +72,7 @@ public sealed class SettingsViewModel : ViewModelBase
         {
             var lic = AppServices.License;
             if (!lic.IsTrial) return L["LicenseFull"];
+            if (!lic.HasDisplayableTrialDays) return L["LicenseTrialNoDays"];
             return string.Format(L["LicenseTrial"], lic.DaysRemaining);
         }
     }

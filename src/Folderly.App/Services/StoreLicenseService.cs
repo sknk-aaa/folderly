@@ -9,6 +9,8 @@ namespace Folderly.App.Services;
 /// </summary>
 public sealed class StoreLicenseService
 {
+    private const int MaximumDisplayableTrialDays = 365;
+
     private StoreContext? _context;
     private StoreAppLicense? _license;
     private Task? _initializeTask;
@@ -16,6 +18,7 @@ public sealed class StoreLicenseService
     public bool IsTrial      { get; private set; } = true;
     public bool IsActive     { get; private set; } = true;
     public int  DaysRemaining{ get; private set; } = 7;
+    public bool HasDisplayableTrialDays => IsTrial && DaysRemaining is >= 0 and <= MaximumDisplayableTrialDays;
 
     public event EventHandler? LicenseChanged;
 

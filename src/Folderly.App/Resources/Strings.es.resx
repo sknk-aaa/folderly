@@ -151,6 +151,7 @@
   <data name="FolderMismatchTitle" xml:space="preserve"><value>La carpeta no coincide</value></data>
   <data name="FolderMismatchMessage" xml:space="preserve"><value>La carpeta seleccionada puede no coincidir con esta entrada del historial. ¿Revertir de todos modos?</value></data>
   <data name="TrialBanner" xml:space="preserve"><value>Prueba gratuita: quedan {0} días</value></data>
+  <data name="TrialBannerNoDays" xml:space="preserve"><value>Prueba gratuita</value></data>
   <data name="BuyNow" xml:space="preserve"><value>Comprar en Microsoft Store</value></data>
   <data name="ClearHistoryConfirmTitle" xml:space="preserve"><value>¿Revertir todas las carpetas?</value></data>
   <data name="ClearHistoryConfirmMessage" xml:space="preserve"><value>Se revertirán todos los iconos de carpeta aplicados y se borrará el historial. Esta acción no se puede deshacer.</value></data>
@@ -177,6 +178,7 @@
   <data name="LicenseLabel" xml:space="preserve"><value>Licencia</value></data>
   <data name="LicenseFull" xml:space="preserve"><value>Con licencia</value></data>
   <data name="LicenseTrial" xml:space="preserve"><value>Prueba gratuita ({0} días restantes)</value></data>
+  <data name="LicenseTrialNoDays" xml:space="preserve"><value>Prueba gratuita</value></data>
   <data name="SupportLink" xml:space="preserve"><value>Contactar soporte</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>Información de licencia</value></data>
   <data name="RateReview" xml:space="preserve"><value>Calificar en Microsoft Store</value></data>
