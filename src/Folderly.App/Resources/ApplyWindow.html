@@ -984,6 +984,7 @@
     cropMode: 'Center',
     selectedTagKey: 'none',
     hasImage: false,
+    canApply: false,
     tags: {},           // key -> {name, hexColor, iconIndex}
     showTagNameOnIcon: false,
     showTagIconOnIcon: false
@@ -1066,6 +1067,9 @@
     // Selected tag
     appState.selectedTagKey = state.selectedTagKey || 'none';
     refreshTagSelection();
+
+    appState.canApply = !!state.canApply;
+    updateApplyButton();
   };
 
   window.folderlySetTransform = function(json) {
@@ -1186,7 +1190,7 @@
 
   // ===== Apply button =====
   function updateApplyButton() {
-    document.getElementById('btn-apply').disabled = !appState.hasImage;
+    document.getElementById('btn-apply').disabled = !(appState.hasImage || appState.canApply);
   }
 
   function clamp(v, min, max) {

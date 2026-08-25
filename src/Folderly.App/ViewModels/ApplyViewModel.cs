@@ -26,6 +26,20 @@ public sealed class ApplyViewModel : ViewModelBase
 
     public string? SourceImagePath { get; set; }
 
+    private bool _hasExistingCustomization;
+    public bool HasExistingCustomization
+    {
+        get => _hasExistingCustomization;
+        set { SetField(ref _hasExistingCustomization, value); Notify(nameof(CanApply)); }
+    }
+
+    private bool _isImageResetPending;
+    public bool IsImageResetPending
+    {
+        get => _isImageResetPending;
+        set { SetField(ref _isImageResetPending, value); Notify(nameof(CanApply)); }
+    }
+
     // ─── 画像調整 ─────────────────────────────────────────────────────────────
 
     private double _scale = 1.0;
@@ -126,7 +140,7 @@ public sealed class ApplyViewModel : ViewModelBase
         set { SetField(ref _isApplying, value); Notify(nameof(CanApply)); }
     }
 
-    public bool CanApply => SourceImage != null && !IsApplying;
+    public bool CanApply => (SourceImage != null || IsImageResetPending) && !IsApplying;
 
     // ─── タグプリセット（SPEC F-05: 7 種） ────────────────────────────────────
 

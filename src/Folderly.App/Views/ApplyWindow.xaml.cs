@@ -285,6 +285,7 @@ public partial class ApplyWindow : Window
                     case "resetImage":
                         _vm.SourceImage = null;
                         _vm.SourceImagePath = string.Empty;
+                        _vm.IsImageResetPending = _vm.HasExistingCustomization;
                         _vm.ResetPosition();
                         await SendStateAsync();
                         await SendPreviewAsync();
@@ -347,6 +348,7 @@ public partial class ApplyWindow : Window
             cropMode          = _vm.CropMode.ToString(),
             showTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon(),
             showTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon(),
+            canApply          = _vm.CanApply,
             tags,
         };
 
@@ -577,6 +579,7 @@ public partial class ApplyWindow : Window
         {
             var entry = AppServices.History.GetByPath(Path.GetFullPath(_vm.FolderPath));
             if (entry is null) return;
+            _vm.HasExistingCustomization = true;
             if (string.IsNullOrWhiteSpace(entry.SourceImagePath)) return;
             if (!File.Exists(entry.SourceImagePath)) return;
             if (!LoadImage(entry.SourceImagePath, resetPosition: false, showError: false)) return;
@@ -638,6 +641,7 @@ public partial class ApplyWindow : Window
 
             _vm.SourceImage     = bitmap;
             _vm.SourceImagePath = string.Empty;
+            _vm.IsImageResetPending = false;
             _vm.ResetPosition();
             await SendPreviewAsync();
         }
@@ -662,6 +666,7 @@ public partial class ApplyWindow : Window
 
             _vm.SourceImage     = bitmap;
             _vm.SourceImagePath = path;
+            _vm.IsImageResetPending = false;
             if (resetPosition)
                 _vm.ResetPosition();
 
@@ -715,9 +720,45 @@ public partial class ApplyWindow : Window
 
     // ─── 適用 ────────────────────────────────────────────────────────────────
 
+    private async Task RevertImageResetAsync()
+    {
+        _vm.IsApplying = true;
+        await ExecuteScriptSafeAsync("window.folderlySetApplying(true)");
+
+        try
+        {
+            await AppServices.Revert.RevertAsync(_vm.FolderPath);
+            _vm.HasExistingCustomization = false;
+            _vm.IsImageResetPending = false;
+
+            Hide();
+            if (ShouldReopenExplorer())
+                await ReopenExplorerWindowsAsync(_vm.FolderPath);
+
+            Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                string.Format(AppServices.Localize["RevertFailed"], ex.Message),
+                "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            _vm.IsApplying = false;
+            await ExecuteScriptSafeAsync("window.folderlySetApplying(false)");
+        }
+    }
+
     private async Task ApplyAsync()
     {
         if (!_vm.CanApply) return;
+
+        if (_vm.SourceImage is null && _vm.IsImageResetPending)
+        {
+            await RevertImageResetAsync();
+            return;
+        }
 
         var protection = FolderProtection.CheckPath(_vm.FolderPath);
         if (protection.IsWarning)
