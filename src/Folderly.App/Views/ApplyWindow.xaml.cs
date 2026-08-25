@@ -448,7 +448,7 @@ public partial class ApplyWindow : Window
         stream.Position = 0;
 
         using var sourceImage = await SixLabors.ImageSharp.Image.LoadAsync(stream);
-        const int previewSize = 320;
+        const int previewSize = 640;
         var previewScale = previewSize / (double)FolderTemplate.BaseSize;
         var previewParams = new ImageAdjustParams(
             Scale: (float)_vm.Scale,

@@ -30,9 +30,6 @@ public static class ImageAdjuster
         var targetH = Math.Max(1, targetSize.Height);
         var scale = Math.Clamp(p.Scale, 0.5f, 3.0f);
 
-        if (p.Mode == CropMode.Center)
-            scale = Math.Max(1.0f, scale);
-
         var baseScale = p.Mode switch
         {
             CropMode.FitWidth => (float)targetW / sourceW,
@@ -68,7 +65,7 @@ public static class ImageAdjuster
 
     private static float ClampOffset(float offset, int resizedLength, int targetLength)
     {
-        var maxOffset = Math.Max(0f, (resizedLength - targetLength) / 2f);
+        var maxOffset = Math.Abs(resizedLength - targetLength) / 2f;
         return Math.Clamp(offset, -maxOffset, maxOffset);
     }
 
@@ -83,9 +80,9 @@ public static class ImageAdjuster
         int resizedW = Math.Max(1, (int)Math.Round(source.Width * effectiveScale));
         int resizedH = Math.Max(1, (int)Math.Round(source.Height * effectiveScale));
 
-        var result = new Image<Rgba32>(target.Width, target.Height);
+        var result = CreateResult(target);
 
-        var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
+        var resized = ResizeSource(source, resizedW, resizedH);
         try
         {
             int pasteX = (int)Math.Round((target.Width - resizedW) / 2f + offsetX);
@@ -112,9 +109,9 @@ public static class ImageAdjuster
         int pasteX = (target.Width - resizedW) / 2 + (int)offsetX;
         int pasteY = (target.Height - resizedH) / 2 + (int)offsetY;
 
-        var result = new Image<Rgba32>(target.Width, target.Height);
+        var result = CreateResult(target);
 
-        var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
+        var resized = ResizeSource(source, resizedW, resizedH);
         try
         {
             DrawClipped(result, resized, pasteX, pasteY);
@@ -139,9 +136,9 @@ public static class ImageAdjuster
         int pasteX = (target.Width - resizedW) / 2 + (int)offsetX;
         int pasteY = (target.Height - resizedH) / 2 + (int)offsetY;
 
-        var result = new Image<Rgba32>(target.Width, target.Height);
+        var result = CreateResult(target);
 
-        var resized = source.Clone(ctx => ctx.Resize(resizedW, resizedH));
+        var resized = ResizeSource(source, resizedW, resizedH);
         try
         {
             DrawClipped(result, resized, pasteX, pasteY);
@@ -180,4 +177,19 @@ public static class ImageAdjuster
             visible.Dispose();
         }
     }
+
+    private static Image<Rgba32> CreateResult(Size target)
+    {
+        var result = new Image<Rgba32>(target.Width, target.Height);
+        result.Mutate(ctx => ctx.BackgroundColor(Color.White));
+        return result;
+    }
+
+    private static Image ResizeSource(Image source, int width, int height)
+        => source.Clone(ctx => ctx.Resize(new ResizeOptions
+        {
+            Size = new Size(width, height),
+            Mode = ResizeMode.Stretch,
+            Sampler = KnownResamplers.Lanczos3,
+        }));
 }
