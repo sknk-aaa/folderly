@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace Folderly.App.Views;
@@ -31,7 +32,7 @@ public sealed class OnboardingDialog : Window
         var L = AppServices.Localize;
 
         Title = L["OnboardingTitle"];
-        Width = 880;
+        Width = 1080;
         SizeToContent = SizeToContent.Height;
         ResizeMode = ResizeMode.NoResize;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -40,7 +41,7 @@ public sealed class OnboardingDialog : Window
         FontFamily = new FontFamily("Segoe UI Variable");
 
         var root = new Grid { Background = Brush(248, 250, 252) };
-        root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(252) });
+        root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(212) });
         root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         Content = root;
 
@@ -49,46 +50,46 @@ public sealed class OnboardingDialog : Window
             Background = Brushes.White,
             BorderBrush = Brush(226, 232, 240),
             BorderThickness = new Thickness(0, 0, 1, 0),
-            Padding = new Thickness(24),
+            Padding = new Thickness(20),
         };
         root.Children.Add(rail);
 
         var railStack = new StackPanel();
         rail.Child = railStack;
 
-        var brand = new Grid { Margin = new Thickness(0, 0, 0, 28) };
+        var brand = new Grid { Margin = new Thickness(0, 0, 0, 24) };
         brand.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         brand.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         railStack.Children.Add(brand);
 
         var iconWrap = new Border
         {
-            Width = 44,
-            Height = 44,
+            Width = 42,
+            Height = 42,
             CornerRadius = new CornerRadius(12),
             Background = Brush(244, 248, 255),
             BorderBrush = Brush(219, 234, 254),
             BorderThickness = new Thickness(1),
-            Margin = new Thickness(0, 0, 12, 0),
+            Margin = new Thickness(0, 0, 10, 0),
         };
         var icon = TryLoadAppIcon();
         iconWrap.Child = icon is null
             ? BuildFallbackIcon()
-            : new Image { Source = icon, Width = 34, Height = 34, Stretch = Stretch.Uniform };
+            : new Image { Source = icon, Width = 32, Height = 32, Stretch = Stretch.Uniform };
         brand.Children.Add(iconWrap);
 
         var brandText = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
         brandText.Children.Add(new TextBlock
         {
             Text = "Folderly",
-            FontSize = 16,
+            FontSize = 15.5,
             FontWeight = FontWeights.SemiBold,
             Foreground = TextBrush(15, 23, 42),
         });
         brandText.Children.Add(new TextBlock
         {
             Text = L["OnboardingTitle"],
-            FontSize = 11.5,
+            FontSize = 11,
             Foreground = TextBrush(100, 116, 139),
             Margin = new Thickness(0, 2, 0, 0),
         });
@@ -105,18 +106,18 @@ public sealed class OnboardingDialog : Window
             stepList.Children.Add(item.Root);
         }
 
-        var main = new StackPanel { Margin = new Thickness(30, 28, 30, 26) };
+        var main = new StackPanel { Margin = new Thickness(38, 34, 38, 30) };
         Grid.SetColumn(main, 1);
         root.Children.Add(main);
 
-        var header = new Grid { Margin = new Thickness(0, 0, 0, 18) };
+        var header = new Grid { Margin = new Thickness(0, 0, 0, 16) };
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         main.Children.Add(header);
 
         _titleText = new TextBlock
         {
-            FontSize = 24,
+            FontSize = 27,
             FontWeight = FontWeights.SemiBold,
             Foreground = TextBrush(15, 23, 42),
             TextWrapping = TextWrapping.Wrap,
@@ -138,8 +139,8 @@ public sealed class OnboardingDialog : Window
 
         _imageGrid = new Grid
         {
-            Height = 360,
-            Margin = new Thickness(0, 0, 0, 18),
+            Height = 430,
+            Margin = new Thickness(0, 0, 0, 20),
         };
         main.Children.Add(_imageGrid);
 
@@ -149,7 +150,7 @@ public sealed class OnboardingDialog : Window
             LineHeight = 24,
             Foreground = TextBrush(51, 65, 85),
             TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(2, 0, 2, 24),
+            Margin = new Thickness(2, 0, 2, 22),
         };
         main.Children.Add(_bodyText);
 
@@ -218,10 +219,10 @@ public sealed class OnboardingDialog : Window
 
         var root = new Border
         {
-            CornerRadius = new CornerRadius(9),
+            CornerRadius = new CornerRadius(8),
             BorderThickness = new Thickness(1),
-            Padding = new Thickness(10),
-            Margin = new Thickness(0, 0, 0, 10),
+            Padding = new Thickness(9),
+            Margin = new Thickness(0, 0, 0, 8),
             Cursor = Cursors.Hand,
         };
         root.MouseLeftButtonUp += (_, _) =>
@@ -238,9 +239,9 @@ public sealed class OnboardingDialog : Window
         var number = new TextBlock
         {
             Text = (index + 1).ToString(),
-            Width = 26,
-            Height = 26,
-            FontSize = 12.5,
+            Width = 24,
+            Height = 24,
+            FontSize = 12,
             FontWeight = FontWeights.SemiBold,
             TextAlignment = TextAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
@@ -250,7 +251,7 @@ public sealed class OnboardingDialog : Window
         var title = new TextBlock
         {
             Text = L[Pages[index].TitleKey],
-            FontSize = 13,
+            FontSize = 12.5,
             FontWeight = FontWeights.SemiBold,
             TextWrapping = TextWrapping.Wrap,
             VerticalAlignment = VerticalAlignment.Center,
@@ -292,6 +293,13 @@ public sealed class OnboardingDialog : Window
     {
         _imageGrid.Children.Clear();
         _imageGrid.ColumnDefinitions.Clear();
+        _imageGrid.RowDefinitions.Clear();
+
+        if (images.Count == 2)
+        {
+            RenderOverlappedImages(images);
+            return;
+        }
 
         for (var i = 0; i < images.Count; i++)
             _imageGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -302,14 +310,56 @@ public sealed class OnboardingDialog : Window
             {
                 Source = LoadOnboardingImage(images[i]),
                 Stretch = Stretch.Uniform,
+                MaxHeight = 420,
                 Margin = new Thickness(i == 0 ? 0 : 8, 0, i == images.Count - 1 ? 0 : 8, 0),
             };
             RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+            image.Effect = BuildImageShadow();
 
             Grid.SetColumn(image, i);
             _imageGrid.Children.Add(image);
         }
     }
+
+    private void RenderOverlappedImages(IReadOnlyList<string> images)
+    {
+        var first = BuildOnboardingImage(images[0], maxWidth: 650, maxHeight: 408);
+        first.HorizontalAlignment = HorizontalAlignment.Left;
+        first.VerticalAlignment = VerticalAlignment.Center;
+        first.Margin = new Thickness(0, 0, 0, 12);
+        Panel.SetZIndex(first, 1);
+        _imageGrid.Children.Add(first);
+
+        var second = BuildOnboardingImage(images[1], maxWidth: 545, maxHeight: 352);
+        second.HorizontalAlignment = HorizontalAlignment.Right;
+        second.VerticalAlignment = VerticalAlignment.Bottom;
+        second.Margin = new Thickness(0, 0, 0, 2);
+        Panel.SetZIndex(second, 2);
+        _imageGrid.Children.Add(second);
+    }
+
+    private static Image BuildOnboardingImage(string fileName, double maxWidth, double maxHeight)
+    {
+        var image = new Image
+        {
+            Source = LoadOnboardingImage(fileName),
+            Stretch = Stretch.Uniform,
+            MaxWidth = maxWidth,
+            MaxHeight = maxHeight,
+        };
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+        image.Effect = BuildImageShadow();
+        return image;
+    }
+
+    private static DropShadowEffect BuildImageShadow()
+        => new()
+        {
+            BlurRadius = 18,
+            ShadowDepth = 8,
+            Opacity = 0.16,
+            Color = Color.FromRgb(30, 64, 120),
+        };
 
     private static Button BuildButton(string text, bool primary)
         => new()
