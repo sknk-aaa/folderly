@@ -136,19 +136,12 @@ public sealed class OnboardingDialog : Window
         Grid.SetColumn(_stepText, 1);
         header.Children.Add(_stepText);
 
-        var imageShell = new Border
+        _imageGrid = new Grid
         {
-            Background = Brushes.White,
-            BorderBrush = Brush(226, 232, 240),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(10),
-            Padding = new Thickness(12),
+            Height = 360,
             Margin = new Thickness(0, 0, 0, 18),
         };
-        main.Children.Add(imageShell);
-
-        _imageGrid = new Grid { Height = 340 };
-        imageShell.Child = _imageGrid;
+        main.Children.Add(_imageGrid);
 
         _bodyText = new TextBlock
         {
@@ -309,21 +302,12 @@ public sealed class OnboardingDialog : Window
             {
                 Source = LoadOnboardingImage(images[i]),
                 Stretch = Stretch.Uniform,
+                Margin = new Thickness(i == 0 ? 0 : 8, 0, i == images.Count - 1 ? 0 : 8, 0),
             };
             RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
 
-            var card = new Border
-            {
-                Background = Brush(248, 250, 252),
-                BorderBrush = Brush(226, 232, 240),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(10),
-                Margin = new Thickness(i == 0 ? 0 : 6, 0, i == images.Count - 1 ? 0 : 6, 0),
-                Child = image,
-            };
-            Grid.SetColumn(card, i);
-            _imageGrid.Children.Add(card);
+            Grid.SetColumn(image, i);
+            _imageGrid.Children.Add(image);
         }
     }
 
