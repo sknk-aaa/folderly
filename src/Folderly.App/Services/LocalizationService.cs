@@ -29,8 +29,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
     public static readonly IReadOnlyList<LanguageDefinition> SupportedLanguages =
     [
         new("en", "en", "LanguageEnglish", "Customize with Folderly"),
-        new("ja", "ja", "LanguageJapanese", "Folderly でカスタマイズ"),
         new("es", "es", "LanguageSpanish", "Personalizar con Folderly"),
+        new("ja", "ja", "LanguageJapanese", "Folderly でカスタマイズ"),
     ];
 
     private static readonly ResourceManager _rm =
