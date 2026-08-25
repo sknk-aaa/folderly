@@ -4,15 +4,29 @@
 
 - Latest source version: `1.6.12.0` (app display `1.6.12`).
 - Next Store candidate: `_out\Folderly_1.6.12.0_x64_store.msix`.
-- Store candidate SHA-256: `DEE341B77C04EA4797B6083D5C0C8053313FFA5DFB722DB3FEFDB3443AFBBD13`.
+- Store candidate SHA-256: `5FF910718AF24BEFEED38BDFB71A2AD9098E756ECA0E6D4CFC98E8801B66865C`.
 - Local install candidate: `_out\Folderly_1.6.12.0_x64_sideload.msix`.
+- Local install candidate SHA-256: `7E66C2AD138C3A32C23ED5B3199E4D17EA0731CD3BCDA93C90606F837CEA984E`.
 - Installed locally: `KanekoApps.Folderly 1.6.12.0`.
-- Latest local commit: `fbdc55b`.
+- Latest local commit: `bfed04f`.
 - A restore point tag exists before the preview work:
   - `before-preview-fix-20260825` -> `f85829cbd5107d1c5f86660bf8e249ddd5723dd6`
 
 ### Done Today
 
+- Onboarding was implemented and polished:
+  - first-run onboarding uses three pages: right-click a folder, choose an image/apply, manage/revert
+  - onboarding is available again from Help
+  - onboarding screenshots are shown without extra card frames
+  - the window and image layout were widened so the second step is easier to read
+- Review prompt timing was adjusted:
+  - review prompts are still disabled during trial
+  - purchase prompt remains trial-only
+  - paid review prompt now appears on the 2nd successful verified apply instead of the 3rd
+  - trial apply counts do not carry over into review prompt counts
+- Image reset from the apply window was improved:
+  - after `Reset image`, the user can press `Apply` when the folder already has a Folderly customization
+  - reset apply uses the existing `RevertService`, so desktop.ini restoration, `_folderly` cleanup, history removal, and shell refresh stay on the established revert path
 - Preview image quality was improved:
   - exact preview generation now renders at `640px` instead of `320px`
   - image resizing now uses `KnownResamplers.Lanczos3`
@@ -23,7 +37,7 @@
   - mode selection resets scale/offset only when the user explicitly changes mode
   - C# state synchronization no longer resets scale/offset during preview dragging
   - intentional clipping is now allowed even when the image is exactly fit to width/height
-- Local MSIX was rebuilt, signed, installed, and launched on this PC after the latest preview changes.
+- Local MSIX was rebuilt, signed, installed, and launched on this PC after the latest changes.
 - The user confirmed the current preview behavior feels good.
 
 ### Important Implementation Notes
@@ -61,25 +75,55 @@
   - intentional clipping beyond the visible region
   - folder-color margin when image does not fill the whole image region
 - Apply the icon and confirm Explorer's actual folder icon matches the preview closely.
+- For an already customized folder, click `Reset image`, confirm `Apply` remains enabled, apply it, and confirm the folder reverts to its original appearance.
 - Scope that should be low-risk but still worth a smoke check:
   - apply
   - revert
   - history/reapply
   - right-click context menu launch
 
-### Current Product Discussion / Pending Idea
+### Localization Priority
 
-- The user is considering a light first-run onboarding.
-- Preferred direction:
-  - 4 simple pages with image + one short sentence
-  - `Previous` / `Next` / `Start` / `Skip`
-  - available again from Help later
-- Draft page flow:
-  1. Right-click a folder and choose Folderly.
-  2. Select an image and adjust it in the preview.
-  3. Apply the image.
-  4. Open Folderly to manage history, edit again, or revert.
-- Images will be prepared by the user.
+Goal: increase CVR by adding languages that cover large groups of users who mainly read that language and are less likely to buy from an English-only Store page. Do not over-weight speculative Microsoft Store search demand or Folderly-specific search demand; those are hard to measure externally.
+
+Recommended first localization batch:
+
+1. `Chinese Simplified`
+2. `Spanish`
+3. `Portuguese Brazil`
+
+Interpretation:
+
+- If choosing purely by "large non-English audience + Windows usage", start with `Chinese Simplified`.
+- If choosing the safest first language, start with `Spanish` because it covers a large language area with lower market/distribution uncertainty than mainland China.
+- `Portuguese Brazil` remains highly attractive because Brazil is a large single-language market with relatively low English proficiency and strong Windows desktop usage.
+
+Suggested implementation order:
+
+- Aggressive: `Chinese Simplified` -> `Spanish` -> `Portuguese Brazil`.
+- Conservative: `Spanish` -> `Portuguese Brazil` -> `Chinese Simplified`.
+
+Next language groups:
+
+- Group 2: `Turkish`, `Korean`, `Arabic`, `Thai`.
+- Group 3: `Vietnamese`, `Indonesian`, `French`, `Italian`, `Hindi`, `Chinese Traditional`.
+- Lower priority for this specific goal: `German`, `Polish`, `Ukrainian`, `Dutch`, `Swedish`, `Russian`.
+
+Rationale:
+
+- `German`, `Polish`, `Dutch`, and `Swedish` are commercially strong markets, but English proficiency is high, so English Store pages likely already capture more of the audience.
+- `Arabic` and `Thai` may have large English-barrier gains, but Arabic requires RTL/UI/screenshot QA and Thai has a smaller market than the first batch.
+- `Hindi` has huge speaker counts, but the overlap between Hindi-primary, low-English users and users likely to buy a paid Windows utility through Microsoft Store is uncertain.
+
+For each new language, ideally localize at least:
+
+- app UI strings
+- Store title, short description, description, keywords
+- first Store screenshot text
+- FAQ/support copy
+- purchase/review/support prompts
+
+After each language launch, compare Partner Center market-level `PV -> Trial -> Purchase` before adding many more languages.
 
 ## 2026-08-21 Update
 
