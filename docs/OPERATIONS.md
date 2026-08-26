@@ -418,6 +418,50 @@ Se mejoró la calidad de la vista previa, la experiencia inicial, el flujo para 
 También se mejoró el comportamiento al mover imágenes en los modos Ajustar al ancho/Ajustar al alto, y se agregó una guía más clara para carpetas donde Windows puede no mostrar los cambios de icono de inmediato.
 ```
 
+### Portuguese (Brazil)
+
+> Latest Partner Center draft: 2026-08-26.
+
+**App Name**: Folderly - Mude ícones de pastas
+
+**Short Description**: Deixe suas pastas do Windows fáceis de reconhecer com suas próprias imagens e etiquetas coloridas.
+
+**Long Description**:
+
+Personalize as pastas do Windows com suas próprias fotos e imagens — sem converter arquivos para .ico.
+
+Encontre a pasta que você precisa de relance, em vez de procurar entre várias pastas amarelas iguais. Adicione suas próprias imagens e etiquetas coloridas para deixar cada pasta fácil de reconhecer.
+
+Com o Folderly, você pode:
+- Usar imagens PNG ou JPG como ícones personalizados de pasta
+- Personalizar pastas diretamente pelo menu de clique com o botão direito do Explorador de Arquivos
+- Ajustar a escala, a posição e o modo de exibição antes de aplicar
+- Adicionar etiquetas coloridas e nomes
+- Restaurar qualquer pasta quando quiser
+
+Basta clicar com o botão direito em uma pasta, escolher uma imagem e aplicar o ícone.
+
+Funciona localmente no seu PC — sem assinatura e sem anúncios.
+
+Observação: o Folderly pode reabrir brevemente a janela do Explorador de Arquivos depois de aplicar um ícone. Isso atualiza o Explorador para que o novo ícone apareça imediatamente.
+
+**Keywords**（Partner Center draft）: `mudar icone pasta` / `alterar icone pasta` / `icones de pastas` / `personalizar pastas` / `icone de pasta personalizado` / `pasta com imagem` / `folder icon changer`
+
+**Product features**:
+- Use suas fotos e imagens
+- Personalize com botão direito
+- Etiquetas coloridas e nomes
+- Ajuste tamanho e posição
+- Restaure pastas pelo histórico
+- Funciona localmente no seu PC
+
+**What's new in this version**:
+
+```text
+Melhoramos a qualidade da pré-visualização, a experiência inicial, o fluxo para redefinir/restaurar imagens, as áreas de Ajuda e Configurações e o momento em que a orientação de compra aparece.
+Também melhoramos o comportamento ao mover imagens nos modos Ajustar à largura/Ajustar à altura e adicionamos uma orientação mais clara para pastas em que o Windows pode não mostrar a alteração do ícone imediatamente.
+```
+
 **Screenshot Plan**:
 1. Explorer 右クリックメニューに Folderly コマンドが表示されている画面
 2. 画像エディタ＋フォルダプレビュー画面
