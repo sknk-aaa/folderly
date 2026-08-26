@@ -201,7 +201,7 @@
   <data name="LicenseTrialNoDays" xml:space="preserve"><value>免费试用</value></data>
   <data name="SupportLink" xml:space="preserve"><value>联系支持</value></data>
   <data name="SupportEmailText" xml:space="preserve"><value>支持邮箱: folderly.support@gmail.com</value></data>
-  <data name="LicenseInfo" xml:space="preserve"><value>许可证信息</value></data>
+  <data name="LicenseInfo" xml:space="preserve"><value>打开 Microsoft Store</value></data>
   <data name="RateReview" xml:space="preserve"><value>在 Microsoft Store 评价</value></data>
   <data name="FaqTitle" xml:space="preserve"><value>常见问题</value></data>
   <data name="HelpContactShort" xml:space="preserve"><value>发送问题或反馈</value></data>
