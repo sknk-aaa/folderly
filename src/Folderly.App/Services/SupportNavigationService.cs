@@ -10,8 +10,7 @@ public static class SupportNavigationService
     private const string ContactFormEs = "https://tally.so/r/1AoroW";
     private const string ContactFormPtBr = "https://tally.so/r/yP5l54";
     private const string ContactFormZhHans = "https://tally.so/r/LZLdL1";
-    private const string FaqJa = "https://folderlyapp.com/privacy/#faq-ja";
-    private const string FaqEn = "https://folderlyapp.com/privacy/#faq";
+    private const string Faq = "https://folderlyapp.com/privacy/";
 
     public static void OpenContactForm()
         => Open(AppServices.Localize.CurrentLang switch
@@ -24,11 +23,7 @@ public static class SupportNavigationService
         });
 
     public static void OpenFaq()
-        => Open(AppServices.Localize.CurrentLang switch
-        {
-            "ja" => FaqJa,
-            _ => FaqEn,
-        });
+        => Open(Faq);
 
     private static void Open(string uri)
     {
