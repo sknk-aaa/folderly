@@ -314,9 +314,7 @@ Works locally on your PC — no subscription, no ads.
 
 ※Folderly may briefly reopen the target File Explorer window after applying an icon. This refreshes File Explorer so the new folder icon appears right away.
 
-**Keywords**（Partner Center draft）: `folder icons` / `change folder icon` / `folder color tag` / `folder cover` / `customize folder` / `photo folder icon` / `custom folder icons`
-
-Note: The Partner Center screenshot included duplicate keyword chips (`photo folder icon`, `custom folder icons`). Before final submission, keep search terms unique and within the Store keyword limit.
+**Keywords**（Partner Center draft）: `folder icons` / `change folder icon` / `folder icon changer` / `folder cover` / `customize folder` / `photo folder icon` / `custom folder icons`
 
 **Product features**:
 - Use your own photos & images
