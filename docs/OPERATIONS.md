@@ -462,6 +462,50 @@ Melhoramos a qualidade da pré-visualização, a experiência inicial, o fluxo p
 Também melhoramos o comportamento ao mover imagens nos modos Ajustar à largura/Ajustar à altura e adicionamos uma orientação mais clara para pastas em que o Windows pode não mostrar a alteração do ícone imediatamente.
 ```
 
+### Chinese (Simplified, China)
+
+> Latest Partner Center draft: 2026-08-26.
+
+**App Name**: Folderly - 更改文件夹图标
+
+**Short Description**: 用自己的图片和颜色标签，让 Windows 文件夹一眼就能认出来。
+
+**Long Description**:
+
+用自己的照片和图片自定义 Windows 文件夹图标，无需转换为 .ico 文件。
+
+不用再在一排排相同的黄色文件夹中寻找目标文件夹。Folderly 可以为文件夹添加自定义图片和颜色标签，让重要文件夹一眼就能认出来。
+
+使用 Folderly，你可以：
+- 将 PNG 或 JPG 图片用作自定义文件夹图标
+- 直接从文件资源管理器的右键菜单自定义文件夹
+- 在应用前调整缩放、位置和显示模式
+- 添加颜色标签和名称
+- 随时将文件夹恢复为原来的样子
+
+只需右键单击文件夹，选择图片，然后应用图标。
+
+所有操作都在你的 PC 本地完成 — 无订阅，无广告。
+
+注意：应用图标后，Folderly 可能会短暂重新打开目标文件资源管理器窗口。这是为了刷新文件资源管理器，让新图标更快显示出来。
+
+**Keywords**（Partner Center draft）: `更改文件夹图标` / `修改文件夹图标` / `自定义文件夹图标` / `文件夹美化` / `Windows 11 文件夹图标` / `folder icon changer` / `文件夹图标更改`
+
+**Product features**:
+- 使用自己的照片和图片
+- 右键菜单快速自定义
+- 颜色标签和名称
+- 调整大小和位置
+- 从历史记录恢复文件夹
+- 在本地 PC 上运行
+
+**What's new in this version**:
+
+```text
+改进了预览质量、首次使用引导、图片重置/恢复流程、帮助/设置页面以及购买提示的显示时机。
+同时改进了在“适应宽度/适应高度”模式下移动图片时的行为，并为 Windows 可能无法立即显示图标变化的文件夹提供了更清晰的提示。
+```
+
 **Screenshot Plan**:
 1. Explorer 右クリックメニューに Folderly コマンドが表示されている画面
 2. 画像エディタ＋フォルダプレビュー画面
