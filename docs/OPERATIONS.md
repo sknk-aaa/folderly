@@ -330,6 +330,50 @@ Improved preview quality, first-run onboarding, image reset/revert flow, Help/Se
 Also improved image positioning behavior in Fit Width/Fit Height modes and added clearer guidance for folders where Windows may not immediately show icon changes.
 ```
 
+### Spanish (Mexico)
+
+> Latest Partner Center draft: 2026-08-26.
+
+**App Name**: Folderly - Cambia iconos de carpetas
+
+**Short Description**: Identifica tus carpetas de Windows al instante con tus propias imágenes y etiquetas de color.
+
+**Long Description**:
+
+Personaliza las carpetas de Windows con tus propias fotos e imágenes — sin convertir archivos a .ico.
+
+Encuentra la carpeta que necesitas de un vistazo en lugar de buscar entre filas de carpetas amarillas iguales. Agrega tus propias imágenes y etiquetas de color para que cada carpeta sea fácil de reconocer.
+
+Con Folderly, puedes:
+- Usar imágenes PNG o JPG como iconos personalizados de carpeta
+- Personalizar carpetas directamente desde el menú de clic derecho del Explorador de archivos
+- Ajustar la escala, la posición y el modo de visualización antes de aplicar
+- Agregar etiquetas de color y nombres
+- Restaurar cualquier carpeta cuando quieras
+
+Solo haz clic derecho en una carpeta, elige una imagen y aplica el icono.
+
+Funciona localmente en tu PC — sin suscripción y sin anuncios.
+
+Nota: Folderly puede reabrir brevemente la ventana del Explorador de archivos después de aplicar un icono. Esto actualiza el Explorador para que el nuevo icono aparezca de inmediato.
+
+**Keywords**（Partner Center draft）: `cambiar icono carpeta` / `iconos de carpetas` / `personalizar carpetas` / `iconos personalizados` / `carpeta con imagen` / `cambiar iconos windows 11` / `folder icon changer`
+
+**Product features**:
+- Usa tus propias fotos e imágenes
+- Personaliza con clic derecho
+- Etiquetas de color y nombres
+- Ajusta tamaño y posición
+- Restaura carpetas desde el historial
+- Funciona localmente en tu PC
+
+**What's new in this version**:
+
+```text
+Se mejoró la calidad de la vista previa, la experiencia inicial, el flujo para restablecer o restaurar imágenes, la sección de Ayuda/Configuración y el momento de la guía de compra.
+También se mejoró el comportamiento al mover imágenes en los modos Ajustar al ancho/Ajustar al alto, y se agregó una guía más clara para carpetas donde Windows puede no mostrar los cambios de icono de inmediato.
+```
+
 **Screenshot Plan**:
 1. Explorer 右クリックメニューに Folderly コマンドが表示されている画面
 2. 画像エディタ＋フォルダプレビュー画面
