@@ -252,6 +252,21 @@ dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj `
 
 Age rating：ローカルデスクトップユーティリティ。ユーザー生成コンテンツ共有・ギャンブル・成人向けコンテンツなし。
 
+### Market-Specific Pricing
+
+> Latest Partner Center draft: 2026-08-26.
+
+Default price remains USD-based for broad markets. Localized Store markets use local currency pricing to improve perceived local fit and conversion.
+
+| Market | Currency | Retail price | Note |
+|---|---:|---:|---|
+| Default | USD | $2.99 | Base price for markets without custom pricing |
+| Japan | JPY | ¥480 | Current screenshot value. CVR/review-growth candidate: ¥300 |
+| Mexico | MXN | $39 | Spanish (Mexico) localized listing |
+| Spain | EUR | €1.99 | Spanish (Spain) localized listing |
+| Brazil | BRL | R$9.95 | Portuguese (Brazil) localized listing |
+| China | CNY | ¥15 | Simplified Chinese localized listing; this is CNY, not JPY |
+
 `runFullTrust` 説明文（Partner Center 入力欄）：
 
 ```text
