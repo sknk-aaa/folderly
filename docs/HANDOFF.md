@@ -1,5 +1,90 @@
 # Folderly Handoff
 
+## 2026-08-26 Update - 2.1 Store Submitted
+
+- User submitted version `2.1.0.0` to Microsoft Store.
+- Store upload package:
+  - `_out\Folderly_2.1.0.0_x64_store.msix`
+  - SHA-256: `F253D12D9949F8B62520C799D4B01616570F51E8F6A5F9DECF1237CDE99913D0`
+  - Size: `94,001,147` bytes
+  - Built at: `2026-08-26 21:41:26`
+- Package identity confirmed:
+  - Name: `KanekoApps.Folderly`
+  - Publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+  - Version: `2.1.0.0`
+- MSIX content check passed:
+  - `WebView2Loader.dll`
+  - `coreclr.dll`
+  - `hostfxr.dll`
+  - `PresentationNative_cor3.dll`
+  - `es\Folderly.resources.dll`
+  - `pt-BR\Folderly.resources.dll`
+  - `zh-Hans\Folderly.resources.dll`
+  - `ja\Folderly.resources.dll`
+- Test result before submission package:
+  - `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
+  - Result: `148 passed`
+
+### Store Listing Work Completed
+
+- Partner Center recognized supported package languages:
+  - English (United States)
+  - Japanese (Japan)
+  - Spanish (Mexico)
+  - Spanish (Spain)
+  - Portuguese (Brazil)
+  - Chinese (China)
+- Store listing text was completed for:
+  - English (United States)
+  - Japanese (Japan)
+  - Spanish (Mexico)
+  - Spanish (Spain)
+  - Portuguese (Brazil)
+  - Chinese (China)
+- Listing copy source of truth:
+  - [docs/OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`
+- Recent Store listing/price commits:
+  - `87c0d35` English Store listing text
+  - `ffb69da` English Store keywords
+  - `9c7cad0` Spanish (Mexico) Store listing text
+  - `c5b43c3` Spanish (Spain) Store listing text
+  - `57db686` Portuguese (Brazil) Store listing text
+  - `00d54c5` Chinese (Simplified, China) Store listing text
+  - `f175241` market-specific pricing
+
+### Market-Specific Pricing
+
+Current Partner Center draft:
+
+| Market | Currency | Retail price |
+|---|---:|---:|
+| Default | USD | $2.99 |
+| Japan | JPY | ¥480 |
+| Mexico | MXN | $39 |
+| Spain | EUR | €1.99 |
+| Brazil | BRL | R$9.95 |
+| China | CNY | ¥15 |
+
+Note: China `¥15` is CNY, not JPY.
+
+### Remaining Store Work
+
+- User will gradually update localized Store screenshots.
+- Code-side localization for the first language batch is done; do not add new app languages until data is checked.
+- After certification approval, check live Store pages:
+  - JP: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=ja-JP&gl=JP`
+  - EN/US: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=en-US&gl=US`
+  - ES/MX: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=es-MX&gl=MX`
+  - ES/ES: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=es-ES&gl=ES`
+  - PT/BR: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=pt-BR&gl=BR`
+  - ZH/CN: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=zh-CN&gl=CN`
+- Confirm after approval:
+  - version `2.1.0.0` is live
+  - all localized listings render without fallback to English where not intended
+  - local prices display correctly
+  - screenshots are not stale or inconsistent with current UI/icon
+  - review/rating count behavior, especially previously reported Partner Center vs public Store mismatch
+
 ## 2026-08-25 Update - 2.1 Current
 
 - Latest source version: `2.1.0.0` (app display `2.1`).
