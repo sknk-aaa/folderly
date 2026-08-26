@@ -200,6 +200,7 @@ O que você deseja fazer?</value></data>
   <data name="LicenseTrial" xml:space="preserve"><value>Teste gratuito ({0} dias restantes)</value></data>
   <data name="LicenseTrialNoDays" xml:space="preserve"><value>Teste gratuito</value></data>
   <data name="SupportLink" xml:space="preserve"><value>Entrar em contato com o suporte</value></data>
+  <data name="SupportEmailText" xml:space="preserve"><value>E-mail de suporte: folderly.support@gmail.com</value></data>
   <data name="LicenseInfo" xml:space="preserve"><value>Informações da licença</value></data>
   <data name="RateReview" xml:space="preserve"><value>Avaliar na Microsoft Store</value></data>
   <data name="FaqTitle" xml:space="preserve"><value>Perguntas frequentes</value></data>

@@ -541,6 +541,12 @@
                         </Grid>
                     </Button>
 
+                    <TextBlock Text="{Binding L[SupportEmailText]}"
+                               FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="2,0,0,18"/>
+
                     <Separator Margin="0,0,0,16" Background="{StaticResource BorderBrush}"/>
 
                     <TextBlock Text="{Binding L[AboutSection]}"
