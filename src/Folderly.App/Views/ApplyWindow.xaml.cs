@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using CoreCropMode = Folderly.Core.Composition.CropMode;
 
@@ -24,6 +25,8 @@ namespace Folderly.App.Views;
 public partial class ApplyWindow : Window
 {
     private const string NetworkWarningSeenSettingKey = "network_folder_warning_seen";
+    private const int ExactPreviewSize = 640;
+    private const int InteractivePreviewSize = 384;
 
     private readonly ApplyViewModel _vm;
     private bool _webViewReady;
@@ -34,6 +37,8 @@ public partial class ApplyWindow : Window
     private bool _previewRenderPendingExact;
     private int _latestTransformRevision;
     private int _previewRenderPendingTransformRevision;
+    private BitmapSource? _previewSourceBitmapCacheKey;
+    private Image<Rgba32>? _previewSourceImageCache;
 
     public ApplyWindow(string folderPath)
     {
@@ -43,6 +48,12 @@ public partial class ApplyWindow : Window
         TryRestoreExistingCustomization();
 
         Loaded += async (_, _) => await InitWebViewAsync();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        ClearPreviewSourceCache();
+        base.OnClosed(e);
     }
 
     // ─── WebView2 初期化 ────────────────────────────────────────────────────
@@ -415,6 +426,7 @@ public partial class ApplyWindow : Window
         // OffscreenPreview プロパティを現在の ViewModel 状態に同期
         if (_vm.SourceImage is null)
         {
+            ClearPreviewSourceCache();
             await ExecuteScriptSafeAsync("window.folderlyClearPreview && window.folderlyClearPreview()");
             return;
         }
@@ -423,7 +435,7 @@ public partial class ApplyWindow : Window
         if (exact && NormalizeViewModelAdjustParams())
             await SendTransformStateAsync(transformRevision);
 
-        var pngBytes = await RenderExactPreviewPngAsync();
+        var pngBytes = await RenderPreviewPngAsync(exact);
         if (renderVersion != _previewRenderVersion && _previewRenderPending) return;
 
         var b64     = Convert.ToBase64String(pngBytes);
@@ -432,16 +444,38 @@ public partial class ApplyWindow : Window
         await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}', {transformRevision})");
     }
 
-    private async Task<byte[]> RenderExactPreviewPngAsync()
+    private async Task<Image<Rgba32>> GetPreviewSourceImageAsync()
     {
+        if (ReferenceEquals(_previewSourceBitmapCacheKey, _vm.SourceImage) &&
+            _previewSourceImageCache is not null)
+        {
+            return _previewSourceImageCache;
+        }
+
+        ClearPreviewSourceCache();
+        _previewSourceBitmapCacheKey = _vm.SourceImage;
+
         using var stream = new MemoryStream();
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(_vm.SourceImage!));
         encoder.Save(stream);
         stream.Position = 0;
 
-        using var sourceImage = await SixLabors.ImageSharp.Image.LoadAsync(stream);
-        const int previewSize = 640;
+        _previewSourceImageCache = await Image.LoadAsync<Rgba32>(stream);
+        return _previewSourceImageCache;
+    }
+
+    private void ClearPreviewSourceCache()
+    {
+        _previewSourceImageCache?.Dispose();
+        _previewSourceImageCache = null;
+        _previewSourceBitmapCacheKey = null;
+    }
+
+    private async Task<byte[]> RenderPreviewPngAsync(bool exact)
+    {
+        var sourceImage = await GetPreviewSourceImageAsync();
+        var previewSize = exact ? ExactPreviewSize : InteractivePreviewSize;
         var previewScale = previewSize / (double)FolderTemplate.BaseSize;
         var previewParams = new ImageAdjustParams(
             Scale: (float)_vm.Scale,
