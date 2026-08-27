@@ -420,45 +420,16 @@ public partial class ApplyWindow : Window
         }
 
         // WPF レイアウトを強制更新してからレンダリング
-        if (NormalizeViewModelAdjustParams())
+        if (exact && NormalizeViewModelAdjustParams())
             await SendTransformStateAsync(transformRevision);
 
-        var pngBytes = exact
-            ? await RenderExactPreviewPngAsync()
-            : RenderFastPreviewPng();
+        var pngBytes = await RenderExactPreviewPngAsync();
         if (renderVersion != _previewRenderVersion && _previewRenderPending) return;
 
         var b64     = Convert.ToBase64String(pngBytes);
         var dataUrl = $"data:image/png;base64,{b64}";
 
         await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}', {transformRevision})");
-    }
-
-    private byte[] RenderFastPreviewPng()
-    {
-        OffscreenPreview.SourceImage       = _vm.SourceImage;
-        OffscreenPreview.SelectedTagColor  = _vm.EffectiveSelectedTagColor;
-        OffscreenPreview.TagName           = TagSettingsService.GetDisplayName(_vm.SelectedTagColor);
-        OffscreenPreview.ShowTagNameOnIcon = TagSettingsService.GetShowTagNameOnIcon();
-        OffscreenPreview.TagIconIndex      = TagSettingsService.GetTagIconIndex(_vm.SelectedTagColor);
-        OffscreenPreview.ShowTagIconOnIcon = TagSettingsService.GetShowTagIconOnIcon();
-        OffscreenPreview.Scale             = _vm.Scale;
-        OffscreenPreview.OffsetX           = _vm.OffsetX;
-        OffscreenPreview.OffsetY           = _vm.OffsetY;
-        OffscreenPreview.CropMode          = _vm.CropMode;
-
-        OffscreenPreview.Measure(new System.Windows.Size(320, 320));
-        OffscreenPreview.Arrange(new Rect(0, 0, 320, 320));
-        OffscreenPreview.UpdateLayout();
-
-        var rtb = new RenderTargetBitmap(320, 320, 96, 96, PixelFormats.Pbgra32);
-        rtb.Render(OffscreenPreview);
-
-        using var ms = new MemoryStream();
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(rtb));
-        encoder.Save(ms);
-        return ms.ToArray();
     }
 
     private async Task<byte[]> RenderExactPreviewPngAsync()
