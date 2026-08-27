@@ -1,5 +1,72 @@
 # Folderly Handoff
 
+## 2026-08-27 Update - 2.2 Store Submitted
+
+- User submitted version `2.2.0.0` to Microsoft Store.
+- Store upload package:
+  - `_out\Folderly_2.2.0.0_x64_store.msix`
+  - SHA-256: `B2D658D8104FDFD25D0C5F2CA14E04D34857FBD25C41BC92AE7CC90441B3142A`
+  - Size: `94,007,854` bytes
+  - Built at: `2026-08-27 15:55:22`
+- Package identity confirmed:
+  - Name: `KanekoApps.Folderly`
+  - Publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+  - Version: `2.2.0.0`
+  - Resources: `en-US`, `ja-JP`, `es-ES`, `es-MX`, `pt-BR`, `zh-CN`
+- MSIX content check passed:
+  - `WebView2Loader.dll`
+  - `coreclr.dll`
+  - `hostfxr.dll`
+  - `PresentationNative_cor3.dll`
+- `makeappx unpack` verification passed.
+- Test result before the Store package:
+  - `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
+  - Result: `149 passed`
+- Release MSBuild passed with the known `NU1702` warning only.
+
+### Done Since 2.1
+
+- Preview/editor performance was improved:
+  - dragging and scale changes now feel lightweight and update in real time
+  - the preview no longer changes overall shape while dragging
+  - preview rendering is closer to the final folder icon result
+  - preview folder size was increased slightly for better visibility
+- Tag icon UI was improved:
+  - fixed uneven/gapped icon alignment in the icon picker
+  - added more tag icon options
+- Startup behavior was optimized:
+  - WebView2 environment initialization is now delayed/preloaded around the apply window instead of blocking ordinary app startup.
+- Store screenshots were replaced by the user in Partner Center for the 2.2 submission.
+
+### Store/Marketing Notes
+
+- The user submitted 2.2 with updated Store screenshots. Store screenshot localization can continue gradually after this submission.
+- Newly noticed strength: customized Folderly folder icons also appear on the Windows desktop. This may be useful in the next Store copy/screenshot update because it shows a clearer everyday benefit than Explorer-only organization.
+- Candidate future copy:
+  - Japanese: `デスクトップのフォルダも、ひと目でわかる見た目に。`
+  - English: `Make desktop folders easy to recognize at a glance.`
+- Do not change Store copy/images for the desktop angle yet; the user wants to revisit it in a later update.
+
+### Remaining Store Work
+
+- After certification approval, check live Store pages:
+  - JP: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=ja-JP&gl=JP`
+  - EN/US: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=en-US&gl=US`
+  - ES/MX: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=es-MX&gl=MX`
+  - ES/ES: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=es-ES&gl=ES`
+  - PT/BR: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=pt-BR&gl=BR`
+  - ZH/CN: `https://apps.microsoft.com/detail/9N99JH5H91H8?hl=zh-CN&gl=CN`
+- Confirm after approval:
+  - version `2.2.0.0` is live
+  - localized listings render without unintended English fallback
+  - local prices display correctly
+  - new screenshots are visible and not stale
+  - public review/rating count behavior
+- Future candidate work:
+  - update Store text/images to mention desktop folder visibility
+  - continue localized Store screenshot work
+  - watch market-level `PV -> Trial -> Purchase` after the 2.1/2.2 localization and screenshot changes settle
+
 ## 2026-08-26 Update - 2.1 Store Submitted
 
 - User submitted version `2.1.0.0` to Microsoft Store.

@@ -1,5 +1,74 @@
 ﻿# Folderly Operations
 
+## 2026-08-27 Store Submission Notes
+
+### Current Store Submission
+
+- Store candidate/submitted version: `2.2.0.0`
+- Store upload package: `_out\Folderly_2.2.0.0_x64_store.msix`
+- SHA-256: `B2D658D8104FDFD25D0C5F2CA14E04D34857FBD25C41BC92AE7CC90441B3142A`
+- Size: `94,007,854` bytes
+- Main changes:
+  - Preview dragging and scale adjustment are lighter and update in real time.
+  - Preview visual stability was improved so only the image position changes while dragging.
+  - Preview/final folder icon consistency was improved, and the preview folder was made slightly larger.
+  - Tag icon picker alignment was fixed and more tag icon options were added.
+  - WebView2 initialization was delayed/preloaded around the apply window to avoid slowing ordinary app startup.
+  - Store screenshots were replaced by the user in Partner Center.
+
+### 2.2 Store Release Notes
+
+Use the following short bullet-style notes in Partner Center if a listing asks for this version's latest information.
+
+**English**
+
+```text
+- Improved preview performance while moving and scaling images.
+- Made the folder preview more stable and closer to the final icon.
+- Fixed tag icon alignment and added more icon choices.
+- Improved startup behavior.
+```
+
+**Japanese**
+
+```text
+- 画像の移動・拡大縮小時のプレビュー動作を軽くしました。
+- フォルダプレビューの見た目を安定させ、実際のアイコンにより近づけました。
+- タグアイコンの並びを整え、選べるアイコンを増やしました。
+- 起動時の動作を改善しました。
+```
+
+**Spanish**
+
+```text
+- Se mejoró el rendimiento de la vista previa al mover y escalar imágenes.
+- La vista previa de la carpeta ahora es más estable y se parece más al icono final.
+- Se corrigió la alineación de los iconos de etiquetas y se agregaron más opciones.
+- Se mejoró el comportamiento al iniciar la app.
+```
+
+**Portuguese (Brazil)**
+
+```text
+- Melhoramos o desempenho da pré-visualização ao mover e redimensionar imagens.
+- A pré-visualização da pasta ficou mais estável e mais próxima do ícone final.
+- Corrigimos o alinhamento dos ícones de etiquetas e adicionamos mais opções.
+- Melhoramos o comportamento ao iniciar o app.
+```
+
+**Chinese (Simplified)**
+
+```text
+- 改进了移动和缩放图片时的预览性能。
+- 文件夹预览更加稳定，也更接近最终图标效果。
+- 修正了标签图标的排列，并增加了更多可选图标。
+- 改进了应用启动时的表现。
+```
+
+### Next Store/Marketing Note
+
+Customized Folderly folders also appear on the Windows desktop. This was confirmed after the 2.2 work and should be considered for future Store copy/screenshots, but it was not added to the 2.2 submission text.
+
 ## 2026-08-25 Store Submission Notes
 
 ### Current Store Submission
@@ -84,10 +153,10 @@ After the Store update is live, check:
 | Package family name | `KanekoApps.Folderly_q8156m1pgwn5a` |
 | Store ID | `9N99JH5H91H8` |
 | Store URL | `https://apps.microsoft.com/detail/9N99JH5H91H8` |
-| Current version | `2.0.0.0`（アプリ表示 `2.0`） |
+| Current version | `2.2.0.0`（アプリ表示 `2.2`） |
 | Min OS | Windows 10 1809 (`10.0.17763.0`) |
 
-バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`2.0.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースも 4 桁目 0。
+バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`2.2.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースも 4 桁目 0。
 
 ## Key URLs
 
@@ -121,7 +190,7 @@ Visual Studio がこの環境で Publish / Store / Create App Packages を表示
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$version = '2.0.0.0'
+$version = '2.2.0.0'
 $root = (Resolve-Path .).Path
 $outDir = Join-Path $root '_out'
 $stage = Join-Path $outDir "store_msix_stage_$version"
@@ -144,8 +213,8 @@ $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeapp
 MSIX 内容確認：
 
 ```powershell
-$msix = '_out\Folderly_2.0.0.0_x64_store.msix'
-$verify = '_out\verify_store_msix_manifest_2.0.0.0'
+$msix = '_out\Folderly_2.2.0.0_x64_store.msix'
+$verify = '_out\verify_store_msix_manifest_2.2.0.0'
 $makeappx = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe'
 Remove-Item -LiteralPath $verify -Recurse -Force -ErrorAction SilentlyContinue
 & $makeappx unpack /p $msix /d $verify
@@ -158,15 +227,15 @@ Get-Content (Join-Path $verify 'AppxManifest.xml')
 
 Store 用パッケージ（Partner Center へアップロードするもの）はローカルに直接インストールできない。ローカルテスト用にはコピーに署名した sideload パッケージを使う。
 
-- Store upload: `_out\Folderly_2.0.0.0_x64_store.msix`（署名なし）
-- Local install: `_out\Folderly_2.0.0.0_x64_sideload.msix`（署名済み）
+- Store upload: `_out\Folderly_2.2.0.0_x64_store.msix`（署名なし）
+- Local install: `_out\Folderly_2.2.0.0_x64_sideload.msix`（署名済み）
 
 ```powershell
 $ErrorActionPreference = 'Stop'
 $publisher = 'CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E'
 $root = (Resolve-Path .).Path
-$storeMsix = Join-Path $root '_out\Folderly_2.0.0.0_x64_store.msix'
-$sideloadMsix = Join-Path $root '_out\Folderly_2.0.0.0_x64_sideload.msix'
+$storeMsix = Join-Path $root '_out\Folderly_2.2.0.0_x64_store.msix'
+$sideloadMsix = Join-Path $root '_out\Folderly_2.2.0.0_x64_sideload.msix'
 $certPath = Join-Path $root '_out\Folderly_LocalSideload.cer'
 
 $cert = Get-ChildItem Cert:\CurrentUser\My |
