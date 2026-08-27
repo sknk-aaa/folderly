@@ -1065,7 +1065,9 @@
   }
 
   // Called from C# via ExecuteScriptAsync
-  window.folderlySetPreview = function(dataUrl) {
+  window.folderlySetPreview = function(dataUrl, revision) {
+    if (typeof revision === 'number' && revision < transformRevision) return;
+
     var img = document.getElementById('folderly-preview');
     var ph  = document.getElementById('preview-placeholder');
     var card = document.getElementById('preview-card');
@@ -1130,6 +1132,9 @@
 
   window.folderlySetTransform = function(json) {
     var state = (typeof json === 'string') ? JSON.parse(json) : json;
+    var revision = typeof state.revision === 'number' ? state.revision : transformRevision;
+    if (revision < transformRevision) return;
+    transformRevision = Math.max(transformRevision, revision);
 
     appState.scale = state.scale !== undefined ? state.scale : appState.scale;
     appState.offsetX = state.offsetX !== undefined ? state.offsetX : appState.offsetX;
@@ -1256,12 +1261,29 @@
   function commitScaleFromPreview(nextScale) {
     appState.scale = clamp(nextScale, 0.5, 3.0);
     if (sliders.scale) sliders.scale.set(appState.scale);
+    markTransformChanged();
     scheduleTransformPreviewPost();
     scheduleTransformPost(180);
   }
 
   var transformPreviewTimer = null;
   var transformExactTimer = null;
+  var transformRevision = 0;
+
+  function markTransformChanged() {
+    transformRevision += 1;
+  }
+
+  function createTransformMessage(type) {
+    return {
+      type:type,
+      revision:transformRevision,
+      scale:appState.scale,
+      offsetX:appState.offsetX,
+      offsetY:appState.offsetY,
+      cropMode:appState.cropMode
+    };
+  }
 
   function postTransformNow() {
     if (transformPreviewTimer) {
@@ -1272,26 +1294,14 @@
       clearTimeout(transformExactTimer);
       transformExactTimer = null;
     }
-    postMsg({
-      type:'transform',
-      scale:appState.scale,
-      offsetX:appState.offsetX,
-      offsetY:appState.offsetY,
-      cropMode:appState.cropMode
-    });
+    postMsg(createTransformMessage('transform'));
   }
 
   function scheduleTransformPreviewPost() {
     if (transformPreviewTimer) return;
     transformPreviewTimer = setTimeout(function() {
       transformPreviewTimer = null;
-      postMsg({
-        type:'transformPreview',
-        scale:appState.scale,
-        offsetX:appState.offsetX,
-        offsetY:appState.offsetY,
-        cropMode:appState.cropMode
-      });
+      postMsg(createTransformMessage('transformPreview'));
     }, 50);
   }
 
@@ -1306,6 +1316,7 @@
   function commitOffsetFromPreview(nextX, nextY) {
     appState.offsetX = clamp(nextX, -128, 128);
     appState.offsetY = clamp(nextY, -128, 128);
+    markTransformChanged();
     scheduleTransformPreviewPost();
   }
 
@@ -1436,20 +1447,20 @@
     sliders.scale = makeSlider('slider-scale', 'fill-scale', 'thumb-scale', 'label-scale',
       0.5, 3.0, 1.0,
       function(v) { return Math.round(v * 100) + '%'; },
-      function(v) { appState.scale = v; scheduleTransformPreviewPost(); },
-      function(v) { appState.scale = v; postTransformNow(); }
+      function(v) { appState.scale = v; markTransformChanged(); scheduleTransformPreviewPost(); },
+      function(v) { appState.scale = v; markTransformChanged(); postTransformNow(); }
     );
     sliders.offsetX = makeSlider('slider-offsetx', 'fill-offsetx', 'thumb-offsetx', 'label-offsetx',
       -128, 128, 0,
       function(v) { return Math.round(v) + 'px'; },
-      function(v) { appState.offsetX = v; scheduleTransformPreviewPost(); },
-      function(v) { appState.offsetX = v; postTransformNow(); }
+      function(v) { appState.offsetX = v; markTransformChanged(); scheduleTransformPreviewPost(); },
+      function(v) { appState.offsetX = v; markTransformChanged(); postTransformNow(); }
     );
     sliders.offsetY = makeSlider('slider-offsety', 'fill-offsety', 'thumb-offsety', 'label-offsety',
       -128, 128, 0,
       function(v) { return Math.round(v) + 'px'; },
-      function(v) { appState.offsetY = v; scheduleTransformPreviewPost(); },
-      function(v) { appState.offsetY = v; postTransformNow(); }
+      function(v) { appState.offsetY = v; markTransformChanged(); scheduleTransformPreviewPost(); },
+      function(v) { appState.offsetY = v; markTransformChanged(); postTransformNow(); }
     );
 
     // --- View transitions ---
@@ -1572,7 +1583,8 @@
         if (sliders.offsetX) sliders.offsetX.set(appState.offsetX);
         if (sliders.offsetY) sliders.offsetY.set(appState.offsetY);
         refreshModeCards(m);
-        postMsg({type:'cropMode', mode:m});
+        markTransformChanged();
+        postMsg({type:'cropMode', mode:m, revision:transformRevision});
       });
     });
 
@@ -1666,7 +1678,10 @@
     if (btnResetImage) btnResetImage.addEventListener('click', function() { postMsg({type:'resetImage'}); });
 
     var btnReset = document.getElementById('btn-reset');
-    if (btnReset) btnReset.addEventListener('click', function() { postMsg({type:'resetPosition'}); });
+    if (btnReset) btnReset.addEventListener('click', function() {
+      markTransformChanged();
+      postMsg({type:'resetPosition', revision:transformRevision});
+    });
 
     var btnApply = document.getElementById('btn-apply');
     if (btnApply) btnApply.addEventListener('click', function() {

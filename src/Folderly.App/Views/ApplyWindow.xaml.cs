@@ -32,6 +32,8 @@ public partial class ApplyWindow : Window
     private bool _previewRenderActive;
     private bool _previewRenderPending;
     private bool _previewRenderPendingExact;
+    private int _latestTransformRevision;
+    private int _previewRenderPendingTransformRevision;
 
     public ApplyWindow(string folderPath)
     {
@@ -283,6 +285,7 @@ public partial class ApplyWindow : Window
                         break;
 
                     case "cropMode":
+                        UpdateTransformRevision(root);
                         var modeStr = root.GetProperty("mode").GetString() ?? "Center";
                         _vm.SetCropMode(ParseCropMode(modeStr), resetPosition: true);
                         await SendTransformStateAsync();
@@ -290,6 +293,7 @@ public partial class ApplyWindow : Window
                         break;
 
                     case "resetPosition":
+                        UpdateTransformRevision(root);
                         _vm.ResetPosition();
                         await SendStateAsync();
                         await SendPreviewAsync();
@@ -376,6 +380,7 @@ public partial class ApplyWindow : Window
         _previewRenderVersion++;
         _previewRenderPending = true;
         _previewRenderPendingExact |= exact;
+        _previewRenderPendingTransformRevision = _latestTransformRevision;
 
         if (_previewRenderActive) return;
 
@@ -387,10 +392,11 @@ public partial class ApplyWindow : Window
             {
                 var renderVersion = _previewRenderVersion;
                 var renderExact = _previewRenderPendingExact;
+                var renderTransformRevision = _previewRenderPendingTransformRevision;
                 _previewRenderPending = false;
                 _previewRenderPendingExact = false;
 
-                await RenderAndSendPreviewAsync(renderExact, renderVersion);
+                await RenderAndSendPreviewAsync(renderExact, renderVersion, renderTransformRevision);
             }
         }
         finally
@@ -402,7 +408,7 @@ public partial class ApplyWindow : Window
             await SendPreviewAsync(exact: false);
     }
 
-    private async Task RenderAndSendPreviewAsync(bool exact, int renderVersion)
+    private async Task RenderAndSendPreviewAsync(bool exact, int renderVersion, int transformRevision)
     {
         if (!_webViewReady) return;
 
@@ -415,7 +421,7 @@ public partial class ApplyWindow : Window
 
         // WPF レイアウトを強制更新してからレンダリング
         if (NormalizeViewModelAdjustParams())
-            await SendTransformStateAsync();
+            await SendTransformStateAsync(transformRevision);
 
         var pngBytes = exact
             ? await RenderExactPreviewPngAsync()
@@ -425,7 +431,7 @@ public partial class ApplyWindow : Window
         var b64     = Convert.ToBase64String(pngBytes);
         var dataUrl = $"data:image/png;base64,{b64}";
 
-        await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}')");
+        await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}', {transformRevision})");
     }
 
     private byte[] RenderFastPreviewPng()
@@ -496,6 +502,8 @@ public partial class ApplyWindow : Window
 
     private void UpdateTransform(JsonElement root)
     {
+        UpdateTransformRevision(root);
+
         if (root.TryGetProperty("scale", out var scale))
             _vm.Scale = scale.GetDouble();
         if (root.TryGetProperty("offsetX", out var offsetX))
@@ -506,6 +514,15 @@ public partial class ApplyWindow : Window
             _vm.CropMode = ParseCropMode(cropMode.GetString());
         else if (root.TryGetProperty("mode", out var mode))
             _vm.CropMode = ParseCropMode(mode.GetString());
+    }
+
+    private void UpdateTransformRevision(JsonElement root)
+    {
+        if (!root.TryGetProperty("revision", out var revision)) return;
+        if (revision.ValueKind != JsonValueKind.Number) return;
+        if (!revision.TryGetInt32(out var value)) return;
+
+        _latestTransformRevision = Math.Max(_latestTransformRevision, value);
     }
 
     private bool NormalizeViewModelAdjustParams()
@@ -535,7 +552,7 @@ public partial class ApplyWindow : Window
         return true;
     }
 
-    private async Task SendTransformStateAsync()
+    private async Task SendTransformStateAsync(int? transformRevision = null)
     {
         var state = new
         {
@@ -543,6 +560,7 @@ public partial class ApplyWindow : Window
             offsetX = _vm.OffsetX,
             offsetY = _vm.OffsetY,
             cropMode = _vm.CropMode.ToString(),
+            revision = transformRevision ?? _latestTransformRevision,
         };
         var json = JsonSerializer.Serialize(state);
         await ExecuteScriptSafeAsync($"window.folderlySetTransform && window.folderlySetTransform({json})");
