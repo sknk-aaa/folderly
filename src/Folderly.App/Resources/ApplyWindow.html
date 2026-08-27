@@ -129,6 +129,78 @@
     user-select:none;
     -webkit-user-drag:none;
   }
+  .live-preview{
+    display:none;
+    position:relative;
+    overflow:hidden;
+    flex:0 0 auto;
+    border-radius:8px;
+    user-select:none;
+  }
+  .live-folder-back{
+    position:absolute;
+    left:44%;
+    top:25%;
+    width:52%;
+    height:22%;
+    border-radius:4% 4% 5% 5%;
+    background:#FFC72C;
+  }
+  .live-folder-tag{
+    position:absolute;
+    left:4.7%;
+    top:15.95%;
+    width:52%;
+    height:15.35%;
+    background:#2D6BD8;
+    clip-path:polygon(0 0, 56% 0, 100% 100%, 0 100%);
+    border-radius:2.5% 0 0 0;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:3;
+  }
+  .live-folder-tag .tag-icon-svg{
+    width:8.5%;
+    height:38%;
+    min-width:18px;
+    min-height:18px;
+  }
+  .live-image-region{
+    position:absolute;
+    left:3.9%;
+    top:32%;
+    width:92.2%;
+    height:64.8%;
+    overflow:hidden;
+    border-radius:3.1%;
+    background:#FFC72C;
+    z-index:2;
+  }
+  .live-source-image{
+    position:absolute;
+    left:0;
+    top:0;
+    max-width:none;
+    max-height:none;
+    background:#fff;
+    transform:translate3d(0,0,0) scale(1);
+    transform-origin:0 0;
+    will-change:transform;
+    pointer-events:none;
+  }
+  .live-folder-edge{
+    position:absolute;
+    left:3.9%;
+    top:32%;
+    width:92.2%;
+    height:64.8%;
+    border:1px solid rgba(255,199,44,0.55);
+    border-radius:3.1%;
+    z-index:4;
+    pointer-events:none;
+  }
 
   /* Placeholder */
   .pp-frame{
@@ -506,6 +578,14 @@
       <!-- Preview card -->
       <div class="card preview-card" id="preview-card">
         <img id="folderly-preview" alt="フォルダプレビュー"/>
+        <div class="live-preview" id="live-preview" aria-hidden="true">
+          <div class="live-folder-back"></div>
+          <div class="live-folder-tag" id="live-folder-tag"></div>
+          <div class="live-image-region" id="live-image-region">
+            <img class="live-source-image" id="live-source-image" alt=""/>
+          </div>
+          <div class="live-folder-edge"></div>
+        </div>
         <div class="pp-frame" id="preview-placeholder">
           <div class="pp-stripes" aria-hidden="true"></div>
           <div class="pp-inner">
@@ -986,6 +1066,13 @@
     selectedTagKey: 'none',
     hasImage: false,
     canApply: false,
+    liveSourceUrl: null,
+    liveSourceWidth: 0,
+    liveSourceHeight: 0,
+    livePreviewActive: false,
+    waitingForExactPreview: false,
+    livePreviewSize: 0,
+    liveTagRenderKey: '',
     tags: {},           // key -> {name, hexColor, iconIndex}
     showTagNameOnIcon: false,
     showTagIconOnIcon: false
@@ -1064,6 +1151,135 @@
     }
   }
 
+  var livePreviewRaf = 0;
+
+  function getSelectedTagData() {
+    return appState.tags[appState.selectedTagKey] || {
+      hexColor:'#2D6BD8',
+      iconIndex:0
+    };
+  }
+
+  function canShowLivePreview() {
+    return appState.hasImage &&
+      !!appState.liveSourceUrl &&
+      appState.liveSourceWidth > 0 &&
+      appState.liveSourceHeight > 0;
+  }
+
+  function setRenderedPreviewVisible(visible) {
+    var img = document.getElementById('folderly-preview');
+    if (img) img.style.display = visible ? 'block' : 'none';
+  }
+
+  function showLivePreview() {
+    if (!canShowLivePreview()) return false;
+
+    var live = document.getElementById('live-preview');
+    var ph = document.getElementById('preview-placeholder');
+    if (!live) return false;
+
+    if (ph) ph.style.display = 'none';
+    setRenderedPreviewVisible(false);
+    live.style.display = 'block';
+    appState.livePreviewActive = true;
+    scheduleLivePreviewRender();
+    return true;
+  }
+
+  function hideLivePreview() {
+    var live = document.getElementById('live-preview');
+    if (live) live.style.display = 'none';
+    appState.livePreviewActive = false;
+  }
+
+  function scheduleLivePreviewRender() {
+    if (livePreviewRaf) return;
+    livePreviewRaf = requestAnimationFrame(function() {
+      livePreviewRaf = 0;
+      renderLivePreview();
+    });
+  }
+
+  function renderLivePreview() {
+    if (!canShowLivePreview()) return;
+
+    var card = document.getElementById('preview-card');
+    var live = document.getElementById('live-preview');
+    var region = document.getElementById('live-image-region');
+    var source = document.getElementById('live-source-image');
+    var tag = document.getElementById('live-folder-tag');
+    if (!card || !live || !region || !source || !tag) return;
+
+    var cardRect = card.getBoundingClientRect();
+    var size = Math.max(1, Math.min(cardRect.width - 8, cardRect.height - 8));
+    if (appState.livePreviewSize !== size) {
+      live.style.width = size + 'px';
+      live.style.height = size + 'px';
+      appState.livePreviewSize = size;
+    }
+
+    var tagData = getSelectedTagData();
+    var tagRenderKey = [
+      tagData.hexColor || '#2D6BD8',
+      appState.showTagIconOnIcon ? tagData.iconIndex : 'hidden'
+    ].join(':');
+    if (appState.liveTagRenderKey !== tagRenderKey) {
+      tag.style.background = tagData.hexColor || '#2D6BD8';
+      tag.innerHTML = appState.showTagIconOnIcon ? renderTagIconSvg(tagData.iconIndex) : '';
+      appState.liveTagRenderKey = tagRenderKey;
+    }
+
+    var regionWidth = size * 0.922;
+    var regionHeight = size * 0.648;
+    var scaleBase;
+    if (appState.cropMode === 'FitWidth') {
+      scaleBase = regionWidth / appState.liveSourceWidth;
+    } else if (appState.cropMode === 'FitHeight') {
+      scaleBase = regionHeight / appState.liveSourceHeight;
+    } else {
+      scaleBase = Math.max(
+        regionWidth / appState.liveSourceWidth,
+        regionHeight / appState.liveSourceHeight
+      );
+    }
+
+    var effectiveScale = scaleBase * appState.scale;
+    var imageWidth = appState.liveSourceWidth * effectiveScale;
+    var imageHeight = appState.liveSourceHeight * effectiveScale;
+    var unitScale = size / 256;
+    var left = (regionWidth - imageWidth) / 2 + appState.offsetX * unitScale;
+    var top = (regionHeight - imageHeight) / 2 + appState.offsetY * unitScale;
+
+    source.style.transform = 'translate3d(' + left.toFixed(2) + 'px,' + top.toFixed(2) + 'px,0) scale(' + effectiveScale.toFixed(5) + ')';
+  }
+
+  window.folderlySetSourceImage = function(dataUrl, width, height) {
+    appState.liveSourceUrl = dataUrl;
+    appState.liveSourceWidth = Number(width) || 0;
+    appState.liveSourceHeight = Number(height) || 0;
+    var source = document.getElementById('live-source-image');
+    if (source) {
+      source.src = dataUrl;
+      source.style.width = appState.liveSourceWidth + 'px';
+      source.style.height = appState.liveSourceHeight + 'px';
+      source.style.transform = 'translate3d(0,0,0) scale(1)';
+    }
+    if (appState.livePreviewActive) scheduleLivePreviewRender();
+  };
+
+  window.folderlyClearSourceImage = function() {
+    appState.liveSourceUrl = null;
+    appState.liveSourceWidth = 0;
+    appState.liveSourceHeight = 0;
+    appState.waitingForExactPreview = false;
+    appState.livePreviewSize = 0;
+    appState.liveTagRenderKey = '';
+    hideLivePreview();
+    var source = document.getElementById('live-source-image');
+    if (source) source.removeAttribute('src');
+  };
+
   // Called from C# via ExecuteScriptAsync
   window.folderlySetPreview = function(dataUrl, revision) {
     if (typeof revision === 'number' && revision < transformRevision) return;
@@ -1072,6 +1288,8 @@
     var ph  = document.getElementById('preview-placeholder');
     var card = document.getElementById('preview-card');
     img.src = dataUrl;
+    appState.waitingForExactPreview = false;
+    hideLivePreview();
     img.style.display = 'block';
     if (ph) ph.style.display = 'none';
     if (card) card.classList.add('has-image');
@@ -1087,6 +1305,7 @@
       img.removeAttribute('src');
       img.style.display = 'none';
     }
+    window.folderlyClearSourceImage();
     if (ph) ph.style.display = 'flex';
     if (card) card.classList.remove('has-image');
     appState.hasImage = false;
@@ -1294,15 +1513,13 @@
       clearTimeout(transformExactTimer);
       transformExactTimer = null;
     }
+    if (showLivePreview()) appState.waitingForExactPreview = true;
     postMsg(createTransformMessage('transform'));
   }
 
   function scheduleTransformPreviewPost() {
-    if (transformPreviewTimer) return;
-    transformPreviewTimer = setTimeout(function() {
-      transformPreviewTimer = null;
-      postMsg(createTransformMessage('transformPreview'));
-    }, 50);
+    showLivePreview();
+    scheduleLivePreviewRender();
   }
 
   function scheduleTransformPost(delayMs) {
@@ -1323,6 +1540,27 @@
   function previewDragToIconUnits(deltaPx, previewPixelSize) {
     if (!previewPixelSize) return 0;
     return deltaPx / previewPixelSize * 256;
+  }
+
+  function getPreviewDisplaySize() {
+    var live = document.getElementById('live-preview');
+    if (live && live.style.display !== 'none') {
+      var liveRect = live.getBoundingClientRect();
+      var liveSize = Math.min(liveRect.width, liveRect.height);
+      if (liveSize > 0) return liveSize;
+    }
+
+    var img = document.getElementById('folderly-preview');
+    if (img) {
+      var imgRect = img.getBoundingClientRect();
+      var imgSize = Math.min(imgRect.width, imgRect.height);
+      if (imgSize > 0) return imgSize;
+    }
+
+    var card = document.getElementById('preview-card');
+    if (!card) return 1;
+    var cardRect = card.getBoundingClientRect();
+    return Math.max(1, Math.min(cardRect.width - 8, cardRect.height - 8));
   }
 
   // ===== Edit tag list =====
@@ -1658,8 +1896,7 @@
 
       document.addEventListener('mousemove', function(e) {
         if (!previewDrag.active) return;
-        var rect = previewImg.getBoundingClientRect();
-        var displaySize = Math.min(rect.width, rect.height) || 1;
+        var displaySize = getPreviewDisplaySize();
         var dx = previewDragToIconUnits(e.clientX - previewDrag.startX, displaySize);
         var dy = previewDragToIconUnits(e.clientY - previewDrag.startY, displaySize);
         commitOffsetFromPreview(previewDrag.startOffsetX + dx, previewDrag.startOffsetY + dy);

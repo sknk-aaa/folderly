@@ -27,6 +27,7 @@ public partial class ApplyWindow : Window
     private const string NetworkWarningSeenSettingKey = "network_folder_warning_seen";
     private const int ExactPreviewSize = 640;
     private const int InteractivePreviewSize = 384;
+    private const int LiveSourcePreviewMaxSize = 640;
 
     private readonly ApplyViewModel _vm;
     private bool _webViewReady;
@@ -39,6 +40,7 @@ public partial class ApplyWindow : Window
     private int _previewRenderPendingTransformRevision;
     private BitmapSource? _previewSourceBitmapCacheKey;
     private Image<Rgba32>? _previewSourceImageCache;
+    private BitmapSource? _liveSourceBitmapSentKey;
 
     public ApplyWindow(string folderPath)
     {
@@ -427,11 +429,13 @@ public partial class ApplyWindow : Window
         if (_vm.SourceImage is null)
         {
             ClearPreviewSourceCache();
-            await ExecuteScriptSafeAsync("window.folderlyClearPreview && window.folderlyClearPreview()");
+            await ExecuteScriptSafeAsync("window.folderlyClearSourceImage && window.folderlyClearSourceImage(); window.folderlyClearPreview && window.folderlyClearPreview()");
             return;
         }
 
         // WPF レイアウトを強制更新してからレンダリング
+        await SendLiveSourceImageAsync();
+
         if (exact && NormalizeViewModelAdjustParams())
             await SendTransformStateAsync(transformRevision);
 
@@ -470,6 +474,35 @@ public partial class ApplyWindow : Window
         _previewSourceImageCache?.Dispose();
         _previewSourceImageCache = null;
         _previewSourceBitmapCacheKey = null;
+        _liveSourceBitmapSentKey = null;
+    }
+
+    private async Task SendLiveSourceImageAsync()
+    {
+        if (!_webViewReady || _vm.SourceImage is null) return;
+        if (ReferenceEquals(_liveSourceBitmapSentKey, _vm.SourceImage)) return;
+
+        var sourceImage = await GetPreviewSourceImageAsync();
+
+        using var liveImage = sourceImage.Clone();
+        if (liveImage.Width > LiveSourcePreviewMaxSize || liveImage.Height > LiveSourcePreviewMaxSize)
+        {
+            liveImage.Mutate(ctx => ctx.Resize(new ResizeOptions
+            {
+                Size = new SixLabors.ImageSharp.Size(LiveSourcePreviewMaxSize, LiveSourcePreviewMaxSize),
+                Mode = SixLabors.ImageSharp.Processing.ResizeMode.Max,
+                Sampler = KnownResamplers.Lanczos3,
+            }));
+        }
+
+        using var ms = new MemoryStream();
+        await liveImage.SaveAsPngAsync(ms);
+        var dataUrl = $"data:image/png;base64,{Convert.ToBase64String(ms.ToArray())}";
+        var dataUrlJson = JsonSerializer.Serialize(dataUrl);
+
+        _liveSourceBitmapSentKey = _vm.SourceImage;
+        await ExecuteScriptSafeAsync(
+            $"window.folderlySetSourceImage && window.folderlySetSourceImage({dataUrlJson}, {liveImage.Width}, {liveImage.Height})");
     }
 
     private async Task<byte[]> RenderPreviewPngAsync(bool exact)
