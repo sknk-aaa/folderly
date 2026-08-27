@@ -15,17 +15,36 @@ internal static class IconHelper
     {
         if (iconIndex == 5) // dots: 3 filled circles
         {
-            var canvas = new Canvas { Width = 24, Height = 24 };
+            var canvas = new Canvas
+            {
+                Width = 24,
+                Height = 24,
+                UseLayoutRounding = true,
+                SnapsToDevicePixels = true
+            };
             double[] xs = [5, 12, 19];
             foreach (var x in xs)
             {
                 const double r = 1.8;
-                var e = new Ellipse { Width = r * 2, Height = r * 2, Fill = stroke };
+                var e = new Ellipse
+                {
+                    Width = r * 2,
+                    Height = r * 2,
+                    Fill = stroke,
+                    SnapsToDevicePixels = true
+                };
                 Canvas.SetLeft(e, x - r);
                 Canvas.SetTop(e, 12 - r);
                 canvas.Children.Add(e);
             }
-            return new Viewbox { Width = size, Height = size, Child = canvas };
+            return new Viewbox
+            {
+                Width = size,
+                Height = size,
+                UseLayoutRounding = true,
+                SnapsToDevicePixels = true,
+                Child = canvas
+            };
         }
 
         if (iconIndex < 0 || iconIndex >= IconPaths.Length) return new FrameworkElement();
@@ -37,21 +56,26 @@ internal static class IconHelper
         {
             Width  = size,
             Height = size,
+            UseLayoutRounding = true,
+            SnapsToDevicePixels = true,
             Child  = new Canvas
             {
                 Width  = 24,
                 Height = 24,
+                UseLayoutRounding = true,
+                SnapsToDevicePixels = true,
                 Children =
                 {
                     new WpfPath
                     {
                         Data               = Geometry.Parse(pathData),
                         Stroke             = stroke,
-                        StrokeThickness    = 1.8,
+                        StrokeThickness    = 2.0,
                         StrokeLineJoin     = PenLineJoin.Round,
                         StrokeStartLineCap = PenLineCap.Round,
                         StrokeEndLineCap   = PenLineCap.Round,
-                        Fill               = Brushes.Transparent,
+                        Fill               = null,
+                        SnapsToDevicePixels = true,
                     }
                 }
             }

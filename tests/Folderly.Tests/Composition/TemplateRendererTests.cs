@@ -248,6 +248,25 @@ public class TemplateRendererTests
     }
 
     [Fact]
+    public void Render_EveryTagIcon_DoesNotThrow()
+    {
+        using var adj = CreateTestAdjustedImage();
+
+        for (var i = 0; i < TagIconLibrary.IconPaths.Length; i++)
+        {
+            using var result = TemplateRenderer.Render(
+                adj,
+                TagColors.Blue,
+                tagIconIndex: i,
+                showTagIcon: true,
+                outputSize: 128);
+
+            Assert.Equal(128, result.Width);
+            Assert.Equal(128, result.Height);
+        }
+    }
+
+    [Fact]
     public void Render_SmallOutputSize_DoesNotThrow()
     {
         using var adj = CreateTestAdjustedImage(16, 10);

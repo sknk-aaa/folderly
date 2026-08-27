@@ -449,7 +449,8 @@
     display:flex;align-items:center;justify-content:center;
     color:var(--ink-2);position:relative;cursor:pointer;
   }
-  .ico-pick svg{width:20px;height:20px}
+  .ico-pick svg{width:22px;height:22px;overflow:visible;shape-rendering:geometricPrecision}
+  .ico-pick svg *{vector-effect:non-scaling-stroke}
   .ico-pick:hover{background:#F5F9FF;border-color:#B7CBE5}
   .ico-pick.active{border-color:var(--accent);box-shadow: inset 0 0 0 1px var(--accent);background:var(--accent-soft);color:var(--accent)}
 
@@ -1001,6 +1002,61 @@
   // Slider handles
   var sliders = {};
 
+  var tagIconDefs = [
+    { title:'Edit', path:'M15,4 L20,9 L9,20 L4,21 L5,16 Z M13.5,5.5 L18.5,10.5' },
+    { title:'Video', path:'M4,6 L20,6 L20,18 L4,18 Z M10,9 L16,12 L10,15 Z' },
+    { title:'Work', path:'M4,8 L20,8 L20,20 L4,20 Z M8,8 L8,6 A2,2,0,0,1,10,4 L14,4 A2,2,0,0,1,16,6 L16,8' },
+    { title:'Document', path:'M7,3 L14,3 L19,8 L19,21 L7,21 Z M14,3 L14,8 L19,8 M10,13 L16,13 M10,17 L14,17' },
+    { title:'Download', path:'M12,4 L12,16 M7,11 L12,16 L17,11 M5,20 L19,20' },
+    { title:'More', dots:true },
+    { title:'Photo', path:'M4,5 L20,5 L20,19 L4,19 Z M4,16 L9,11 L13,15 L16,12 L20,16 M8,10 L8.1,10' },
+    { title:'Music', path:'M9,18 L9,5 L20,3 L20,15 M6,20 A3,3,0,1,0,6,14 A3,3,0,1,0,6,20 M17,17 A3,3,0,1,0,17,11 A3,3,0,1,0,17,17' },
+    { title:'Game', path:'M7,10 L17,10 A4,4,0,0,1,21,14 L21,16 A4,4,0,0,1,17,20 L7,20 A4,4,0,0,1,3,16 L3,14 A4,4,0,0,1,7,10 Z M8,14 L8,17 M6.5,15.5 L9.5,15.5 M15,15 L15.1,15 M18,15 L18.1,15' },
+    { title:'Study', path:'M5,4 L19,4 L19,20 L6,20 A2,2,0,0,1,6,16 L19,16 M5,4 L5,18' },
+    { title:'Important', path:'M12,3 L14.7,8.8 L21,9.5 L16.3,13.9 L17.6,20 L12,16.9 L6.4,20 L7.7,13.9 L3,9.5 L9.3,8.8 Z' },
+    { title:'Chat', path:'M4,5 A2,2,0,0,1,6,3 L18,3 A2,2,0,0,1,20,5 L20,15 A2,2,0,0,1,18,17 L12,17 L7,21 L7,17 L6,17 A2,2,0,0,1,4,15 Z' },
+    { title:'Design', path:'M12,21 A9,9,0,1,1,21,12 A4,4,0,0,0,17,16 L15,16 A3,3,0,0,0,12,19 Z M7.5,11 L7.6,11 M11,7 L11.1,7 M15,7.5 L15.1,7.5' },
+    { title:'Bookmark', path:'M6,3 L18,3 L18,20 L12,16 L6,20 Z' },
+    { title:'Private', path:'M6,10 L6,21 L18,21 L18,10 Z M8,10 L8,7 A4,4,0,0,1,16,7 L16,10' },
+    { title:'Home', path:'M3,11 L12,4 L21,11 M6,9.5 L6,20 L18,20 L18,9.5' },
+    { title:'Folder', path:'M4,7 L9,7 L11,9 L20,9 L20,19 L4,19 Z' },
+    { title:'Tag', path:'M4,5 L11,5 L20,14 L14,20 L5,11 Z M8,8 L8.1,8' },
+    { title:'Place', path:'M12,21 L18,12 A6,6,0,1,0,6,12 Z M10,10 A2,2,0,1,0,14,10 A2,2,0,1,0,10,10' },
+    { title:'Calendar', path:'M5,5 L19,5 L19,20 L5,20 Z M5,9 L19,9 M8,3 L8,7 M16,3 L16,7' },
+    { title:'Flag', path:'M6,4 L6,21 M6,5 L18,5 L15,9 L18,13 L6,13' },
+    { title:'Code', path:'M8,7 L4,12 L8,17 M16,7 L20,12 L16,17 M14,5 L10,19' },
+    { title:'Terminal', path:'M4,5 L20,5 L20,19 L4,19 Z M8,10 L11,13 L8,16 M13,16 L17,16' },
+    { title:'Database', path:'M4,7 A8,3,0,1,0,20,7 A8,3,0,1,0,4,7 M4,7 L4,17 A8,3,0,1,0,20,17 L20,7 M4,12 A8,3,0,1,0,20,12' },
+    { title:'Chart', path:'M4,19 L4,14 M9,19 L9,10 M14,19 L14,5 M20,19 L4,19 M6,12 L10,8 L14,11 L19,5' },
+    { title:'Camera', path:'M5,8 A3,3,0,0,1,8,5 L16,5 A3,3,0,0,1,19,8 L19,18 L5,18 Z M9,5 L10,3 L14,3 L15,5 M9,12 L9.1,12' },
+    { title:'Mail', path:'M4,6 L20,6 L20,18 L4,18 Z M4,7 L12,13 L20,7' },
+    { title:'Person', path:'M12,12 A4,4,0,1,0,12,4 A4,4,0,1,0,12,12 M4,21 A8,8,0,0,1,20,21' },
+    { title:'Team', path:'M8,20 A4,4,0,0,1,16,20 M8,11 A4,4,0,1,0,8,3 A4,4,0,1,0,8,11 M16,11 A4,4,0,1,0,16,3 A4,4,0,1,0,16,11' },
+    { title:'Web', path:'M4,12 A8,8,0,1,0,20,12 A8,8,0,1,0,4,12 M4,12 L20,12 M12,4 A12,12,0,0,1,12,20 M12,4 A12,12,0,0,0,12,20' },
+    { title:'Cloud', path:'M6,18 A4,4,0,0,1,7,10 A5,5,0,0,1,17,10 A4,4,0,0,1,18,18 Z' },
+    { title:'Tool', path:'M14,6 L18,10 M7,17 L4,20 M15,5 A3,3,0,0,1,19,9 L10,18 L6,14 Z' },
+    { title:'Invoice', path:'M5,4 L13,4 L19,10 L19,20 L5,20 Z M13,4 L13,10 L19,10 M9,15 L15,15' },
+    { title:'Clock', path:'M12,4 A8,8,0,1,0,20,12 A8,8,0,1,0,12,4 M12,7 L12,12 L16,14' },
+    { title:'Archive', path:'M4,7 L9,4 L15,4 L20,7 L20,19 L4,19 Z M8,11 L16,11 M8,15 L16,15' }
+  ];
+
+  function renderTagIconSvg(idx) {
+    var def = tagIconDefs[idx];
+    if (!def) return '';
+    var body = def.dots
+      ? '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>'
+      : '<path d="' + def.path + '"/>';
+    return '<svg class="tag-icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
+  }
+
+  function renderIconLibrary() {
+    var iconLib = document.querySelector('.iconlib');
+    if (!iconLib) return;
+    iconLib.innerHTML = tagIconDefs.map(function(def, idx) {
+      return '<div class="ico-pick" data-icon-index="' + idx + '" title="' + def.title + '">' + renderTagIconSvg(idx) + '</div>';
+    }).join('');
+  }
+
   // ===== C# bridge =====
   function postMsg(obj) {
     if (window.chrome && window.chrome.webview) {
@@ -1330,8 +1386,7 @@
 
   // Return innerHTML of icon SVG for given index (matches .ico-pick data-icon-index)
   function getIconSvgHtml(idx) {
-    var pick = document.querySelector('.ico-pick[data-icon-index="' + idx + '"]');
-    return pick ? pick.innerHTML : null;
+    return renderTagIconSvg(idx) || null;
   }
 
   // Swap the icon <svg> inside a swatch element (tag chip / edit list row) to match iconIndex.
@@ -1375,6 +1430,7 @@
 
   // ===== Initialization =====
   document.addEventListener('DOMContentLoaded', function() {
+    renderIconLibrary();
 
     // --- Sliders ---
     sliders.scale = makeSlider('slider-scale', 'fill-scale', 'thumb-scale', 'label-scale',
