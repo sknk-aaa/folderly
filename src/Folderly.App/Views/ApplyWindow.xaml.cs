@@ -64,11 +64,7 @@ public partial class ApplyWindow : Window
     {
         try
         {
-            // AppServices.Initialize() で並列開始済みの Environment を使い回す
-            var env = await (AppServices.WebView2EnvTask
-                ?? CoreWebView2Environment.CreateAsync(null, Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Folderly", "WebView2")));
+            var env = await AppServices.GetWebView2EnvironmentAsync();
             await WebView.EnsureCoreWebView2Async(env);
 
             WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;

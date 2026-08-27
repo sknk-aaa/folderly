@@ -1,27 +1,23 @@
+using Folderly.App.Services;
 using Folderly.Core.Application;
 using Folderly.Core.History;
-using Folderly.App.Services;
 using Folderly.Shell;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 
 namespace Folderly.App.Infrastructure;
 
-/// <summary>
-/// アプリ全体で共有するサービスの静的コンテナ。
-/// DI フレームワーク非使用（YAGNI: v1.0 の規模では不要）。
-/// </summary>
 public static class AppServices
 {
-    public static HistoryRepository    History     { get; private set; } = null!;
-    public static ApplyService         Apply       { get; private set; } = null!;
-    public static RevertService        Revert      { get; private set; } = null!;
-    public static StoreLicenseService  License     { get; private set; } = null!;
-    public static LocalizationService  Localize    { get; private set; } = null!;
-    public static ILoggerFactory       LogFactory  { get; private set; } = null!;
+    private static readonly object WebView2EnvLock = new();
+    private static Task<CoreWebView2Environment>? _webView2EnvTask;
 
-    // SQLite 初期化と並列でバックグラウンド作成し、ApplyWindow で使い回す
-    public static Task<CoreWebView2Environment>? WebView2EnvTask { get; private set; }
+    public static HistoryRepository   History    { get; private set; } = null!;
+    public static ApplyService        Apply      { get; private set; } = null!;
+    public static RevertService       Revert     { get; private set; } = null!;
+    public static StoreLicenseService License    { get; private set; } = null!;
+    public static LocalizationService Localize   { get; private set; } = null!;
+    public static ILoggerFactory      LogFactory { get; private set; } = null!;
 
     public static void Initialize()
     {
@@ -37,24 +33,40 @@ public static class AppServices
 
         var dbPath = Path.Combine(baseDir, "folderly.db");
 
-        // WebView2 Environment を SQLite 初期化と並列でバックグラウンド起動
-        // (UI スレッドから呼ぶため STA 要件を満たす)
-        var webView2DataFolder = Path.Combine(appData, "Folderly", "WebView2");
-        WebView2EnvTask = CoreWebView2Environment.CreateAsync(null, webView2DataFolder);
-
-        History    = new HistoryRepository(dbPath, LogFactory.CreateLogger<HistoryRepository>());
+        History = new HistoryRepository(dbPath, LogFactory.CreateLogger<HistoryRepository>());
 
         var notifier = new ShellNotifier();
-        Apply  = new ApplyService(History, notifier, LogFactory.CreateLogger<ApplyService>());
+        Apply = new ApplyService(History, notifier, LogFactory.CreateLogger<ApplyService>());
         Revert = new RevertService(History, notifier, LogFactory.CreateLogger<RevertService>());
 
-        License  = new StoreLicenseService();
+        License = new StoreLicenseService();
         Localize = LocalizationService.Instance;
 
-        // 言語設定を DB から復元
         var savedLang = History.GetSetting("language") ?? "system";
         Localize.SetLanguage(savedLang);
     }
 
     public static ILogger<T> Logger<T>() => LogFactory.CreateLogger<T>();
+
+    public static Task<CoreWebView2Environment> GetWebView2EnvironmentAsync()
+    {
+        lock (WebView2EnvLock)
+        {
+            if (_webView2EnvTask is not null)
+                return _webView2EnvTask;
+
+            var webView2DataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Folderly",
+                "WebView2");
+
+            _webView2EnvTask = CoreWebView2Environment.CreateAsync(null, webView2DataFolder);
+            return _webView2EnvTask;
+        }
+    }
+
+    public static void PreloadWebView2Environment()
+    {
+        _ = GetWebView2EnvironmentAsync();
+    }
 }

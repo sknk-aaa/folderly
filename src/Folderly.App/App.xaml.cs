@@ -145,6 +145,7 @@ public partial class App : Application
     private void OpenApplyWindow(string folderPath)
     {
         StopIdleShutdownTimer();
+        AppServices.PreloadWebView2Environment();
         _applyWindowCount++;
 
         var win = new ApplyWindow(folderPath);
