@@ -44,12 +44,20 @@ public partial class ApplyWindow : Window
 
     public ApplyWindow(string folderPath)
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log($"ApplyWindow.ctor begin path={folderPath}");
         InitializeComponent();
+        StartupTrace.Log($"ApplyWindow.ctor InitializeComponent completed elapsed={StartupTrace.Elapsed(sw)}");
         Title = AppServices.Localize["ApplyWindowTitle"];
         _vm = new ApplyViewModel(folderPath);
         TryRestoreExistingCustomization();
+        StartupTrace.Log($"ApplyWindow.ctor completed elapsed={StartupTrace.Elapsed(sw)}");
 
-        Loaded += async (_, _) => await InitWebViewAsync();
+        Loaded += async (_, _) =>
+        {
+            StartupTrace.Log($"ApplyWindow.Loaded path={_vm.FolderPath}");
+            await InitWebViewAsync();
+        };
     }
 
     protected override void OnClosed(EventArgs e)
@@ -62,10 +70,14 @@ public partial class ApplyWindow : Window
 
     private async Task InitWebViewAsync()
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log("ApplyWindow.InitWebView begin");
         try
         {
             var env = await AppServices.GetWebView2EnvironmentAsync();
+            StartupTrace.Log($"ApplyWindow.InitWebView environment ready elapsed={StartupTrace.Elapsed(sw)}");
             await WebView.EnsureCoreWebView2Async(env);
+            StartupTrace.Log($"ApplyWindow.InitWebView EnsureCoreWebView2 completed elapsed={StartupTrace.Elapsed(sw)}");
 
             WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
             WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled   = false;
@@ -75,10 +87,13 @@ public partial class ApplyWindow : Window
             WebView.CoreWebView2.NavigationCompleted += OnNavigationCompleted;
 
             var html = LoadHtml();
+            StartupTrace.Log($"ApplyWindow.InitWebView HTML ready length={html.Length} elapsed={StartupTrace.Elapsed(sw)}");
             WebView.NavigateToString(html);
+            StartupTrace.Log($"ApplyWindow.InitWebView NavigateToString called elapsed={StartupTrace.Elapsed(sw)}");
         }
         catch (Exception ex)
         {
+            StartupTrace.Log($"ApplyWindow.InitWebView failed elapsed={StartupTrace.Elapsed(sw)} error={ex.Message}");
             MessageBox.Show(
                 string.Format(AppServices.Localize["WebViewInitFailed"], ex.Message),
                 "Folderly", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -88,9 +103,13 @@ public partial class ApplyWindow : Window
 
     private static string LoadHtml()
     {
+        var sw = Stopwatch.StartNew();
         var language = AppServices.Localize.CurrentLang;
         if (CachedHtmlByLanguage.TryGetValue(language, out var cachedHtml))
+        {
+            StartupTrace.Log($"ApplyWindow.LoadHtml cache hit language={language} elapsed={StartupTrace.Elapsed(sw)}");
             return cachedHtml;
+        }
 
         var asm = Assembly.GetExecutingAssembly();
         using var stream = asm.GetManifestResourceStream("Folderly.App.Resources.ApplyWindow.html");
@@ -98,6 +117,7 @@ public partial class ApplyWindow : Window
         using var reader = new StreamReader(stream);
         var html = LocalizeHtml(reader.ReadToEnd());
         CachedHtmlByLanguage[language] = html;
+        StartupTrace.Log($"ApplyWindow.LoadHtml cache miss language={language} length={html.Length} elapsed={StartupTrace.Elapsed(sw)}");
         return html;
     }
 
@@ -217,12 +237,16 @@ public partial class ApplyWindow : Window
 
     private async void OnNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log($"ApplyWindow.NavigationCompleted success={e.IsSuccess} webError={e.WebErrorStatus}");
         // 初回ナビゲーション完了後のみ状態を送信
         if (!_webViewReady)
         {
             _webViewReady = true;
             await SendStateAsync();
+            StartupTrace.Log($"ApplyWindow.NavigationCompleted initial state sent elapsed={StartupTrace.Elapsed(sw)}");
             await SendPreviewAsync();
+            StartupTrace.Log($"ApplyWindow.NavigationCompleted initial preview sent elapsed={StartupTrace.Elapsed(sw)}");
         }
     }
 
@@ -640,14 +664,32 @@ public partial class ApplyWindow : Window
 
     private void TryRestoreExistingCustomization()
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization begin path={_vm.FolderPath}");
         try
         {
             var entry = AppServices.History.GetByPath(Path.GetFullPath(_vm.FolderPath));
-            if (entry is null) return;
+            if (entry is null)
+            {
+                StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization no entry elapsed={StartupTrace.Elapsed(sw)}");
+                return;
+            }
             _vm.HasExistingCustomization = true;
-            if (string.IsNullOrWhiteSpace(entry.SourceImagePath)) return;
-            if (!File.Exists(entry.SourceImagePath)) return;
-            if (!LoadImage(entry.SourceImagePath, resetPosition: false, showError: false)) return;
+            if (string.IsNullOrWhiteSpace(entry.SourceImagePath))
+            {
+                StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization entry without source image elapsed={StartupTrace.Elapsed(sw)}");
+                return;
+            }
+            if (!File.Exists(entry.SourceImagePath))
+            {
+                StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization source image missing elapsed={StartupTrace.Elapsed(sw)}");
+                return;
+            }
+            if (!LoadImage(entry.SourceImagePath, resetPosition: false, showError: false))
+            {
+                StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization source image load failed elapsed={StartupTrace.Elapsed(sw)}");
+                return;
+            }
 
             _vm.CropMode = entry.CropMode switch
             {
@@ -661,9 +703,11 @@ public partial class ApplyWindow : Window
             _vm.SelectedTagColor = !string.IsNullOrWhiteSpace(entry.TagKey)
                 ? TagColors.All.FirstOrDefault(t => t.Key == entry.TagKey) ?? TagColors.None
                 : TagColors.None;
+            StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization restored elapsed={StartupTrace.Elapsed(sw)}");
         }
-        catch
+        catch (Exception ex)
         {
+            StartupTrace.Log($"ApplyWindow.TryRestoreExistingCustomization failed elapsed={StartupTrace.Elapsed(sw)} error={ex.Message}");
             // 履歴復元に失敗しても、通常の新規カスタマイズ画面として開ければよい。
         }
     }
@@ -719,6 +763,8 @@ public partial class ApplyWindow : Window
 
     private bool LoadImage(string path, bool resetPosition = true, bool showError = true)
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log($"ApplyWindow.LoadImage begin resetPosition={resetPosition} path={path}");
         try
         {
             var bitmap = new BitmapImage();
@@ -736,10 +782,12 @@ public partial class ApplyWindow : Window
                 _vm.ResetPosition();
 
             _ = SendPreviewAsync();
+            StartupTrace.Log($"ApplyWindow.LoadImage completed width={bitmap.PixelWidth} height={bitmap.PixelHeight} elapsed={StartupTrace.Elapsed(sw)}");
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            StartupTrace.Log($"ApplyWindow.LoadImage failed elapsed={StartupTrace.Elapsed(sw)} error={ex.Message}");
             if (showError)
             {
                 MessageBox.Show(AppServices.Localize["ImageLoadError"], "Folderly",

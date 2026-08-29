@@ -4,6 +4,7 @@ using System.IO.Pipes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Folderly.App.Infrastructure;
 using Folderly.App.Services;
 using Folderly.Core.History;
 
@@ -111,14 +112,21 @@ public sealed class FolderlyContextMenuHandler : IExplorerCommand
 
     public int Invoke(IShellItemArray? psiItemArray, IntPtr pbc)
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log("ContextMenu.Invoke begin");
         try
         {
             if (psiItemArray == null) return S_OK;
             psiItemArray.GetItemAt(0, out IShellItem item);
             item.GetDisplayName(SIGDN_FILESYSPATH, out string path);
+            StartupTrace.Log($"ContextMenu.Invoke selected path={path} elapsed={StartupTrace.Elapsed(sw)}");
             ComServer.HandleFolder(path);
+            StartupTrace.Log($"ContextMenu.Invoke completed elapsed={StartupTrace.Elapsed(sw)}");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            StartupTrace.Log($"ContextMenu.Invoke failed elapsed={StartupTrace.Elapsed(sw)} error={ex.Message}");
+        }
         return S_OK;
     }
 
@@ -196,6 +204,8 @@ internal static class ComServer
 
     public static void Start(Application app)
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log("ComServer.Start begin");
         _app = app;
         var clsid = new Guid("2A7A05DA-70D8-4302-8B23-AE8D79D801B6");
         var factory = new FolderlyClassFactory();
@@ -205,19 +215,31 @@ internal static class ComServer
             1  /* REGCLS_MULTIPLEUSE */,
             out _cookie);
         Marshal.ThrowExceptionForHR(hr);
+        StartupTrace.Log($"ComServer.Start registered elapsed={StartupTrace.Elapsed(sw)}");
 
         _timeoutTimer = new System.Timers.Timer(30_000) { AutoReset = false };
         _timeoutTimer.Elapsed += (_, _) => Stop();
         _timeoutTimer.Start();
+        StartupTrace.Log($"ComServer.Start completed elapsed={StartupTrace.Elapsed(sw)}");
     }
 
     public static void HandleFolder(string folderPath)
     {
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log($"ComServer.HandleFolder begin path={folderPath}");
         _timeoutTimer?.Stop();
         if (!TrySendViaPipe(folderPath))
+        {
+            StartupTrace.Log($"ComServer.HandleFolder pipe unavailable; starting app elapsed={StartupTrace.Elapsed(sw)}");
             Process.Start(new ProcessStartInfo(GetFolderlyExePath(), $"\"{folderPath}\"")
                 { UseShellExecute = false });
+        }
+        else
+        {
+            StartupTrace.Log($"ComServer.HandleFolder sent via pipe elapsed={StartupTrace.Elapsed(sw)}");
+        }
         Stop();
+        StartupTrace.Log($"ComServer.HandleFolder completed elapsed={StartupTrace.Elapsed(sw)}");
     }
 
     private static string GetFolderlyExePath()
@@ -250,21 +272,28 @@ internal static class ComServer
     public static void Stop() =>
         _app?.Dispatcher.Invoke(() =>
         {
+            StartupTrace.Log("ComServer.Stop begin");
             CoRevokeClassObject(_cookie);
             _app.Shutdown();
         });
 
     private static bool TrySendViaPipe(string folderPath)
     {
+        var sw = Stopwatch.StartNew();
         try
         {
             using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
             client.Connect(timeout: 500);
             using var writer = new System.IO.StreamWriter(client);
             writer.WriteLine(folderPath);
+            StartupTrace.Log($"ComServer.TrySendViaPipe success elapsed={StartupTrace.Elapsed(sw)}");
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            StartupTrace.Log($"ComServer.TrySendViaPipe failed elapsed={StartupTrace.Elapsed(sw)}");
+            return false;
+        }
     }
 
     [DllImport("ole32.dll")]
