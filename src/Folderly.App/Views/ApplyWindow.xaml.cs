@@ -41,6 +41,7 @@ public partial class ApplyWindow : Window
     private BitmapSource? _previewSourceBitmapCacheKey;
     private Image<Rgba32>? _previewSourceImageCache;
     private BitmapSource? _liveSourceBitmapSentKey;
+    private bool _hasSentPreviewImage;
 
     public ApplyWindow(string folderPath)
     {
@@ -448,6 +449,7 @@ public partial class ApplyWindow : Window
         // OffscreenPreview プロパティを現在の ViewModel 状態に同期
         if (_vm.SourceImage is null)
         {
+            _hasSentPreviewImage = false;
             ClearPreviewSourceCache();
             await ExecuteScriptSafeAsync("window.folderlyClearSourceImage && window.folderlyClearSourceImage(); window.folderlyClearPreview && window.folderlyClearPreview()");
             return;
@@ -459,7 +461,8 @@ public partial class ApplyWindow : Window
         if (exact && NormalizeViewModelAdjustParams())
             await SendTransformStateAsync(transformRevision);
 
-        if (exact)
+        var showLoading = exact && !_hasSentPreviewImage;
+        if (showLoading)
             await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(true)");
 
         byte[] pngBytes;
@@ -469,14 +472,14 @@ public partial class ApplyWindow : Window
         }
         catch
         {
-            if (exact)
+            if (showLoading)
                 await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(false)");
             throw;
         }
 
         if (renderVersion != _previewRenderVersion && _previewRenderPending)
         {
-            if (exact)
+            if (showLoading)
                 await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(false)");
             return;
         }
@@ -485,6 +488,7 @@ public partial class ApplyWindow : Window
         var dataUrl = $"data:image/png;base64,{b64}";
 
         await ExecuteScriptSafeAsync($"window.folderlySetPreview('{dataUrl}', {transformRevision})");
+        _hasSentPreviewImage = true;
     }
 
     private async Task<Image<Rgba32>> GetPreviewSourceImageAsync()

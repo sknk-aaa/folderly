@@ -21,6 +21,7 @@ public sealed class StoreLicenseService
     public bool IsTrial      { get; private set; } = true;
     public bool IsActive     { get; private set; } = true;
     public int  DaysRemaining{ get; private set; } = 7;
+    public bool HasResolvedLicense { get; private set; }
     public bool HasDisplayableTrialDays => IsTrial && DaysRemaining is >= 0 and <= MaximumDisplayableTrialDays;
 
     public event EventHandler? LicenseChanged;
@@ -108,6 +109,7 @@ public sealed class StoreLicenseService
             _license = await _context.GetAppLicenseAsync();
             IsActive  = _license.IsActive;
             IsTrial   = _license.IsTrial;
+            HasResolvedLicense = true;
 
             if (IsTrial && _license.ExpirationDate != DateTimeOffset.MinValue)
             {

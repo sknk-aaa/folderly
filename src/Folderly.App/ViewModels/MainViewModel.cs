@@ -54,7 +54,7 @@ public sealed class MainViewModel : ViewModelBase
     public void RefreshLicense()
     {
         var lic = AppServices.License;
-        ShowTrialBanner = lic.IsTrial && lic.IsActive;
+        ShowTrialBanner = lic.HasResolvedLicense && lic.IsTrial && lic.IsActive;
         TrialText = lic.HasDisplayableTrialDays
             ? string.Format(L["TrialBanner"], lic.DaysRemaining)
             : L["TrialBannerNoDays"];
