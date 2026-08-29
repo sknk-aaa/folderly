@@ -16,6 +16,7 @@ public sealed class StoreLicenseService
     private StoreContext? _context;
     private StoreAppLicense? _license;
     private Task? _initializeTask;
+    private readonly object _initializeGate = new();
 
     public bool IsTrial      { get; private set; } = true;
     public bool IsActive     { get; private set; } = true;
@@ -27,18 +28,48 @@ public sealed class StoreLicenseService
     public async Task InitializeAsync()
     {
         var sw = Stopwatch.StartNew();
-        if (_initializeTask is not null)
+        Task initializeTask;
+        TaskCompletionSource? initializer = null;
+        var started = false;
+
+        lock (_initializeGate)
         {
-            StartupTrace.Log("StoreLicense.Initialize reused task");
-            await _initializeTask;
-            StartupTrace.Log($"StoreLicense.Initialize reused task completed elapsed={StartupTrace.Elapsed(sw)}");
-            return;
+            if (_initializeTask is null)
+            {
+                StartupTrace.Log("StoreLicense.Initialize begin");
+                initializer = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                _initializeTask = initializer.Task;
+                started = true;
+            }
+            else
+            {
+                StartupTrace.Log("StoreLicense.Initialize reused task");
+            }
+
+            initializeTask = _initializeTask;
         }
 
-        StartupTrace.Log("StoreLicense.Initialize begin");
-        _initializeTask = InitializeCoreAsync();
-        await _initializeTask;
-        StartupTrace.Log($"StoreLicense.Initialize completed elapsed={StartupTrace.Elapsed(sw)}");
+        if (initializer is not null)
+        {
+            try
+            {
+                await InitializeCoreAsync();
+                initializer.SetResult();
+            }
+            catch (Exception ex)
+            {
+                initializer.SetException(ex);
+                throw;
+            }
+        }
+        else
+        {
+            await initializeTask;
+        }
+
+        StartupTrace.Log(started
+            ? $"StoreLicense.Initialize completed elapsed={StartupTrace.Elapsed(sw)}"
+            : $"StoreLicense.Initialize reused task completed elapsed={StartupTrace.Elapsed(sw)}");
     }
 
     private async Task InitializeCoreAsync()

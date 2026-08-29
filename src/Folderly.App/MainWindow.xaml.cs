@@ -50,13 +50,30 @@ public partial class MainWindow : Window
         Help
     }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _vm.Refresh();
-        await AppServices.License.InitializeAsync();
         _vm.RefreshLicense();
         _settingsVm.Notify(nameof(_settingsVm.LicenseText));
+        QueueLicenseRefresh();
         ShowFirstRunOnboardingIfNeeded();
+    }
+
+    private void QueueLicenseRefresh()
+    {
+        _ = Dispatcher.BeginInvoke(new Action(async () =>
+        {
+            try
+            {
+                await Task.Delay(1500);
+                await AppServices.License.InitializeAsync();
+                _vm.RefreshLicense();
+                _settingsVm.Notify(nameof(_settingsVm.LicenseText));
+            }
+            catch
+            {
+            }
+        }), DispatcherPriority.ApplicationIdle);
     }
 
     private void HistoryTab_Click(object sender, RoutedEventArgs e)
