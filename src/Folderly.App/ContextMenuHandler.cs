@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using Folderly.App.Infrastructure;
 using Folderly.App.Services;
@@ -196,6 +197,7 @@ internal sealed class FolderlyClassFactory : IClassFactory
 
 internal static class ComServer
 {
+    private const string AppMutexName = "Folderly_SingleInstance_v1";
     private const string PipeName = "FolderlyIPC_v1";
 
     private static uint _cookie;
@@ -228,7 +230,8 @@ internal static class ComServer
         var sw = Stopwatch.StartNew();
         StartupTrace.Log($"ComServer.HandleFolder begin path={folderPath}");
         _timeoutTimer?.Stop();
-        if (!TrySendViaPipe(folderPath))
+        var sentToExistingApp = HasRunningAppInstance() && TrySendViaPipe(folderPath);
+        if (!sentToExistingApp)
         {
             StartupTrace.Log($"ComServer.HandleFolder pipe unavailable; starting app elapsed={StartupTrace.Elapsed(sw)}");
             Process.Start(new ProcessStartInfo(GetFolderlyExePath(), $"\"{folderPath}\"")
@@ -293,6 +296,26 @@ internal static class ComServer
         {
             StartupTrace.Log($"ComServer.TrySendViaPipe failed elapsed={StartupTrace.Elapsed(sw)}");
             return false;
+        }
+    }
+
+    private static bool HasRunningAppInstance()
+    {
+        try
+        {
+            using var _ = Mutex.OpenExisting(AppMutexName);
+            StartupTrace.Log("ComServer.HasRunningAppInstance result=True");
+            return true;
+        }
+        catch (WaitHandleCannotBeOpenedException)
+        {
+            StartupTrace.Log("ComServer.HasRunningAppInstance result=False");
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            StartupTrace.Log("ComServer.HasRunningAppInstance result=True inaccessible=True");
+            return true;
         }
     }
 

@@ -1,3 +1,5 @@
+using Folderly.App.Infrastructure;
+using System.Diagnostics;
 using Windows.Services.Store;
 
 namespace Folderly.App.Services;
@@ -24,23 +26,31 @@ public sealed class StoreLicenseService
 
     public async Task InitializeAsync()
     {
+        var sw = Stopwatch.StartNew();
         if (_initializeTask is not null)
         {
+            StartupTrace.Log("StoreLicense.Initialize reused task");
             await _initializeTask;
+            StartupTrace.Log($"StoreLicense.Initialize reused task completed elapsed={StartupTrace.Elapsed(sw)}");
             return;
         }
 
+        StartupTrace.Log("StoreLicense.Initialize begin");
         _initializeTask = InitializeCoreAsync();
         await _initializeTask;
+        StartupTrace.Log($"StoreLicense.Initialize completed elapsed={StartupTrace.Elapsed(sw)}");
     }
 
     private async Task InitializeCoreAsync()
     {
+        var sw = Stopwatch.StartNew();
         try
         {
             _context = StoreContext.GetDefault();
+            StartupTrace.Log($"StoreLicense.InitializeCore context ready elapsed={StartupTrace.Elapsed(sw)}");
             _context.OfflineLicensesChanged += OnLicenseChanged;
             await RefreshAsync();
+            StartupTrace.Log($"StoreLicense.InitializeCore completed elapsed={StartupTrace.Elapsed(sw)}");
         }
         catch
         {
@@ -60,6 +70,8 @@ public sealed class StoreLicenseService
     private async Task RefreshAsync()
     {
         if (_context == null) return;
+        var sw = Stopwatch.StartNew();
+        StartupTrace.Log("StoreLicense.Refresh begin");
         try
         {
             _license = await _context.GetAppLicenseAsync();
@@ -75,9 +87,11 @@ public sealed class StoreLicenseService
             {
                 DaysRemaining = 0;
             }
+            StartupTrace.Log($"StoreLicense.Refresh completed isActive={IsActive} isTrial={IsTrial} elapsed={StartupTrace.Elapsed(sw)}");
         }
-        catch
+        catch (Exception ex)
         {
+            StartupTrace.Log($"StoreLicense.Refresh failed elapsed={StartupTrace.Elapsed(sw)} error={ex.Message}");
             // Store API エラー → 現在の状態を維持
         }
     }

@@ -20,6 +20,7 @@ public partial class App : Application
     private MainWindow?  _mainWindow;
     private DispatcherTimer? _idleShutdownTimer;
     private int _applyWindowCount;
+    private bool _licenseInitializationQueued;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -54,7 +55,6 @@ public partial class App : Application
 
         AppServices.Initialize();
         StartupTrace.Log($"App.OnStartup services initialized elapsed={StartupTrace.Elapsed(sw)}");
-        _ = AppServices.License.InitializeAsync();
         AppServices.Logger<App>().LogInformation("Folderly started. Args: [{Args}]", string.Join(", ", e.Args));
 
         if (e.Args.Length > 0)
@@ -62,6 +62,7 @@ public partial class App : Application
             // 右クリックから起動: ApplyWindow を直接開く
             StartupTrace.Log($"App.OnStartup opening apply window elapsed={StartupTrace.Elapsed(sw)}");
             OpenApplyWindow(e.Args[0]);
+            QueueLicenseInitialization();
         }
         else
         {
@@ -74,6 +75,31 @@ public partial class App : Application
         // 2番目のインスタンスからのパイプ受信を開始
         StartPipeServer();
         StartupTrace.Log($"App.OnStartup completed elapsed={StartupTrace.Elapsed(sw)}");
+    }
+
+    private void QueueLicenseInitialization()
+    {
+        if (_licenseInitializationQueued)
+            return;
+
+        _licenseInitializationQueued = true;
+        StartupTrace.Log("License initialization queued");
+
+        _ = Dispatcher.BeginInvoke(new Action(async () =>
+        {
+            var sw = Stopwatch.StartNew();
+            StartupTrace.Log("License initialization begin");
+            try
+            {
+                await Task.Delay(1500);
+                await AppServices.License.InitializeAsync();
+                StartupTrace.Log($"License initialization completed elapsed={StartupTrace.Elapsed(sw)}");
+            }
+            catch (Exception ex)
+            {
+                StartupTrace.Log($"License initialization failed elapsed={StartupTrace.Elapsed(sw)} error={ex.Message}");
+            }
+        }), DispatcherPriority.ApplicationIdle);
     }
 
     protected override void OnExit(ExitEventArgs e)
