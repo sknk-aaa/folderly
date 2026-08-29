@@ -174,7 +174,7 @@
     height:64.8%;
     overflow:hidden;
     border-radius:3.1%;
-    background:#FFC72C;
+    background:transparent;
     z-index:1;
   }
   .live-source-image{
@@ -1143,7 +1143,7 @@
   }
 
   var livePreviewRaf = 0;
-  var useHtmlLivePreview = false;
+  var useHtmlLivePreview = true;
 
   function canShowLivePreview() {
     var img = document.getElementById('folderly-preview');
@@ -1556,11 +1556,8 @@
   }
 
   function scheduleTransformPreviewPost() {
-    if (transformPreviewTimer) return;
-    transformPreviewTimer = setTimeout(function() {
-      transformPreviewTimer = null;
-      postMsg(createTransformMessage('transformPreview'));
-    }, 50);
+    showLivePreview();
+    scheduleLivePreviewRender();
   }
 
   function scheduleTransformPost(delayMs) {
