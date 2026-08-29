@@ -117,6 +117,7 @@
   .preview-card:not(.has-image){cursor:pointer}
   .preview-card.has-image{cursor:grab}
   .preview-card.has-image.dragging{cursor:grabbing}
+  .preview-card.loading{cursor:progress}
   .preview-card.loading::after{
     content:"";
     position:absolute;
@@ -129,8 +130,6 @@
     z-index:5;
     pointer-events:none;
   }
-  .preview-card.loading #folderly-preview,
-  .preview-card.loading .pp-frame{opacity:0.58}
   @keyframes folderly-spin{to{transform:rotate(360deg)}}
   @media (prefers-reduced-motion: reduce){
     .preview-card.loading::after{animation:none}
@@ -1855,6 +1854,7 @@
 
     if (previewCard && previewImg) {
       previewCard.addEventListener('click', function() {
+        if (previewCard.classList.contains('loading')) return;
         if (appState.hasImage) return;
         postMsg({type:'selectImage'});
       });

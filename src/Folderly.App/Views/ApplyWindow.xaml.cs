@@ -462,8 +462,24 @@ public partial class ApplyWindow : Window
         if (exact)
             await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(true)");
 
-        var pngBytes = await RenderPreviewPngAsync(exact);
-        if (renderVersion != _previewRenderVersion && _previewRenderPending) return;
+        byte[] pngBytes;
+        try
+        {
+            pngBytes = await RenderPreviewPngAsync(exact);
+        }
+        catch
+        {
+            if (exact)
+                await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(false)");
+            throw;
+        }
+
+        if (renderVersion != _previewRenderVersion && _previewRenderPending)
+        {
+            if (exact)
+                await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(false)");
+            return;
+        }
 
         var b64     = Convert.ToBase64String(pngBytes);
         var dataUrl = $"data:image/png;base64,{b64}";
