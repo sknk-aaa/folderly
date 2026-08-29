@@ -174,7 +174,7 @@
     height:64.8%;
     overflow:hidden;
     border-radius:3.1%;
-    background:transparent;
+    background:#FFC72C;
     z-index:1;
   }
   .live-source-image{
@@ -1060,7 +1060,6 @@
     liveSourceUrl: null,
     liveSourceWidth: 0,
     liveSourceHeight: 0,
-    previewBitmapSize: 0,
     livePreviewActive: false,
     waitingForExactPreview: false,
     livePreviewSize: 0,
@@ -1143,12 +1142,10 @@
   }
 
   var livePreviewRaf = 0;
-  var useHtmlLivePreview = true;
 
   function canShowLivePreview() {
     var img = document.getElementById('folderly-preview');
-    return useHtmlLivePreview &&
-      appState.hasImage &&
+    return appState.hasImage &&
       !!appState.liveSourceUrl &&
       appState.liveSourceWidth > 0 &&
       appState.liveSourceHeight > 0 &&
@@ -1209,65 +1206,28 @@
       appState.livePreviewSize = size;
     }
 
-    var bitmapSize = Math.max(1, appState.previewBitmapSize || 640);
-    var regionX = Math.round(bitmapSize * 0.039);
-    var regionY = Math.round(bitmapSize * 0.32);
-    var regionWidthPx = Math.max(1, Math.round(bitmapSize * 0.922));
-    var regionHeightPx = Math.max(1, Math.round(bitmapSize * 0.648));
-    var regionWidth = regionWidthPx / bitmapSize * size;
-    var regionHeight = regionHeightPx / bitmapSize * size;
-
-    region.style.left = (regionX / bitmapSize * size).toFixed(2) + 'px';
-    region.style.top = (regionY / bitmapSize * size).toFixed(2) + 'px';
-    region.style.width = regionWidth.toFixed(2) + 'px';
-    region.style.height = regionHeight.toFixed(2) + 'px';
-    region.style.borderRadius = (size * 0.031).toFixed(2) + 'px';
-
-    var scaleBasePx;
+    var regionWidth = size * 0.922;
+    var regionHeight = size * 0.648;
+    var scaleBase;
     if (appState.cropMode === 'FitWidth') {
-      scaleBasePx = regionWidthPx / appState.liveSourceWidth;
+      scaleBase = regionWidth / appState.liveSourceWidth;
     } else if (appState.cropMode === 'FitHeight') {
-      scaleBasePx = regionHeightPx / appState.liveSourceHeight;
+      scaleBase = regionHeight / appState.liveSourceHeight;
     } else {
-      scaleBasePx = Math.max(
-        regionWidthPx / appState.liveSourceWidth,
-        regionHeightPx / appState.liveSourceHeight
+      scaleBase = Math.max(
+        regionWidth / appState.liveSourceWidth,
+        regionHeight / appState.liveSourceHeight
       );
     }
 
-    var effectiveScalePx = Math.max(scaleBasePx * appState.scale, 0.001);
-    var imageWidthPx = Math.max(1, Math.round(appState.liveSourceWidth * effectiveScalePx));
-    var imageHeightPx = Math.max(1, Math.round(appState.liveSourceHeight * effectiveScalePx));
-    var offsetXPx = appState.offsetX * bitmapSize / 256;
-    var offsetYPx = appState.offsetY * bitmapSize / 256;
-    var pasteX;
-    var pasteY;
+    var effectiveScale = scaleBase * appState.scale;
+    var imageWidth = appState.liveSourceWidth * effectiveScale;
+    var imageHeight = appState.liveSourceHeight * effectiveScale;
+    var unitScale = size / 256;
+    var left = (regionWidth - imageWidth) / 2 + appState.offsetX * unitScale;
+    var top = (regionHeight - imageHeight) / 2 + appState.offsetY * unitScale;
 
-    if (appState.cropMode === 'Center') {
-      pasteX = roundToEven((regionWidthPx - imageWidthPx) / 2 + offsetXPx);
-      pasteY = roundToEven((regionHeightPx - imageHeightPx) / 2 + offsetYPx);
-    } else {
-      pasteX = Math.trunc((regionWidthPx - imageWidthPx) / 2) + Math.trunc(offsetXPx);
-      pasteY = Math.trunc((regionHeightPx - imageHeightPx) / 2) + Math.trunc(offsetYPx);
-    }
-
-    var bleed = size / bitmapSize;
-    var renderScaleX = (regionWidthPx + 2) / regionWidthPx;
-    var renderScaleY = (regionHeightPx + 2) / regionHeightPx;
-    var left = pasteX * renderScaleX * size / bitmapSize - bleed;
-    var top = pasteY * renderScaleY * size / bitmapSize - bleed;
-    var scaleX = imageWidthPx * renderScaleX * size / bitmapSize / appState.liveSourceWidth;
-    var scaleY = imageHeightPx * renderScaleY * size / bitmapSize / appState.liveSourceHeight;
-
-    source.style.transform = 'translate3d(' + left.toFixed(2) + 'px,' + top.toFixed(2) + 'px,0) scale(' + scaleX.toFixed(5) + ',' + scaleY.toFixed(5) + ')';
-  }
-
-  function roundToEven(value) {
-    var floor = Math.floor(value);
-    var diff = value - floor;
-    if (diff < 0.5) return floor;
-    if (diff > 0.5) return floor + 1;
-    return floor % 2 === 0 ? floor : floor + 1;
+    source.style.transform = 'translate3d(' + left.toFixed(2) + 'px,' + top.toFixed(2) + 'px,0) scale(' + effectiveScale.toFixed(5) + ')';
   }
 
   window.folderlySetSourceImage = function(dataUrl, width, height) {
@@ -1288,7 +1248,6 @@
     appState.liveSourceUrl = null;
     appState.liveSourceWidth = 0;
     appState.liveSourceHeight = 0;
-    appState.previewBitmapSize = 0;
     appState.waitingForExactPreview = false;
     appState.livePreviewSize = 0;
     hideLivePreview();
@@ -1297,37 +1256,21 @@
   };
 
   // Called from C# via ExecuteScriptAsync
-  var previewSwapToken = 0;
-
   window.folderlySetPreview = function(dataUrl, revision) {
     if (typeof revision === 'number' && revision < transformRevision) return;
 
     var img = document.getElementById('folderly-preview');
     var ph  = document.getElementById('preview-placeholder');
     var card = document.getElementById('preview-card');
-    if (!img) return;
-
-    var token = ++previewSwapToken;
-    var finishSwap = function() {
-      if (token !== previewSwapToken) return;
-      if (card) card.classList.remove('loading');
-      appState.previewBitmapSize = Math.max(img.naturalWidth || 0, img.naturalHeight || 0);
-      appState.waitingForExactPreview = false;
-      hideLivePreview();
-      img.style.display = 'block';
-      if (ph) ph.style.display = 'none';
-      if (card) card.classList.add('has-image');
-      appState.hasImage = true;
-      updateApplyButton();
-    };
-
-    img.onload = finishSwap;
-    img.onerror = function() {
-      if (token !== previewSwapToken) return;
-      if (card) card.classList.remove('loading');
-    };
+    if (card) card.classList.remove('loading');
     img.src = dataUrl;
-    if (img.complete && img.naturalWidth > 0) finishSwap();
+    appState.waitingForExactPreview = false;
+    hideLivePreview();
+    img.style.display = 'block';
+    if (ph) ph.style.display = 'none';
+    if (card) card.classList.add('has-image');
+    appState.hasImage = true;
+    updateApplyButton();
   };
 
   window.folderlyClearPreview = function() {
@@ -1552,6 +1495,7 @@
       clearTimeout(transformExactTimer);
       transformExactTimer = null;
     }
+    if (showLivePreview()) appState.waitingForExactPreview = true;
     postMsg(createTransformMessage('transform'));
   }
 

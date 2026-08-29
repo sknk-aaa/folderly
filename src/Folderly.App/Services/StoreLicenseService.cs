@@ -16,12 +16,10 @@ public sealed class StoreLicenseService
     private StoreContext? _context;
     private StoreAppLicense? _license;
     private Task? _initializeTask;
-    private readonly object _initializeGate = new();
 
     public bool IsTrial      { get; private set; } = true;
     public bool IsActive     { get; private set; } = true;
     public int  DaysRemaining{ get; private set; } = 7;
-    public bool HasResolvedLicense { get; private set; }
     public bool HasDisplayableTrialDays => IsTrial && DaysRemaining is >= 0 and <= MaximumDisplayableTrialDays;
 
     public event EventHandler? LicenseChanged;
@@ -29,48 +27,18 @@ public sealed class StoreLicenseService
     public async Task InitializeAsync()
     {
         var sw = Stopwatch.StartNew();
-        Task initializeTask;
-        TaskCompletionSource? initializer = null;
-        var started = false;
-
-        lock (_initializeGate)
+        if (_initializeTask is not null)
         {
-            if (_initializeTask is null)
-            {
-                StartupTrace.Log("StoreLicense.Initialize begin");
-                initializer = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-                _initializeTask = initializer.Task;
-                started = true;
-            }
-            else
-            {
-                StartupTrace.Log("StoreLicense.Initialize reused task");
-            }
-
-            initializeTask = _initializeTask;
+            StartupTrace.Log("StoreLicense.Initialize reused task");
+            await _initializeTask;
+            StartupTrace.Log($"StoreLicense.Initialize reused task completed elapsed={StartupTrace.Elapsed(sw)}");
+            return;
         }
 
-        if (initializer is not null)
-        {
-            try
-            {
-                await InitializeCoreAsync();
-                initializer.SetResult();
-            }
-            catch (Exception ex)
-            {
-                initializer.SetException(ex);
-                throw;
-            }
-        }
-        else
-        {
-            await initializeTask;
-        }
-
-        StartupTrace.Log(started
-            ? $"StoreLicense.Initialize completed elapsed={StartupTrace.Elapsed(sw)}"
-            : $"StoreLicense.Initialize reused task completed elapsed={StartupTrace.Elapsed(sw)}");
+        StartupTrace.Log("StoreLicense.Initialize begin");
+        _initializeTask = InitializeCoreAsync();
+        await _initializeTask;
+        StartupTrace.Log($"StoreLicense.Initialize completed elapsed={StartupTrace.Elapsed(sw)}");
     }
 
     private async Task InitializeCoreAsync()
@@ -109,7 +77,6 @@ public sealed class StoreLicenseService
             _license = await _context.GetAppLicenseAsync();
             IsActive  = _license.IsActive;
             IsTrial   = _license.IsTrial;
-            HasResolvedLicense = true;
 
             if (IsTrial && _license.ExpirationDate != DateTimeOffset.MinValue)
             {
