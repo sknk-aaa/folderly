@@ -15,7 +15,7 @@
   <Identity
     Name="KanekoApps.Folderly"
     Publisher="CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E"
-    Version="2.2.10.0"
+    Version="2.3.0.0"
     ProcessorArchitecture="x64" />
 
   <Properties>

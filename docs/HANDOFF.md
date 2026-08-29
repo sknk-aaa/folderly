@@ -1,5 +1,57 @@
 # Folderly Handoff
 
+## 2026-08-29 Update - 2.3 Store Candidate
+
+- Current release candidate version: `2.3.0.0` (app display `2.3`).
+- Store upload package:
+  - `_out\Folderly_2.3.0.0_x64_store.msix`
+  - SHA-256: `4DD1B62E774234D55C667FFE82C7840A3E059E3B16985AF99035667D24B23B34`
+  - Size: `94,014,728` bytes
+  - Built at: `2026-08-29 19:11:05`
+  - Signature: `NotSigned` (intended for Partner Center upload)
+- Local install package:
+  - `_out\Folderly_2.3.0.0_x64_sideload.msix`
+  - SHA-256: `0724122439B80FBD04DF201BD38259AEB0706497DD72FB76BBB7294303EF1613`
+  - Size: `94,033,648` bytes
+  - Signature: `Valid`
+- Installed locally on this PC:
+  - `KanekoApps.Folderly 2.3.0.0`
+  - `KanekoApps.Folderly_2.3.0.0_x64__q8156m1pgwn5a`
+
+### Done Since 2.2
+
+- Right-click first launch was shortened while keeping the existing 5-minute background keep-alive behavior.
+- `StartupTrace` remains available for Debug builds, but product Release builds no longer write startup timing logs.
+- The apply preview now blocks clicks while the first preview image is still loading, so an empty preview card cannot accidentally open Explorer.
+- The loading indicator is limited to the initial preview image load. It is not shown again during normal preview dragging after an image is visible.
+- Preview changes that made the app heavy were reverted. The current preview behavior is back on the stable lightweight live-preview path, with only the initial loading/click guard retained.
+
+### Validation Done
+
+- `dotnet test .\tests\Folderly.Tests\Folderly.Tests.csproj --filter "FullyQualifiedName!~CheckPath_NoWriteAccess_IsDenied"`
+  - Result: `149 passed`
+- Release MSBuild for `Folderly.Package.wapproj`
+  - Result: passed
+  - Warning: known `NU1702` only
+- Store MSIX was packed with `makeappx`.
+- Store MSIX was unpacked and checked:
+  - Identity: `KanekoApps.Folderly`
+  - Publisher: `CN=F27FAE8B-A689-44D3-AB88-09E593D2DA9E`
+  - Version: `2.3.0.0`
+  - Required root files present: `WebView2Loader.dll`, `coreclr.dll`, `hostfxr.dll`, `PresentationNative_cor3.dll`, `Folderly.exe`
+- Local sideload MSIX was signed, verified, installed locally, and version-confirmed.
+
+### Manual Check Notes
+
+- User confirmed earlier that the loading behavior no longer appears after releasing the preview drag.
+- User observed that the small movement of the yellow folder/image after releasing drag still appears. It is likely part of the pre-existing lightweight preview-to-exact-preview swap, not caused by the retained initial loading/click guard changes.
+- Do not reintroduce the exact-render-on-preview-operation approach from the reverted preview attempts; it removed the visible movement but made the app too heavy for release.
+- Before Store submission, do a quick smoke check from Explorer right-click:
+  - first launch opens correctly
+  - second launch within 5 minutes is fast
+  - empty/loading preview card does not open Explorer
+  - apply/revert still work on an ordinary local folder
+
 ## 2026-08-27 Update - 2.2 Store Submitted
 
 - User submitted version `2.2.0.0` to Microsoft Store.

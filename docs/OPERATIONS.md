@@ -1,5 +1,43 @@
 ﻿# Folderly Operations
 
+## 2026-08-29 Store Submission Notes
+
+### Current Store Candidate
+
+- Store candidate version: `2.3.0.0`
+- Store upload package: `_out\Folderly_2.3.0.0_x64_store.msix`
+- SHA-256: `4DD1B62E774234D55C667FFE82C7840A3E059E3B16985AF99035667D24B23B34`
+- Size: `94,014,728` bytes
+- Built at: `2026-08-29 19:11:05`
+- Local verification package: `_out\Folderly_2.3.0.0_x64_sideload.msix`
+- Installed locally: `KanekoApps.Folderly 2.3.0.0`
+- Main changes:
+  - Right-click first launch opens faster.
+  - Debug-only startup timing remains available without writing timing logs in Release builds.
+  - Initial preview loading is clearer before the first preview image appears.
+  - Empty/loading preview clicks are blocked so Explorer does not open unexpectedly.
+  - Heavy preview rendering experiments were reverted; lightweight preview behavior is retained.
+
+### 2.3 Store Release Notes
+
+Use the following short bullet-style notes in Partner Center if a listing asks for this version's latest information.
+
+**English**
+
+```text
+- Improved first launch speed from the File Explorer right-click menu.
+- Improved the initial preview loading state.
+- Prevented empty preview clicks before the preview image is ready.
+```
+
+**Japanese**
+
+```text
+- エクスプローラーの右クリックメニューから開く初回起動を改善しました。
+- 初回プレビュー表示前の読み込み状態をわかりやすくしました。
+- プレビュー画像が準備できる前に空のプレビューをクリックしても、誤って開かないようにしました。
+```
+
 ## 2026-08-27 Store Submission Notes
 
 ### Current Store Submission
@@ -153,7 +191,7 @@ After the Store update is live, check:
 | Package family name | `KanekoApps.Folderly_q8156m1pgwn5a` |
 | Store ID | `9N99JH5H91H8` |
 | Store URL | `https://apps.microsoft.com/detail/9N99JH5H91H8` |
-| Current version | `2.2.0.0`（アプリ表示 `2.2`） |
+| Current version | `2.3.0.0`（アプリ表示 `2.3`） |
 | Min OS | Windows 10 1809 (`10.0.17763.0`) |
 
 バージョンルール：Microsoft Store は4桁目が非ゼロの MSIX を拒否する。`2.2.0.0` は OK、`1.0.0.17` は NG。バージョンは Package.appxmanifest の `Version` と `Folderly.App.csproj` の `<Version>` の両方を更新する。次リリースも 4 桁目 0。
