@@ -53,6 +53,29 @@
   - empty/loading preview card does not open Explorer
   - apply/revert still work on an ordinary local folder
 
+### Current English Store Listing
+
+- Source of truth: the current Partner Center English (United States) screen and [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
+- Do not treat the local `listingData-*.csv` export as authoritative if it conflicts with the Partner Center screen; it may be stale.
+- Product name: `Folderly - Folder Icon Changer`
+- Short title: `Folderly`
+- Short description: `Make desktop and File Explorer folders instantly recognizable with your own images.`
+- Description opening: `Turn plain Windows folders into visual shortcuts for your desktop and File Explorer.`
+- Keywords:
+  - `folder icons`
+  - `change folder icon`
+  - `folder cover`
+  - `customize folder`
+  - `photo folder icon`
+  - `custom folder icons`
+  - `desktop folder icons`
+- What's new:
+  - `Improved preview performance when moving or scaling images.`
+  - `Reduced preview jumps and made the preview closer to the final folder icon.`
+  - `Refined tag icons and added more icon choices.`
+  - `Made startup initialization lighter.`
+- ASO priority from 2026-08-29 discussion: English ranking is the main priority, followed by non-Japanese localizations. Current English keywords intentionally emphasize desktop/File Explorer folders, user images, photo folder icons, and custom folder icons.
+
 ## 2026-08-27 Update - 2.2 Store Submitted
 
 - User submitted version `2.2.0.0` to Microsoft Store.
