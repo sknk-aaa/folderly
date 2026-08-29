@@ -105,9 +105,12 @@ Known caveat:
 
 This area has regressed before. Test it carefully.
 
+- [ ] Initial preview loading appears only before the first preview image is visible.
+- [ ] Clicking the preview card while the first preview is loading does not open Explorer or the file picker unexpectedly.
 - [ ] Dragging the image in the preview moves the image smoothly.
 - [ ] Dragging the image does not move the X/Y slider thumbs live.
 - [ ] Releasing the mouse commits the exact render.
+- [ ] Releasing the mouse does not show a loading indicator after a preview image is already visible.
 - [ ] Repeated drag operations do not make the editor progressively slower.
 - [ ] Moving X/Y sliders updates the preview.
 - [ ] Moving X/Y sliders commits the final icon position.

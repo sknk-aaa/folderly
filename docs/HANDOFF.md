@@ -46,6 +46,7 @@
 - User confirmed earlier that the loading behavior no longer appears after releasing the preview drag.
 - User observed that the small movement of the yellow folder/image after releasing drag still appears. It is likely part of the pre-existing lightweight preview-to-exact-preview swap, not caused by the retained initial loading/click guard changes.
 - Do not reintroduce the exact-render-on-preview-operation approach from the reverted preview attempts; it removed the visible movement but made the app too heavy for release.
+- Preview lessons from the 2026-08-29 work are summarized in [PREVIEW_NOTES.md](PREVIEW_NOTES.md).
 - Before Store submission, do a quick smoke check from Explorer right-click:
   - first launch opens correctly
   - second launch within 5 minutes is fast

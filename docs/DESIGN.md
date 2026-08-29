@@ -86,6 +86,8 @@ Windows のフォルダアイコンを以下の組み合わせでカスタマイ
 
 ## Preview Performance
 
+Detailed implementation lessons and tradeoffs are recorded in [PREVIEW_NOTES.md](PREVIEW_NOTES.md).
+
 プレビューは2つの更新パスを持つ：
 
 - `transformPreview`: ドラッグ/スライダー操作中の高速スロットル更新（50ms）
