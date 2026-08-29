@@ -53,28 +53,46 @@
   - empty/loading preview card does not open Explorer
   - apply/revert still work on an ordinary local folder
 
-### Current English Store Listing
+### Current English Store Listing / ASO Test 1
 
 - Source of truth: the current Partner Center English (United States) screen and [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
 - Do not treat the local `listingData-*.csv` export as authoritative if it conflicts with the Partner Center screen; it may be stale.
 - Product name: `Folderly - Folder Icon Changer`
 - Short title: `Folderly`
-- Short description: `Make desktop and File Explorer folders instantly recognizable with your own images.`
-- Description opening: `Turn plain Windows folders into visual shortcuts for your desktop and File Explorer.`
+- Short description: `Change Windows folder icons with your own photos and images, then spot them instantly on the desktop and in File Explorer.`
+- Description opening: `Change plain Windows folder icons into visual shortcuts for your desktop and File Explorer.`
 - Keywords:
   - `folder icons`
   - `change folder icon`
-  - `folder cover`
-  - `customize folder`
-  - `photo folder icon`
+  - `folder icon maker`
+  - `windows folder icon`
   - `custom folder icons`
   - `desktop folder icons`
+  - `photo folder icon`
 - What's new:
   - `Improved preview performance when moving or scaling images.`
   - `Reduced preview jumps and made the preview closer to the final folder icon.`
   - `Refined tag icons and added more icon choices.`
   - `Made startup initialization lighter.`
-- ASO priority from 2026-08-29 discussion: English ranking is the main priority, followed by non-Japanese localizations. Current English keywords intentionally emphasize desktop/File Explorer folders, user images, photo folder icons, and custom folder icons.
+- ASO priority from 2026-08-29 discussion: English ranking is the main priority, followed by non-Japanese localizations.
+- ASO Test 1 changed only English listing text/search terms; do not mix screenshot, price, category, or product-title changes into the same measurement window unless explicitly deciding to abandon clean attribution.
+- Baseline Store search positions before this change, measured 2026-08-29 with the unofficial Store search JSON endpoint (`market=US`, `locale=en-US`, `deviceFamily=windows.desktop`):
+  - `folder icon changer`: 15
+  - `folder icons`: 14
+  - `change folder icon`: 11
+  - `custom folder icons`: 20
+  - `custom folder icon`: 15
+  - `desktop folder icons`: 12
+  - `photo folder icon`: 12
+  - `folder cover`: 11
+  - `customize folder`: 12
+  - `folder icon maker`: not returned
+  - `windows folder icon`: not returned
+  - `windows folder icons`: not returned
+  - `folder color`: not returned
+  - `change folder color`: 10
+  - `folder color changer`: not returned
+- Recheck the same queries after the submission is live, then again after 24 hours, 72 hours, and 7 days if possible. Store rankings can vary by market, account state, and time, so compare against the same endpoint/market/locale when possible.
 
 ## 2026-08-27 Update - 2.2 Store Submitted
 
