@@ -66,7 +66,7 @@
   - `change folder icon`
   - `folder icon maker`
   - `windows folder icon`
-  - `custom folder icons`
+  - `custom folder icon`
   - `desktop folder icons`
   - `photo folder icon`
 - What's new:
@@ -93,6 +93,18 @@
   - `change folder color`: 10
   - `folder color changer`: not returned
 - Recheck the same queries after the submission is live, then again after 24 hours, 72 hours, and 7 days if possible. Store rankings can vary by market, account state, and time, so compare against the same endpoint/market/locale when possible.
+- Important reasoning rule for future ASO work: separate Microsoft-documented facts, Store search observations, and hypotheses. Do not present keyword or price guesses as certain ranking causes.
+
+### End-of-Day ASO / Pricing Notes
+
+- User changed the English Partner Center listing to the ASO Test 1 values above.
+- Current priority:
+  - 1: English ranking and English acquisition.
+  - 2: non-Japanese localized listings, with pt-BR currently looking weakest from Store search checks, then zh-CN, then es-MX/es-ES.
+  - JP is lower priority for now because the exact query `フォルダ アイコン 変更` ranked 1st in the same style of Store search check.
+- Pricing question discussed: only compare `$2.49 -> $1.49` vs `$3.49 -> $1.49`; do not introduce `$2.99` unless the user explicitly asks.
+- Recommendation recorded: prefer `$2.49 -> $1.49` for the current stage because the goal is English acquisition/review/ranking growth and a lower post-sale regular price should reduce purchase friction. `$3.49 -> $1.49` has a stronger discount display but is less attractive after the sale and should wait until Folderly has stronger English proof, reviews, and ranking.
+- Measurement caveat: changing price during the ASO Test 1 measurement window can confound attribution. If price is changed anyway, record the exact live date/time and compare Partner Center page views, acquisition, conversion, and ratings alongside Store search positions.
 
 ## 2026-08-27 Update - 2.2 Store Submitted
 
