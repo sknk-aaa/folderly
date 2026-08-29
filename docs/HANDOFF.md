@@ -41,11 +41,12 @@
 ### Store/Marketing Notes
 
 - The user submitted 2.2 with updated Store screenshots. Store screenshot localization can continue gradually after this submission.
-- Newly noticed strength: customized Folderly folder icons also appear on the Windows desktop. This may be useful in the next Store copy/screenshot update because it shows a clearer everyday benefit than Explorer-only organization.
-- Candidate future copy:
-  - Japanese: `デスクトップのフォルダも、ひと目でわかる見た目に。`
-  - English: `Make desktop folders easy to recognize at a glance.`
-- Do not change Store copy/images for the desktop angle yet; the user wants to revisit it in a later update.
+- Newly noticed strength: customized Folderly folder icons also appear on the Windows desktop. This may be useful in Store copy/screenshot updates because it shows a clearer everyday benefit than Explorer-only organization.
+- The user updated the English Store listing only to include the desktop angle:
+  - Short description: `Make desktop and File Explorer folders instantly recognizable with your own images.`
+  - Long description opening: `Turn plain Windows folders into visual shortcuts for your desktop and File Explorer.`
+  - Keyword change: `folder icon changer` -> `desktop folder icons`
+- Japanese and other localized Store listings have not yet been updated for the desktop angle.
 
 ### Remaining Store Work
 

@@ -323,7 +323,7 @@ Age rating：ローカルデスクトップユーティリティ。ユーザー�
 
 ### Market-Specific Pricing
 
-> Latest Partner Center draft: 2026-08-26.
+> Latest Partner Center draft: 2026-08-29.
 
 Default price remains USD-based for broad markets. Localized Store markets use local currency pricing to improve perceived local fit and conversion.
 
@@ -378,11 +378,11 @@ Folderly は、Windows 10 / 11 のフォルダアイコンを好きな画像・�
 
 **App Name**: Folderly - Folder Icon Changer
 
-**Short Description**: Make Windows folders instantly recognizable with your own photos and images.
+**Short Description**: Make desktop and File Explorer folders instantly recognizable with your own images.
 
 **Long Description**:
 
-Customize Windows folders with your own photos and images — no .ico conversion required.
+Turn plain Windows folders into visual shortcuts for your desktop and File Explorer.
 
 Find the folder you need at a glance instead of searching through rows of identical yellow folders. Add your own images and color tags to make folders instantly recognizable.
 
@@ -398,7 +398,7 @@ Works locally on your PC — no subscription, no ads.
 
 ※Folderly may briefly reopen the target File Explorer window after applying an icon. This refreshes File Explorer so the new folder icon appears right away.
 
-**Keywords**（Partner Center draft）: `folder icons` / `change folder icon` / `folder icon changer` / `folder cover` / `customize folder` / `photo folder icon` / `custom folder icons`
+**Keywords**（Partner Center draft）: `folder icons` / `change folder icon` / `desktop folder icons` / `folder cover` / `customize folder` / `photo folder icon` / `custom folder icons`
 
 **Product features**:
 - Use your own photos & images
