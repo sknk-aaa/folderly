@@ -1143,10 +1143,12 @@
   }
 
   var livePreviewRaf = 0;
+  var useHtmlLivePreview = false;
 
   function canShowLivePreview() {
     var img = document.getElementById('folderly-preview');
-    return appState.hasImage &&
+    return useHtmlLivePreview &&
+      appState.hasImage &&
       !!appState.liveSourceUrl &&
       appState.liveSourceWidth > 0 &&
       appState.liveSourceHeight > 0 &&
@@ -1550,13 +1552,15 @@
       clearTimeout(transformExactTimer);
       transformExactTimer = null;
     }
-    if (showLivePreview()) appState.waitingForExactPreview = true;
     postMsg(createTransformMessage('transform'));
   }
 
   function scheduleTransformPreviewPost() {
-    showLivePreview();
-    scheduleLivePreviewRender();
+    if (transformPreviewTimer) return;
+    transformPreviewTimer = setTimeout(function() {
+      transformPreviewTimer = null;
+      postMsg(createTransformMessage('transformPreview'));
+    }, 50);
   }
 
   function scheduleTransformPost(delayMs) {
