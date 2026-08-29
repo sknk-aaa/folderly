@@ -12,6 +12,7 @@ internal static class StartupTrace
         "logs",
         "startup-timing.log");
 
+    [Conditional("DEBUG")]
     public static void Log(string message)
     {
         try
