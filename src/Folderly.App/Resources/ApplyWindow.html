@@ -1060,6 +1060,7 @@
     liveSourceUrl: null,
     liveSourceWidth: 0,
     liveSourceHeight: 0,
+    previewBitmapSize: 0,
     livePreviewActive: false,
     waitingForExactPreview: false,
     livePreviewSize: 0,
@@ -1206,28 +1207,65 @@
       appState.livePreviewSize = size;
     }
 
-    var regionWidth = size * 0.922;
-    var regionHeight = size * 0.648;
-    var scaleBase;
+    var bitmapSize = Math.max(1, appState.previewBitmapSize || 640);
+    var regionX = Math.round(bitmapSize * 0.039);
+    var regionY = Math.round(bitmapSize * 0.32);
+    var regionWidthPx = Math.max(1, Math.round(bitmapSize * 0.922));
+    var regionHeightPx = Math.max(1, Math.round(bitmapSize * 0.648));
+    var regionWidth = regionWidthPx / bitmapSize * size;
+    var regionHeight = regionHeightPx / bitmapSize * size;
+
+    region.style.left = (regionX / bitmapSize * size).toFixed(2) + 'px';
+    region.style.top = (regionY / bitmapSize * size).toFixed(2) + 'px';
+    region.style.width = regionWidth.toFixed(2) + 'px';
+    region.style.height = regionHeight.toFixed(2) + 'px';
+    region.style.borderRadius = (size * 0.031).toFixed(2) + 'px';
+
+    var scaleBasePx;
     if (appState.cropMode === 'FitWidth') {
-      scaleBase = regionWidth / appState.liveSourceWidth;
+      scaleBasePx = regionWidthPx / appState.liveSourceWidth;
     } else if (appState.cropMode === 'FitHeight') {
-      scaleBase = regionHeight / appState.liveSourceHeight;
+      scaleBasePx = regionHeightPx / appState.liveSourceHeight;
     } else {
-      scaleBase = Math.max(
-        regionWidth / appState.liveSourceWidth,
-        regionHeight / appState.liveSourceHeight
+      scaleBasePx = Math.max(
+        regionWidthPx / appState.liveSourceWidth,
+        regionHeightPx / appState.liveSourceHeight
       );
     }
 
-    var effectiveScale = scaleBase * appState.scale;
-    var imageWidth = appState.liveSourceWidth * effectiveScale;
-    var imageHeight = appState.liveSourceHeight * effectiveScale;
-    var unitScale = size / 256;
-    var left = (regionWidth - imageWidth) / 2 + appState.offsetX * unitScale;
-    var top = (regionHeight - imageHeight) / 2 + appState.offsetY * unitScale;
+    var effectiveScalePx = Math.max(scaleBasePx * appState.scale, 0.001);
+    var imageWidthPx = Math.max(1, Math.round(appState.liveSourceWidth * effectiveScalePx));
+    var imageHeightPx = Math.max(1, Math.round(appState.liveSourceHeight * effectiveScalePx));
+    var offsetXPx = appState.offsetX * bitmapSize / 256;
+    var offsetYPx = appState.offsetY * bitmapSize / 256;
+    var pasteX;
+    var pasteY;
 
-    source.style.transform = 'translate3d(' + left.toFixed(2) + 'px,' + top.toFixed(2) + 'px,0) scale(' + effectiveScale.toFixed(5) + ')';
+    if (appState.cropMode === 'Center') {
+      pasteX = roundToEven((regionWidthPx - imageWidthPx) / 2 + offsetXPx);
+      pasteY = roundToEven((regionHeightPx - imageHeightPx) / 2 + offsetYPx);
+    } else {
+      pasteX = Math.trunc((regionWidthPx - imageWidthPx) / 2) + Math.trunc(offsetXPx);
+      pasteY = Math.trunc((regionHeightPx - imageHeightPx) / 2) + Math.trunc(offsetYPx);
+    }
+
+    var bleed = size / bitmapSize;
+    var renderScaleX = (regionWidthPx + 2) / regionWidthPx;
+    var renderScaleY = (regionHeightPx + 2) / regionHeightPx;
+    var left = pasteX * renderScaleX * size / bitmapSize - bleed;
+    var top = pasteY * renderScaleY * size / bitmapSize - bleed;
+    var scaleX = imageWidthPx * renderScaleX * size / bitmapSize / appState.liveSourceWidth;
+    var scaleY = imageHeightPx * renderScaleY * size / bitmapSize / appState.liveSourceHeight;
+
+    source.style.transform = 'translate3d(' + left.toFixed(2) + 'px,' + top.toFixed(2) + 'px,0) scale(' + scaleX.toFixed(5) + ',' + scaleY.toFixed(5) + ')';
+  }
+
+  function roundToEven(value) {
+    var floor = Math.floor(value);
+    var diff = value - floor;
+    if (diff < 0.5) return floor;
+    if (diff > 0.5) return floor + 1;
+    return floor % 2 === 0 ? floor : floor + 1;
   }
 
   window.folderlySetSourceImage = function(dataUrl, width, height) {
@@ -1248,6 +1286,7 @@
     appState.liveSourceUrl = null;
     appState.liveSourceWidth = 0;
     appState.liveSourceHeight = 0;
+    appState.previewBitmapSize = 0;
     appState.waitingForExactPreview = false;
     appState.livePreviewSize = 0;
     hideLivePreview();
@@ -1270,6 +1309,7 @@
     var finishSwap = function() {
       if (token !== previewSwapToken) return;
       if (card) card.classList.remove('loading');
+      appState.previewBitmapSize = Math.max(img.naturalWidth || 0, img.naturalHeight || 0);
       appState.waitingForExactPreview = false;
       hideLivePreview();
       img.style.display = 'block';
