@@ -1256,21 +1256,36 @@
   };
 
   // Called from C# via ExecuteScriptAsync
+  var previewSwapToken = 0;
+
   window.folderlySetPreview = function(dataUrl, revision) {
     if (typeof revision === 'number' && revision < transformRevision) return;
 
     var img = document.getElementById('folderly-preview');
     var ph  = document.getElementById('preview-placeholder');
     var card = document.getElementById('preview-card');
-    if (card) card.classList.remove('loading');
+    if (!img) return;
+
+    var token = ++previewSwapToken;
+    var finishSwap = function() {
+      if (token !== previewSwapToken) return;
+      if (card) card.classList.remove('loading');
+      appState.waitingForExactPreview = false;
+      hideLivePreview();
+      img.style.display = 'block';
+      if (ph) ph.style.display = 'none';
+      if (card) card.classList.add('has-image');
+      appState.hasImage = true;
+      updateApplyButton();
+    };
+
+    img.onload = finishSwap;
+    img.onerror = function() {
+      if (token !== previewSwapToken) return;
+      if (card) card.classList.remove('loading');
+    };
     img.src = dataUrl;
-    appState.waitingForExactPreview = false;
-    hideLivePreview();
-    img.style.display = 'block';
-    if (ph) ph.style.display = 'none';
-    if (card) card.classList.add('has-image');
-    appState.hasImage = true;
-    updateApplyButton();
+    if (img.complete && img.naturalWidth > 0) finishSwap();
   };
 
   window.folderlyClearPreview = function() {
