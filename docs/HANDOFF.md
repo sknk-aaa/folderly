@@ -45,6 +45,7 @@
 - The user updated the English Store listing only to include the desktop angle:
   - Short description: `Make desktop and File Explorer folders instantly recognizable with your own images.`
   - Long description opening: `Turn plain Windows folders into visual shortcuts for your desktop and File Explorer.`
+  - Full long description now emphasizes custom photos/images/color tags, desktop and File Explorer organization, preview adjustment, local-only operation, no subscription, no ads, and local image storage.
   - Keyword change: `folder icon changer` -> `desktop folder icons`
 - Japanese and other localized Store listings have not yet been updated for the desktop angle.
 
