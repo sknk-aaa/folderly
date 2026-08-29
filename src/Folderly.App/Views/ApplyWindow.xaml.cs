@@ -459,6 +459,9 @@ public partial class ApplyWindow : Window
         if (exact && NormalizeViewModelAdjustParams())
             await SendTransformStateAsync(transformRevision);
 
+        if (exact)
+            await ExecuteScriptSafeAsync("window.folderlySetPreviewLoading && window.folderlySetPreviewLoading(true)");
+
         var pngBytes = await RenderPreviewPngAsync(exact);
         if (renderVersion != _previewRenderVersion && _previewRenderPending) return;
 

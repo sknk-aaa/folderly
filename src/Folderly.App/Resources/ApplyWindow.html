@@ -117,6 +117,24 @@
   .preview-card:not(.has-image){cursor:pointer}
   .preview-card.has-image{cursor:grab}
   .preview-card.has-image.dragging{cursor:grabbing}
+  .preview-card.loading::after{
+    content:"";
+    position:absolute;
+    width:28px;
+    height:28px;
+    border:3px solid rgba(0,0,0,0.12);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:folderly-spin 0.8s linear infinite;
+    z-index:5;
+    pointer-events:none;
+  }
+  .preview-card.loading #folderly-preview,
+  .preview-card.loading .pp-frame{opacity:0.58}
+  @keyframes folderly-spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){
+    .preview-card.loading::after{animation:none}
+  }
 
   /* Preview image */
   #folderly-preview{
@@ -1245,6 +1263,7 @@
     var img = document.getElementById('folderly-preview');
     var ph  = document.getElementById('preview-placeholder');
     var card = document.getElementById('preview-card');
+    if (card) card.classList.remove('loading');
     img.src = dataUrl;
     appState.waitingForExactPreview = false;
     hideLivePreview();
@@ -1265,9 +1284,15 @@
     }
     window.folderlyClearSourceImage();
     if (ph) ph.style.display = 'flex';
-    if (card) card.classList.remove('has-image');
+    if (card) card.classList.remove('has-image', 'loading');
     appState.hasImage = false;
     updateApplyButton();
+  };
+
+  window.folderlySetPreviewLoading = function(loading) {
+    var card = document.getElementById('preview-card');
+    if (!card) return;
+    card.classList.toggle('loading', !!loading);
   };
 
   window.folderlySetState = function(json) {
