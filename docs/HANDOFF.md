@@ -166,6 +166,29 @@
   - United States is the largest visible install market, supporting the decision to prioritize English ASO and acquisition.
   - The visible geography page does not show China or Brazil; use the next geography pages or CSV export before drawing firm conclusions about zh-CN/pt-BR performance.
 
+### 2026-08-30 Market Page View Notes
+
+- User-provided screenshots showed market-filtered page views:
+  - Mexico + China + Brazil combined: `61` page views over the past 3 months.
+  - Japan only: `302` page views over the past 3 months.
+- User noted that Mexico/China/Brazil have had about 3 days since localization and still show `0` downloads.
+- Visible pattern:
+  - Mexico/China/Brazil were mostly near zero before the late-August localization/screenshot work, then began showing several page views per day near the end of August.
+  - Japan had a steadier baseline across June-August and also rose in late August.
+- Statistical caution:
+  - With only `61` page views, `0` downloads is not enough to prove that those markets have structurally bad conversion.
+  - If the true conversion rate were the overall visible `2.87%`, the expected downloads from `61` page views would be about `1.75`, and the probability of observing zero is still about `17%`.
+  - If Japan's rough `10 installs / 302 page views` rate were used, expected downloads from `61` page views would be about `2.02`, and the probability of observing zero is still about `13%`.
+  - Rule-of-three upper bound for `0/61` means the underlying conversion could still be up to roughly `4.9%` at a rough 95% upper-bound level.
+- Interpretation:
+  - The three localized markets are not proven failures yet; the sample is too small.
+  - However, their low page-view base supports the idea that localized ASO/search exposure is still immature.
+  - The global CVR drop versus earlier months should not be read as proof that the older higher-price/weaker-screenshot listing converted better. Earlier months had much lower page-view volume, so one install could create a high day-level CVR.
+  - The late-August PV growth likely widened exposure to lower-intent users, which can increase total page views while diluting overall CVR.
+- Next measurement need:
+  - Export or screenshot market-level funnel data for US, JP, MX, CN, and BR separately: page views, install attempts, successful installs, user-initiated aborts, and conversion.
+  - Separate page type/source if possible: Product Display Page, Mini-PDP, Store installer, Store app/search, Store web, external URL, custom campaign.
+
 ## 2026-08-27 Update - 2.2 Store Submitted
 
 - User submitted version `2.2.0.0` to Microsoft Store.
