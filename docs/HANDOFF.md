@@ -106,6 +106,20 @@
 - Recommendation recorded: prefer `$2.49 -> $1.49` for the current stage because the goal is English acquisition/review/ranking growth and a lower post-sale regular price should reduce purchase friction. `$3.49 -> $1.49` has a stronger discount display but is less attractive after the sale and should wait until Folderly has stronger English proof, reviews, and ranking.
 - Measurement caveat: changing price during the ASO Test 1 measurement window can confound attribution. If price is changed anyway, record the exact live date/time and compare Partner Center page views, acquisition, conversion, and ratings alongside Store search positions.
 
+### Free Promotion Discussion For Reviews
+
+- User clarified: the goal is not permanent free distribution; Folderly's purpose remains making money. Any free pricing should be a short, controlled experiment.
+- User also clarified that `$0.99` is not useful for this question because the biggest behavioral difference is free vs paid, not a small discount.
+- Review-focused free experiment logic:
+  - US short-term free can increase acquisition volume in the largest confirmed market and may help review count if users have a good first experience.
+  - Japan short-term free is also worth considering because Japan already has about `3` reviews; this may make it easier to test whether Microsoft Store's public review display threshold is global or market-specific.
+  - If Japan crosses public review visibility while US does not, that suggests market-specific behavior. If both markets start showing reviews after total review count rises, that suggests a global threshold or mixed logic. This is not definitive because Store caching/moderation can still delay display.
+- Guardrails:
+  - Do not ask for reviews in exchange for free access or imply a review is required.
+  - Record exact market, start/end date, price state, review count before/after, visible public rating state for JP/US, installs, first launches, and support/issues.
+  - Free pricing may confound ASO Test 1, so label it as a separate review-threshold/acquisition experiment if used.
+  - Check the app behavior after a free-market install: current review prompt appears only when `AppServices.License.IsActive && !AppServices.License.IsTrial`, so verify whether a free acquisition is treated as non-trial and still triggers the review prompt after successful apply.
+
 ## 2026-08-30 Store Analytics Snapshot
 
 - Source image: local `a.png`, Microsoft Partner Center -> Analytics -> Acquisitions, date range shown as past 3 months.
@@ -161,7 +175,7 @@
     - known issue: preview can visually jump after releasing drag; not fixed without causing unacceptable performance cost
 - Working interpretation:
   - Strongest observed effect so far is the page-view jump after Store listing/screenshot work around 2026-08-23 to 2026-08-29.
-- Installs did not rise proportionally to page views in the visible charts; this makes product-page conversion, pricing/trial clarity, screenshots, review count, and search intent match the next measurement focus.
+  - Installs did not rise proportionally to page views in the visible charts; this makes product-page conversion, pricing/trial clarity, screenshots, review count, and search intent match the next measurement focus.
   - Install reliability does not look like the current bottleneck because install success rate is visible as `100%` and install errors show no data.
   - United States is the largest visible install market, supporting the decision to prioritize English ASO and acquisition.
   - The visible geography page does not show China or Brazil; use the next geography pages or CSV export before drawing firm conclusions about zh-CN/pt-BR performance.
