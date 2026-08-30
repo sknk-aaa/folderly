@@ -112,8 +112,7 @@
   - `フォルダー デザイン 変更`
   - `デスクトップ フォルダ アイコン`
   - `フォルダ画像変更`
-  - `デスクトップ フォルダ アイコン`
-- Note: `デスクトップ フォルダ アイコン` appears twice in the user's current Partner Center entry. Leave as-is for historical accuracy unless the user decides to replace one duplicate later.
+- Note: the current Japanese Partner Center entry has 6 keyword chips, not 7.
 - What's new:
   - `画像の移動・拡大縮小時のプレビュー動作を軽くしました。`
   - `プレビュー表示を実際のフォルダアイコンにより近づけました。`
