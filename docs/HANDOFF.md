@@ -106,6 +106,66 @@
 - Recommendation recorded: prefer `$2.49 -> $1.49` for the current stage because the goal is English acquisition/review/ranking growth and a lower post-sale regular price should reduce purchase friction. `$3.49 -> $1.49` has a stronger discount display but is less attractive after the sale and should wait until Folderly has stronger English proof, reviews, and ranking.
 - Measurement caveat: changing price during the ASO Test 1 measurement window can confound attribution. If price is changed anyway, record the exact live date/time and compare Partner Center page views, acquisition, conversion, and ratings alongside Store search positions.
 
+## 2026-08-30 Store Analytics Snapshot
+
+- Source image: local `a.png`, Microsoft Partner Center -> Analytics -> Acquisitions, date range shown as past 3 months.
+- Visible totals in the screenshot:
+  - Page views: about `2K` in the summary card; detailed/source charts show `1.71K`.
+  - Installs: `49` in the summary/detailed install chart.
+  - Acquisition graph total: `64`.
+  - Conversion: `2.87%` page-view-to-install.
+  - Install success rate: `100%`.
+  - Total revenue: `$62.36`.
+  - Acquisition channel chart:
+    - Page views: `1.71K`
+    - Install attempts: `65`
+    - Successful installs: `50`
+    - Initial launches from Microsoft Store: `30`
+  - User-initiated cancellations: `15`.
+  - Install errors: no data visible.
+  - Custom campaign performance: no campaign installs/page views/conversions visible for the listed campaigns.
+  - Visible install geography page:
+    - United States: `14` (`28%`)
+    - Japan: `10` (`20%`)
+    - Germany: `4` (`8%`)
+    - Mexico: `3` (`6%`)
+    - United Kingdom: `3` (`6%`)
+    - Canada: `3` (`6%`)
+    - France: `3` (`6%`)
+- Update timeline provided by the user:
+  - 2026-08-23 update:
+    - improved description and short description
+    - replaced Store screenshots from the second image onward; first screenshot stayed as the original casual one
+    - user observed page views increased about 4x for two days
+    - changed price from `$2.99` to `$2.49`
+  - 2026-08-25 update:
+    - Folderly 2.0
+    - improved preview quality, first-run guide, image reset, Help/Settings, purchase guidance, and review-request timing
+    - improved Fit Width/Fit Height image positioning behavior
+    - improved guidance for folders where Windows may not immediately show icon changes
+  - 2026-08-26 update:
+    - added 3 localized Store listings
+    - localized Store screenshots were still English
+  - 2026-08-27 update:
+    - replaced Store screenshots for the 3 localized listings
+    - made preview real-time and lightweight
+    - improved tag icons and added more choices
+    - enabled 40% discount in the 3 localized markets
+  - 2026-08-29 update:
+    - English Store listing only
+    - improved Store screenshots
+    - added desktop-related copy
+    - made first startup lighter
+    - added first-preview loading indicator
+    - blocked preview clicks before preview is displayed
+    - known issue: preview can visually jump after releasing drag; not fixed without causing unacceptable performance cost
+- Working interpretation:
+  - Strongest observed effect so far is the page-view jump after Store listing/screenshot work around 2026-08-23 to 2026-08-29.
+  - Installs did not rise proportionally to page views in the visible charts; this makes product-page conversion, pricing/trial clarity, screenshots, reviews, and search intent match the next measurement focus.
+  - Install reliability does not look like the current bottleneck because install success rate is visible as `100%` and install errors show no data.
+  - United States is the largest visible install market, supporting the decision to prioritize English ASO and acquisition.
+  - The visible geography page does not show China or Brazil; use the next geography pages or CSV export before drawing firm conclusions about zh-CN/pt-BR performance.
+
 ## 2026-08-27 Update - 2.2 Store Submitted
 
 - User submitted version `2.2.0.0` to Microsoft Store.
