@@ -7,7 +7,7 @@
         MinHeight="400" MinWidth="600"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource SurfaceBrush}"
-        FontFamily="Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo">
+        FontFamily="{DynamicResource FolderlyUIFontFamily}">
 
     <Window.Resources>
         <Style x:Key="LanguageComboBoxItem" TargetType="ComboBoxItem">

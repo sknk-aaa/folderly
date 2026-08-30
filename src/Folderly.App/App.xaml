@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <FontFamily x:Key="FolderlyUIFontFamily">Segoe UI Variable, Segoe UI, Yu Gothic UI, Microsoft YaHei UI, Meiryo</FontFamily>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Brand.xaml"/>
             </ResourceDictionary.MergedDictionaries>

@@ -31,6 +31,7 @@ public partial class MainWindow : Window
         Loaded += OnLoaded;
         AppServices.Localize.PropertyChanged += (_, _) =>
         {
+            AppServices.RefreshUiFontResources();
             _vm.Notify(nameof(_vm.L));
             _settingsVm.Notify(nameof(_settingsVm.L));
             _settingsVm.Notify(nameof(_settingsVm.LanguageOptions));

@@ -3,22 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ctrl="clr-namespace:Folderly.App.Views.Controls"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        Title="Folderly — フォルダのカスタム"
+        Title="Folderly"
         Width="960" Height="780"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        AllowsTransparency="False">
+        AllowsTransparency="False"
+        FontFamily="{DynamicResource FolderlyUIFontFamily}">
 
     <Grid>
-        <!-- オフスクリーン FolderPreview: base64 レンダリング専用, ユーザーには見えない -->
         <Canvas Width="0" Height="0" ClipToBounds="False"
                 Panel.ZIndex="-999" IsHitTestVisible="False">
             <ctrl:FolderPreview x:Name="OffscreenPreview"
                                 Canvas.Left="-9999" Canvas.Top="-9999"/>
         </Canvas>
 
-        <!-- WebView2: ウィンドウ全体を占有 -->
         <wv2:WebView2 x:Name="WebView"
                       DefaultBackgroundColor="Transparent"/>
     </Grid>

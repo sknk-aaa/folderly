@@ -435,9 +435,10 @@ Note: China `¥15` is CNY, not JPY.
   - Spanish: `https://tally.so/r/1AoroW`
   - Portuguese Brazil: `https://tally.so/r/yP5l54`
   - Simplified Chinese: `https://tally.so/r/LZLdL1`
-- Added/kept font fallback for non-English UI:
-  - WPF/App: `Segoe UI Variable`, `Microsoft YaHei UI`, `Yu Gothic UI`, `Meiryo`.
-  - Apply WebView UI uses the same fallback family.
+- UI fonts are now language-specific instead of using one CJK fallback order:
+  - Japanese: `Yu Gothic UI`, `Meiryo`, then Segoe fallbacks.
+  - Simplified Chinese: `Microsoft YaHei UI`, then Segoe/Japanese fallbacks.
+  - WPF, code-built dialogs, Apply WebView HTML, offscreen preview tag text, and final icon tag text follow the current language/culture.
 
 ### Validation Done
 
@@ -475,7 +476,8 @@ Note: China `¥15` is CNY, not JPY.
   - review prompt
   - warning/error text
   - support/contact link opens the correct Tally form
-- For Chinese specifically, visually check whether `Microsoft YaHei UI` fallback looks acceptable on this PC.
+- For Japanese, visually check that shared Han characters are no longer rendered with Chinese-style glyphs.
+- For Simplified Chinese, visually check that the UI still uses Chinese-style glyphs via `Microsoft YaHei UI`.
 - Check that Help -> Contact opens:
   - `es`: `https://tally.so/r/1AoroW`
   - `pt-BR`: `https://tally.so/r/yP5l54`

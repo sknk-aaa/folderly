@@ -179,13 +179,28 @@ public static class TemplateRenderer
 
     private static Font CreateFont(float size)
     {
-        foreach (var family in new[] { "Yu Gothic UI", "Meiryo", "Segoe UI" })
+        foreach (var family in GetPreferredFontFamilies())
         {
             if (SystemFonts.TryGet(family, out var fontFamily))
                 return fontFamily.CreateFont(size, FontStyle.Bold);
         }
 
         return SystemFonts.Collection.Families.First().CreateFont(size, FontStyle.Bold);
+    }
+
+    private static string[] GetPreferredFontFamilies()
+    {
+        var cultureName = CultureInfo.CurrentUICulture.Name;
+        if (cultureName.Equals("ja", StringComparison.OrdinalIgnoreCase)
+            || cultureName.StartsWith("ja-", StringComparison.OrdinalIgnoreCase))
+            return ["Yu Gothic UI", "Meiryo", "Segoe UI", "Microsoft YaHei UI"];
+
+        if (cultureName.Equals("zh-Hans", StringComparison.OrdinalIgnoreCase)
+            || cultureName.Equals("zh-CN", StringComparison.OrdinalIgnoreCase)
+            || cultureName.Equals("zh-SG", StringComparison.OrdinalIgnoreCase))
+            return ["Microsoft YaHei UI", "Segoe UI", "Yu Gothic UI", "Meiryo"];
+
+        return ["Segoe UI", "Yu Gothic UI", "Meiryo", "Microsoft YaHei UI"];
     }
 
     private static FontRectangle Measure(string text, Font font)

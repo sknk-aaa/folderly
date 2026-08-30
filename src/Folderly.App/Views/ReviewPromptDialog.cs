@@ -25,7 +25,7 @@ public sealed class ReviewPromptDialog : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         ShowInTaskbar = false;
         Background = Brushes.Transparent;
-        FontFamily = new FontFamily("Segoe UI Variable, Microsoft YaHei UI, Yu Gothic UI, Meiryo");
+        FontFamily = AppServices.Localize.WpfFontFamily;
 
         var root = new Border
         {

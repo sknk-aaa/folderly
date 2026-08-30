@@ -5,11 +5,13 @@ using Folderly.Shell;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
+using System.Windows;
 
 namespace Folderly.App.Infrastructure;
 
 public static class AppServices
 {
+    public const string UiFontFamilyResourceKey = "FolderlyUIFontFamily";
     private static readonly object WebView2EnvLock = new();
     private static Task<CoreWebView2Environment>? _webView2EnvTask;
 
@@ -51,10 +53,19 @@ public static class AppServices
 
         var savedLang = History.GetSetting("language") ?? "system";
         Localize.SetLanguage(savedLang);
+        RefreshUiFontResources();
         StartupTrace.Log($"AppServices.Initialize completed language={Localize.CurrentLang} elapsed={StartupTrace.Elapsed(sw)}");
     }
 
     public static ILogger<T> Logger<T>() => LogFactory.CreateLogger<T>();
+
+    public static void RefreshUiFontResources()
+    {
+        if (Application.Current is null)
+            return;
+
+        Application.Current.Resources[UiFontFamilyResourceKey] = Localize.WpfFontFamily;
+    }
 
     public static Task<CoreWebView2Environment> GetWebView2EnvironmentAsync()
     {

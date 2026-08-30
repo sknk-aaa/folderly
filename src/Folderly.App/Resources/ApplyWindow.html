@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja">
+<html lang="__FOLDERLY_HTML_LANG__">
 <head>
 <meta charset="utf-8"/>
 <title>Folderly</title>
@@ -28,7 +28,7 @@
     --tag-blue-2: #4A86E8;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);font-family:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","Yu Gothic UI","Meiryo","Hiragino Kaku Gothic ProN",system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;width:100%;height:100%;overflow:hidden}
+  html,body{margin:0;padding:0;background:var(--bg);font-family:__FOLDERLY_UI_FONT_STACK__;color:var(--ink);-webkit-font-smoothing:antialiased;width:100%;height:100%;overflow:hidden}
 
   /* ===== App window ===== */
   .window{
@@ -88,7 +88,7 @@
   }
   .header-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
   .header-label{font-size:12px;color:var(--ink-3);letter-spacing:0.02em}
-  .header-path{font-size:13.5px;color:var(--ink);font-family:"Cascadia Mono","Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","Yu Gothic UI","Meiryo",monospace,system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:600px}
+  .header-path{font-size:13.5px;color:var(--ink);font-family:__FOLDERLY_MONO_FONT_STACK__;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:600px}
 
   /* Body grid */
   .body{

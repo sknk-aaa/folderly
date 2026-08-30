@@ -130,6 +130,11 @@ public partial class ApplyWindow : Window
         string DefaultTagName(string key) =>
             Html(L[key].Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?.Trim() ?? L[key]);
 
+        html = html
+            .Replace("__FOLDERLY_HTML_LANG__", Html(L.HtmlLang), StringComparison.Ordinal)
+            .Replace("__FOLDERLY_UI_FONT_STACK__", L.CssFontFamily, StringComparison.Ordinal)
+            .Replace("__FOLDERLY_MONO_FONT_STACK__", L.CssMonospaceFontFamily, StringComparison.Ordinal);
+
         var replacements = new (string From, string To)[]
         {
             ("対象フォルダ", T("TargetFolder")),

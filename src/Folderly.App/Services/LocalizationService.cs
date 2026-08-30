@@ -2,20 +2,10 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Resources;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace Folderly.App.Services;
 
-/// <summary>
-/// 多言語対応サービス。再起動不要で即時切替可能（SPEC F-15）。
-///
-/// XAML バインディング例:
-///   Text="{Binding L[Apply], Source={x:Static svc:LocalizationService.Instance}}"
-/// または ViewModel に public LocalizationService L => LocalizationService.Instance; を追加して
-///   Text="{Binding L[Apply]}"
-///
-/// SetLanguage() を呼ぶと PropertyChanged("Item[]") が発火し、
-/// WPF がインデクサバインディングを再評価する。
-/// </summary>
 public sealed class LocalizationService : INotifyPropertyChanged
 {
     public static readonly LocalizationService Instance = new();
@@ -35,7 +25,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
         new("ja", "ja", "LanguageJapanese", "Folderly でカスタマイズ"),
     ];
 
-    private static readonly ResourceManager _rm =
+    private static readonly ResourceManager ResourceManager =
         new("Folderly.App.Resources.Strings", typeof(LocalizationService).Assembly);
 
     private CultureInfo _culture = CultureInfo.GetCultureInfo("en");
@@ -43,23 +33,22 @@ public sealed class LocalizationService : INotifyPropertyChanged
 
     private LocalizationService() { }
 
-    /// <summary>キーに対応するローカライズ文字列を返す。未定義キーはキー名をそのまま返す。</summary>
-    public string this[string key] => _rm.GetString(key, _culture) ?? key;
+    public string this[string key] => ResourceManager.GetString(key, _culture) ?? key;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>
-    /// 言語を切り替える。"system" または SupportedLanguages の Code を受け付ける。
-    /// 切り替え後、全インデクサバインディングが WPF により再評価される。
-    /// </summary>
     public void SetLanguage(string lang)
     {
         var definition = ResolveLanguage(NormalizeLanguageSetting(lang), CultureInfo.CurrentUICulture);
         _culture = CultureInfo.GetCultureInfo(definition.CultureName);
         _currentLang = definition.Code;
 
-        // Binding.IndexerName = "Item[]" → WPF がインデクサバインディング全体を再評価する
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Binding.IndexerName));
+        CultureInfo.CurrentCulture = _culture;
+        CultureInfo.CurrentUICulture = _culture;
+        CultureInfo.DefaultThreadCurrentCulture = _culture;
+        CultureInfo.DefaultThreadCurrentUICulture = _culture;
+
+        NotifyAll();
     }
 
     public static string NormalizeLanguageSetting(string? lang)
@@ -73,6 +62,17 @@ public sealed class LocalizationService : INotifyPropertyChanged
 
     public static string GetContextMenuTitle(string? savedLang, CultureInfo currentUiCulture)
         => ResolveLanguage(NormalizeLanguageSetting(savedLang), currentUiCulture).ContextMenuTitle;
+
+    private void NotifyAll()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Binding.IndexerName));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentLang)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HtmlLang)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WpfFontFamilyName)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WpfFontFamily)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CssFontFamily)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CssMonospaceFontFamily)));
+    }
 
     private static LanguageDefinition ResolveLanguage(string normalizedLang, CultureInfo currentUiCulture)
     {
@@ -114,6 +114,30 @@ public sealed class LocalizationService : INotifyPropertyChanged
     private static LanguageDefinition English
         => SupportedLanguages.First(l => l.Code == "en");
 
-    /// <summary>現在有効な言語コードを返す（例: "en" / "ja" / "es"）。</summary>
     public string CurrentLang => _currentLang;
+
+    public string HtmlLang => _culture.Name;
+
+    public string WpfFontFamilyName => _currentLang switch
+    {
+        "ja" => "Yu Gothic UI, Meiryo, Segoe UI Variable, Segoe UI, Microsoft YaHei UI",
+        "zh-Hans" => "Microsoft YaHei UI, Segoe UI Variable, Segoe UI, Yu Gothic UI, Meiryo",
+        _ => "Segoe UI Variable, Segoe UI, Yu Gothic UI, Meiryo, Microsoft YaHei UI",
+    };
+
+    public FontFamily WpfFontFamily => new(WpfFontFamilyName);
+
+    public string CssFontFamily => _currentLang switch
+    {
+        "ja" => "\"Yu Gothic UI\",\"Meiryo\",\"Segoe UI Variable Text\",\"Segoe UI\",\"Microsoft YaHei UI\",system-ui,sans-serif",
+        "zh-Hans" => "\"Microsoft YaHei UI\",\"Segoe UI Variable Text\",\"Segoe UI\",\"Yu Gothic UI\",\"Meiryo\",system-ui,sans-serif",
+        _ => "\"Segoe UI Variable Text\",\"Segoe UI\",\"Yu Gothic UI\",\"Meiryo\",\"Microsoft YaHei UI\",system-ui,sans-serif",
+    };
+
+    public string CssMonospaceFontFamily => _currentLang switch
+    {
+        "ja" => "\"Cascadia Mono\",\"Yu Gothic UI\",\"Meiryo\",\"Segoe UI Variable Text\",\"Segoe UI\",monospace,system-ui,sans-serif",
+        "zh-Hans" => "\"Cascadia Mono\",\"Microsoft YaHei UI\",\"Segoe UI Variable Text\",\"Segoe UI\",monospace,system-ui,sans-serif",
+        _ => "\"Cascadia Mono\",\"Segoe UI Variable Text\",\"Segoe UI\",\"Yu Gothic UI\",\"Meiryo\",monospace,system-ui,sans-serif",
+    };
 }
