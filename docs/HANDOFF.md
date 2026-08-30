@@ -171,10 +171,17 @@
 - User-provided screenshots showed market-filtered page views:
   - Mexico + China + Brazil combined: `61` page views over the past 3 months.
   - Japan only: `302` page views over the past 3 months.
+  - United States only:
+    - Page views: `309`
+    - Installs: `14`
+    - Conversion: `4.53%`
+    - Install success rate: `100%`
 - User noted that Mexico/China/Brazil have had about 3 days since localization and still show `0` downloads.
+- User noted that Germany/Italy/France and similar countries are probably long-tail markets, around `50` page views each.
 - Visible pattern:
   - Mexico/China/Brazil were mostly near zero before the late-August localization/screenshot work, then began showing several page views per day near the end of August.
   - Japan had a steadier baseline across June-August and also rose in late August.
+  - United States had `309` page views and `14` installs, making it the strongest confirmed market by both installs and conversion in the screenshots.
 - Statistical caution:
   - With only `61` page views, `0` downloads is not enough to prove that those markets have structurally bad conversion.
   - If the true conversion rate were the overall visible `2.87%`, the expected downloads from `61` page views would be about `1.75`, and the probability of observing zero is still about `17%`.
@@ -183,6 +190,8 @@
 - Interpretation:
   - The three localized markets are not proven failures yet; the sample is too small.
   - However, their low page-view base supports the idea that localized ASO/search exposure is still immature.
+  - US conversion does not look weak in the current screenshot; `4.53%` is above the global visible `2.87%`.
+  - The overall CVR problem is likely caused by market/source mix rather than the US product page alone.
   - The global CVR drop versus earlier months should not be read as proof that the older higher-price/weaker-screenshot listing converted better. Earlier months had much lower page-view volume, so one install could create a high day-level CVR.
   - The late-August PV growth likely widened exposure to lower-intent users, which can increase total page views while diluting overall CVR.
 - Next measurement need:
