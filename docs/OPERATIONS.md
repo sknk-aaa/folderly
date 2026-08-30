@@ -388,7 +388,7 @@ Folderly only operates on folders explicitly selected by the user. It does not r
 
 ### Japanese
 
-> Latest Partner Center draft: 2026-08-30. Japan-only limited free pricing was set by the user, with paid pricing scheduled to resume on 2026-09-30.
+> Latest Partner Center draft: 2026-08-30. The user set Japan-market base price to `0`, with paid pricing scheduled to resume on 2026-09-30. The free-period copy below is still under discussion and is not confirmed final.
 
 **App Name**: Folderly - フォルダアイコン変更ツール
 
@@ -400,7 +400,7 @@ Folderly only operates on folders explicitly selected by the user. It does not r
 
 **Long Description**:
 
-【日本限定・期間限定無料】
+【9/30まで期間限定無料】
 2026年9月30日から通常価格に戻ります。
 
 デスクトップやエクスプローラーのフォルダを好きな画像で見分けやすくできます。
@@ -414,7 +414,7 @@ Folderlyは、Windowsのフォルダアイコンを変更できるアプリで�
 - 色タグやタグ名でフォルダを分類（仕事・学習・写真・制作など）
 
 期間限定無料について:
-日本のユーザーの方にまず試していただきたく、現在は期間限定で無料公開しています。気になっていた方は、この機会にぜひお試しください。
+より多くの方にFolderlyを試していただき、今後の改善につなげるため、現在は期間限定で無料公開しています。気になっていた方は、この機会にぜひお試しください。
 
 - サブスクなし・広告なし・PC内だけで完結
 
