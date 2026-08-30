@@ -99,7 +99,7 @@
 
 - Corrected latest values are in [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
 - 2026-08-30 pricing update: Japan-only base price was changed to `0`, with paid pricing scheduled to resume on 2026-09-30. This is a temporary acquisition/review-threshold experiment, not a permanent free strategy.
-- Listing-copy status: not final. The user pushed back on making "do not say the purpose is downloads/reviews" a fixed rule. Re-evaluate the wording as copy, not policy: avoid internal-looking "Japan-only" phrasing, and avoid language that could look like reviews are expected in exchange for free access, while still considering an honest explanation if it feels stronger.
+- Listing-copy status: finalized by the user on 2026-08-30. The copy openly says the free period is to let more people try Folderly and support future improvements; it also asks for reviews/ratings only if the user likes it. Treat the exact current copy in [OPERATIONS.md](OPERATIONS.md) as the source of truth.
 
 - Source of truth: the current Partner Center Japanese screen and [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
 - Updated by the user on 2026-08-30 to make the Japanese Store copy closer to the English listing strategy.

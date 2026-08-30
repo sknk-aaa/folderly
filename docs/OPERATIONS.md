@@ -388,7 +388,7 @@ Folderly only operates on folders explicitly selected by the user. It does not r
 
 ### Japanese
 
-> Latest Partner Center draft: 2026-08-30. The user set Japan-market base price to `0`, with paid pricing scheduled to resume on 2026-09-30. The free-period copy below is still under discussion and is not confirmed final.
+> Latest Partner Center draft: 2026-08-30. The user set Japan-market base price to `0`, with paid pricing scheduled to resume on 2026-09-30.
 
 **App Name**: Folderly - フォルダアイコン変更ツール
 
@@ -401,25 +401,23 @@ Folderly only operates on folders explicitly selected by the user. It does not r
 **Long Description**:
 
 【9/30まで期間限定無料】
-2026年9月30日から通常価格に戻ります。
-
 デスクトップやエクスプローラーのフォルダを好きな画像で見分けやすくできます。
 
-Folderlyは、Windowsのフォルダアイコンを変更できるアプリです。写真、イラスト、スクリーンショットなどを選ぶだけで、よく使うフォルダを表紙のように見分けやすくできます。
+Folderlyは、Windowsのフォルダアイコンを変更できるアプリです。写真、イラスト、スクリーンショットなどを選ぶだけでフォルダの表紙のように表示できます。
 
 主な機能:
 - フォルダを右クリックして「Folderlyでカスタマイズ」
 - 好きな画像（PNG / JPG）を自分のフォルダから選択するだけ。
 - 拡大率・位置・表示モードをプレビューで調整
 - 色タグやタグ名でフォルダを分類（仕事・学習・写真・制作など）
-
-期間限定無料について:
-より多くの方にFolderlyを試していただき、今後の改善につなげるため、現在は期間限定で無料公開しています。気になっていた方は、この機会にぜひお試しください。
-
 - サブスクなし・広告なし・PC内だけで完結
 
-注意:
-アイコン更新時に Explorer ウィンドウを開き直す場合があります。これは Windows のアイコンキャッシュ更新のための仕様です。
+【期間限定無料について】
+より多くの方にFolderlyを試していただき今後の改善につなげるため、9/30まで無料公開しています。
+少しでも気になった方は、ぜひこの機会に使ってみてください。
+気に入っていただけたら、レビューや評価をいただけると今後の開発の励みになります。
+
+※アイコン更新時に Explorer ウィンドウを開き直す場合があります。これは Windows のアイコンキャッシュ更新のための仕様です。
 
 **Keywords**（検索用語・6枠）: `フォルダ アイコン 変更` / `フォルダ アイコン カスタマイズ` / `アイコン 変更 ツール` / `フォルダー デザイン 変更` / `デスクトップ フォルダ アイコン` / `フォルダ画像変更`
 
