@@ -95,6 +95,31 @@
 - Recheck the same queries after the submission is live, then again after 24 hours, 72 hours, and 7 days if possible. Store rankings can vary by market, account state, and time, so compare against the same endpoint/market/locale when possible.
 - Important reasoning rule for future ASO work: separate Microsoft-documented facts, Store search observations, and hypotheses. Do not present keyword or price guesses as certain ranking causes.
 
+### Current Japanese Store Listing
+
+- Source of truth: the current Partner Center Japanese screen and [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
+- Updated by the user on 2026-08-30 to make the Japanese Store copy closer to the English listing strategy.
+- Product name: `Folderly - フォルダアイコン変更ツール`
+- Short title: `Folderly`
+- Short description: `Windowsのフォルダアイコンを好きな写真や画像に変更。デスクトップやエクスプローラーで、目的のフォルダをすぐ見分けられます。`
+- Description opening:
+  - `デスクトップやエクスプローラーのフォルダを好きな写真や画像で見分けやすくできます。`
+  - `Folderlyは、Windowsのフォルダアイコンをかんたんに変更できるアプリです。写真、イラスト、スクリーンショットなどを選ぶだけでフォルダの表紙のように表示できます。`
+- Keywords currently entered:
+  - `フォルダ アイコン 変更`
+  - `フォルダ アイコン カスタマイズ`
+  - `アイコン 変更 ツール`
+  - `フォルダー デザイン 変更`
+  - `デスクトップ フォルダ アイコン`
+  - `フォルダ画像変更`
+  - `デスクトップ フォルダ アイコン`
+- Note: `デスクトップ フォルダ アイコン` appears twice in the user's current Partner Center entry. Leave as-is for historical accuracy unless the user decides to replace one duplicate later.
+- What's new:
+  - `画像の移動・拡大縮小時のプレビュー動作を軽くしました。`
+  - `プレビュー表示を実際のフォルダアイコンにより近づけました。`
+  - `タグアイコンを調整し、選べるアイコンを増やしました。`
+  - `初回起動時の初期化を軽くしました。`
+
 ### End-of-Day ASO / Pricing Notes
 
 - User changed the English Partner Center listing to the ASO Test 1 values above.
