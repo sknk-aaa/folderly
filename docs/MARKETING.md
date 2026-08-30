@@ -86,10 +86,10 @@
 
 ### レビュー表示の注意
 
-- Partner Centerでは1件の評価/レビューが見えているが、公開Storeでは0件表示になることがある。
-- 想定原因は、公開反映の遅延、国/地域別表示、レビュー本文のモデレーション、評価とレビューの集計仕様、Store側キャッシュ。
-- Microsoftへサポートリクエスト送信済み。回答待ち。
-- 公開Storeでレビュー0件が続く場合、レビュー獲得導線をさらに強化する。初期はレビュー件数そのものがCVRにかなり効く。
+- Partner Centerで評価/レビューが見えていても、公開Storeでは低件数の間は表示されないことがある。
+- Microsoftは公開表示に必要な件数しきい値を開示していない。また、しきい値が全体集計か市場別かも不明。
+- 現在は全体で約6件。これは不具合ではなく、低件数時の正常挙動として扱う。
+- 公開表示をサポートケースで追うより、正当なレビュー獲得を継続する。初期はレビュー件数そのものが信頼・CVR・順位に効く可能性がある。
 
 マーケティングの正（チャネル方針・ASO・キーワード調査・競合・SEO/LP設計）。施策で得た知見はここに集約する。
 ストア掲載の確定コピー（製品名/短い説明/キーワード/説明）は重複を避け [docs/OPERATIONS.md](OPERATIONS.md) の「Store Listing Text」に置く。
@@ -118,6 +118,18 @@
   - 訴求軸：**「自分の画像が使える（既製アイコンと違う）／.ico変換不要・面倒な設定なし／買い切り・サブスク無」**。
 - 試用版：**1日**（7日だとずるずる使われるため短縮）。試用期限切れ後の起動ブロックは Microsoft Store の自動挙動に委ねる（runFullTrust パッケージでの自動ブロックは実機で要確認、効かなければ次版で `IsActive` 判定によるApply無効化＋購入プロンプトを追加）。
 
+### 2026-08-30 Store分析からの現在方針
+
+- 短期売上より長期の検索順位・取得数・レビュー蓄積を優先する。
+- 現在の最重要市場は英語/US。Partner Centerスクショでは過去3か月で US `309 PV / 14 installs / CVR 4.53% / install success 100%`。
+- JPは `302 PV`、地理データ上のJapan installsが `10` ならCVRは約 `3.31%`。JPは強いが、長期成長の主戦場はUS/英語へ寄せる。
+- Mexico + China + Brazil は合計 `61 PV / 0 downloads`。ローカライズ後約3日なので失敗判定は早いが、PV母数が小さくASO/検索露出の蓄積不足が強い。
+- Germany / Italy / France などは各50PV前後のロングテール候補。既に英語ページでも見られているため、次のローカライズ候補として観察する。
+- 全体CVR `2.87%` はUSページ単体の弱さではなく、市場/流入ソースのミックスで薄まっている可能性が高い。USはCVR改善より、まず高意図検索順位とPV増加が課題。
+- 英語ASO Test 1は最低7日程度いじらず、公開後に同じクエリで順位・US PV・US installs・US CVRを見る。
+- 画像変更は効果が大きい可能性があるため、次に触るならPartner CenterのProduct page experimentsで1枚目スクリーンショットをA/Bテストする。
+- 価格は頻繁に触らない。`$2.49 -> $1.49` と `$3.49 -> $1.49` の比較なら、現在フェーズでは取得数・レビュー・順位蓄積を優先して `$2.49 -> $1.49` を推奨。
+
 ### 2026-07-19 Store リローンチ判断
 
 - 1.3.0.0 は Store クラッシュ修正を最優先で提出。あわせて Store スクリーンショット、ASO テキスト、価格を更新して提出済み。
@@ -125,8 +137,8 @@
 - 画像以外の ASO 要素: 製品名、短いタイトル、短い説明、長い説明、Product features、検索語句、カテゴリ、言語別ローカライズ、価格/試用、評価・レビュー、最新情報、外部流入/キャンペーン計測。
 - 製品名は英 `Folderly - Folder Icon Changer` を維持。主検索語 `folder icon changer` を自然に含み、過剰なキーワード詰め込みにならないため。
 - 英語の短い説明と長い説明は、冒頭で `change Windows folder icons`、`own images`、`no .ico conversion`、`color tags` を明示する方針。機能名より先に「何の問題を解くか」を見せる。
-- 検索語句は最大7枠のため、素材探し・Mac意図・広すぎる語を避け、購入/導入意図に近い語へ寄せる。英: `change folder icon` / `folder icon changer` / `custom folder icon` / `folder color tag` / `folder image` / `folder organizer` / `desktop organization`。日: `フォルダ アイコン 変更` / `フォルダ アイコン 画像` / `Windows11 フォルダ アイコン` / `フォルダ 色分け` / `アイコン カスタマイズ` / `デスクトップ 整理` / `ico 変換`。
-- 価格は JP `¥480` / US `$2.99` に調整。恒久的な大幅値下げはしない。500円→300円級の値下げは販売数が約1.67倍以上にならないと売上増にならず、現在の流入量では根拠が足りないため。
+- 検索語句は最大7枠のため、素材探し・Mac意図・広すぎる語を避け、購入/導入意図に近い語へ寄せる。英語ASO Test 1: `folder icons` / `change folder icon` / `folder icon maker` / `windows folder icon` / `custom folder icon` / `desktop folder icons` / `photo folder icon`。日: `フォルダ アイコン 変更` / `フォルダ アイコン 画像` / `Windows11 フォルダ アイコン` / `フォルダ 色分け` / `アイコン カスタマイズ` / `デスクトップ 整理` / `ico 変換`。
+- 価格は長期の取得数・レビュー蓄積・順位改善を優先して判断する。現在フェーズでは高い通常価格で割引率を大きく見せるより、`$2.49 -> $1.49` のほうが購入摩擦を下げやすい。価格変更はASOテストの測定を混濁させるため、変更日時と市場別PV/CVRを必ず記録する。
 - 以後の判断指標はインストール数単体ではなく **売上/PV**。価格・画像・ASO更新後、2〜4週間または最低数百PVを見て、市場別・流入別・CVR別に判断する。
 
 ## キーワード調査（2026-05-31）
@@ -161,7 +173,7 @@
 
 ### サイズ感の結論
 - 実アドレス可能（Windows×アプリ意図）は**国別で数百〜数千/月のニッチ**。Mac・素材探しを除くと英語はさらに薄い。
-- **日本が相対的に最良**（フォルダ語が1000規模＋競合が薄い）。→ **日本語ページを主戦場、英語はおまけ**。
+- 初期調査では日本が相対的に強かったが、2026-08-30時点のStoreデータではUSが最大の確認済み市場で、CVRも `4.53%` と全体より高い。現在の主戦場は英語/US、JPは強い補助市場として扱う。
 - 拡散した how-to 需要は **チュートリアル記事**で束ねて送客するのが効率的。
 
 ## 競合
@@ -173,7 +185,7 @@
 | Folder Icon Changer PRO（MS Store / MakeTone） | ¥980 | 画像→アイコン D&D・**レビュー0** | UI/価格で優位、レビュー薄く割って入れる |
 | Folder Icon Change / Custom Folder Icon Changer / FolderIconStudio 等 | 無料〜 | 既製アイコン選択型も混在 | 「自分の画像が使える」で差別化 |
 
-- 市場は同名アプリが密集するが**レビュー定着が薄い**（PRO=0件）。**レビューを数件取るだけで信頼度上位に並べる**。
+- 市場は同名アプリが密集するが**レビュー定着が薄い**。ただしMicrosoft Storeは低件数レビューを公開表示しない場合があり、表示しきい値は非公開。**数件で即表示される前提は置かず、継続的にレビュー母数を増やす**。
 - Folderly差別化：**自分の画像／¥480買い切り／色タグ・タグ名／プレビュー調整／いつでも元に戻す**。
 - 英語側は "free / png / download / crack" 意図が濃い＝価格で勝てない層は捨て、「ラクして綺麗に」で勝つ。
 
@@ -217,7 +229,7 @@ SEO初期設定：title≤60字・description≈120字・H1単一・`hreflang`(e
 ### 実装済み（on-page / 技術）
 - title をキーワード先頭に（JP「フォルダアイコンを画像に変更 | Folderly（Windows 10/11）」／EN「Folder Icon Changer for Windows 10 & 11 | Folderly」）。
 - description（キーワード入り）・canonical・hreflang(ja/en/x-default)・OGP。
-- **`SoftwareApplication` 構造化データ**（OS・価格 JPY¥480/USD$2.99・DLリンク）。
+- **`SoftwareApplication` 構造化データ**（OS・価格・DLリンク）。価格はStore/LPの最新セール状態とズレないよう更新する。
 - **Core Web Vitals**：全画像を WebP 化＋最大1300px(ロゴ160px)にリサイズ（合計 ~11MB→~0.5MB、hero 937→57KB）。hero に `preload`＋`fetchpriority=high`、全 `<img>` に width/height（CLS防止）、ヒーロー以外は `loading=lazy`。
 - sitemap.xml / robots.txt、Google Search Console・Bing Webmaster Tools 登録・sitemap送信済み。
 
@@ -248,5 +260,5 @@ SERPが情報系なので、how-to/悩み解決記事で拡散需要を回収→
 - [~] **how-to 記事を `/blog/` に制作**（SEOの本命）。JP pillar「Windows 11でフォルダのアイコンを画像に変更する方法」公開済み（`/blog/windows-folder-icon-change/`・手順スクショ＋作例＋比較・CTAはLP一本）。残：JP★「変更できない時の対処法」・EN版。
 - [ ] 被リンク：Product Hunt / AlternativeTo・Softpedia / Reddit など（新規ドメインの権威づけ）
 - [ ] スクリーンショット/動画の作り込み（Before/Afterヒーロー＋短尺デモ）
-- [ ] レビュー獲得策（初期数件で競合に並ぶ）
+- [ ] レビュー獲得策（公開表示しきい値が非公開のため、初期数件で満足せず正当に積み上げる）
 - [ ] 公開後：Reddit / YouTube Shorts / note でコツコツ発信
