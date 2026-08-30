@@ -22,9 +22,7 @@ logs/
 *.log
 
 ## Generated packages
-_out/Folderly_*.msix
-_out/store_msix_stage_*/
-_out/verify_store_msix_manifest_*/
+_out/
 
 ## Local agent settings
 .claude/settings.local.json
