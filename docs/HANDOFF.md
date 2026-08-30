@@ -97,6 +97,10 @@
 
 ### Current Japanese Store Listing
 
+- Corrected latest values are in [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
+- 2026-08-30 pricing update: Japan-only base price was changed to `0`, with paid pricing scheduled to resume on 2026-09-30. This is a temporary acquisition/review-threshold experiment, not a permanent free strategy.
+- Listing-copy rule for this experiment: do not say the purpose is to increase downloads or reviews. Present it as a Japan-only limited free period for users to try Folderly, and keep review requests optional/natural inside the app.
+
 - Source of truth: the current Partner Center Japanese screen and [OPERATIONS.md](OPERATIONS.md) -> `Store Listing Text`.
 - Updated by the user on 2026-08-30 to make the Japanese Store copy closer to the English listing strategy.
 - Product name: `Folderly - フォルダアイコン変更ツール`
