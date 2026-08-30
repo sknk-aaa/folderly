@@ -9,6 +9,7 @@ namespace Folderly.App.Services;
 public sealed class LocalizationService : INotifyPropertyChanged
 {
     public static readonly LocalizationService Instance = new();
+    private static readonly CultureInfo SystemUiCulture = CultureInfo.CurrentUICulture;
 
     public sealed record LanguageDefinition(
         string Code,
@@ -39,7 +40,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
 
     public void SetLanguage(string lang)
     {
-        var definition = ResolveLanguage(NormalizeLanguageSetting(lang), CultureInfo.CurrentUICulture);
+        var definition = ResolveLanguage(NormalizeLanguageSetting(lang), SystemUiCulture);
         _culture = CultureInfo.GetCultureInfo(definition.CultureName);
         _currentLang = definition.Code;
 
