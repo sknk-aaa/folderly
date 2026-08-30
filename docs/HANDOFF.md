@@ -161,7 +161,7 @@
     - known issue: preview can visually jump after releasing drag; not fixed without causing unacceptable performance cost
 - Working interpretation:
   - Strongest observed effect so far is the page-view jump after Store listing/screenshot work around 2026-08-23 to 2026-08-29.
-  - Installs did not rise proportionally to page views in the visible charts; this makes product-page conversion, pricing/trial clarity, screenshots, reviews, and search intent match the next measurement focus.
+- Installs did not rise proportionally to page views in the visible charts; this makes product-page conversion, pricing/trial clarity, screenshots, review count, and search intent match the next measurement focus.
   - Install reliability does not look like the current bottleneck because install success rate is visible as `100%` and install errors show no data.
   - United States is the largest visible install market, supporting the decision to prioritize English ASO and acquisition.
   - The visible geography page does not show China or Brazil; use the next geography pages or CSV export before drawing firm conclusions about zh-CN/pt-BR performance.
@@ -192,6 +192,7 @@
   - However, their low page-view base supports the idea that localized ASO/search exposure is still immature.
   - US conversion does not look weak in the current screenshot; `4.53%` is above the global visible `2.87%`.
   - The overall CVR problem is likely caused by market/source mix rather than the US product page alone.
+  - Review display clarification from the user: public Store not showing reviews is considered normal/expected at the current low count, not an active bug. Microsoft cannot disclose the threshold for display, and it is unclear whether the threshold is global or market-specific. Current total review count is about `6`, so accumulating more reviews remains important for trust and possible ranking, but do not treat this as a Microsoft support escalation item unless new evidence appears.
   - The global CVR drop versus earlier months should not be read as proof that the older higher-price/weaker-screenshot listing converted better. Earlier months had much lower page-view volume, so one install could create a high day-level CVR.
   - The late-August PV growth likely widened exposure to lower-intent users, which can increase total page views while diluting overall CVR.
 - Next measurement need:
@@ -839,7 +840,7 @@ After each language launch, compare Partner Center market-level `PV -> Trial -> 
 1. Store listing reflects version `1.6.1.0`.
 2. Japanese Store page still displays Japanese listing content and support language properly.
 3. English Store page displays English listing content properly.
-4. Public rating/review count issue is still under Microsoft support investigation.
+4. Public rating/review display may remain hidden until Microsoft Store's undisclosed review-count threshold is met.
 5. Review replies are visible if Microsoft exposes them.
 6. In-app Help opens the Help tab, not an external page or dialog.
 7. Japanese language opens `https://tally.so/r/q48Bqk`.
@@ -847,19 +848,17 @@ After each language launch, compare Partner Center market-level `PV -> Trial -> 
 9. Tag edit dialog no longer shows a disabled Delete button.
 10. Primary button background is light enough to read comfortably.
 
-### Microsoft Support Status
+### Review Display Status
 
-- Support case:
-  - `2607300030003368`
-- Issue:
-  - Partner Center shows rating/review data, but public Microsoft Store shows `0` ratings/reviews.
-- Microsoft confirmed:
-  - They also see no review on the public Store page.
-  - The Japan-region review is not showing even in the Japan market.
-  - They escalated the issue to the US-side related team.
-- Suggested by Microsoft:
-  - Replying to the review may affect public display.
-  - Store-published replies cannot be edited later.
+- Previous support case: `2607300030003368`.
+- Current understanding from the user:
+  - The public Store review/rating display is normal at the current low review count, not a confirmed bug.
+  - Microsoft does not disclose how many reviews are required before public display appears.
+  - Microsoft also does not clarify whether the threshold is global or market-specific.
+  - Current total review count is about `6`.
+- Strategy implication:
+  - Do not spend more effort treating review display as a support-blocked issue unless new contradictory evidence appears.
+  - Keep improving legitimate review acquisition after successful paid use, because if the threshold is market-specific, visible reviews may take longer to appear in each market.
 
 ### Pricing / Growth State
 
@@ -877,9 +876,7 @@ After each language launch, compare Partner Center market-level `PV -> Trial -> 
 
 - Wait for Store certification result for `1.6.1.0`.
 - After approval, check live Store pages in Japanese and English.
-- Reply to Microsoft support if review visibility changes after review replies or Store update.
 - Watch acquisition/review metrics for the sale period through `2026-09-02`.
-- If ratings still do not show publicly, follow up with Microsoft using support case `2607300030003368`.
 - Continue external exposure work:
   - note article
   - Reddit post
