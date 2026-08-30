@@ -23,6 +23,14 @@ logs/
 
 ## Generated packages
 _out/
+out/
+stage/
+_staging/
+_verify_msix/
+src/Folderly.Package/AppPackages/
+
+## Local temporary work dirs
+.tmp-*/
 
 ## Local agent settings
 .claude/settings.local.json
